@@ -78,6 +78,9 @@ jQuery(document).ready(function ($) {
             var response = jQuery.parseJSON(data);
             console.log(response);
             $('#wcvim_spinner').remove();
+            if(response.success == true) {
+                window.location.reload();
+            }
         });
     });
     $(document).on('click', '[data-role="order-title"]', function(event) {
