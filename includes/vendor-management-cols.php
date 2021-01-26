@@ -12,11 +12,11 @@ class Vendor_Management_Columns {
 
     public function get_columns_receive_inventory() {
         return array(
-            '_sku' => __('<a href = "#">CC SKU</a>', 'wcvm'),
+            '_sku' => __('CC SKU', 'wcvm'),
             //'post_title' => __('Name', 'wcvm'),
             'product_cat' => __('Categories', 'wcvm'),
             'product_tag' => __('Tags', 'wcvm'),
-            'wcvm_primary' => __('<a href = "#">Vendor Name</a>', 'wcvm'),
+            'wcvm_primary' => __('Vendor Name', 'wcvm'),
             '__wcvm_vendor_code' => __('Vendor Code', 'wcvm'),
             '__wcvm_vendor_sku' => __('Vendor SKU', 'wcvm'),
             '__wcvm_vendor_price_last' => __('Vendor Price', 'wcvm'),
@@ -33,9 +33,9 @@ class Vendor_Management_Columns {
 
     public function get_columns_receive_back_order_items() {
         return array(
-            '_sku' => __('<a href = "#">CC SKU</a>', 'wcvm'),
-            'post_title' => __('<a href = "#">Name</a>', 'wcvm'),
-            'wcvm_primary' => __('<a href = "#">Vendor Name</a>', 'wcvm'),
+            '_sku' => __('CC SKU', 'wcvm'),
+            'post_title' => __('Name', 'wcvm'),
+            'wcvm_primary' => __('Vendor Name', 'wcvm'),
             '__wcvm_vendor_code' => __('Vendor Code', 'wcvm'),
             '__wcvm_vendor_sku' => __('Vendor SKU', 'wcvm'),
             'product_quantity' => __('Order QTY', 'wcvm'),
@@ -51,17 +51,17 @@ class Vendor_Management_Columns {
     public function get_columns_vendors_list() {
         $status = $_REQUEST['status'];
         $columns_array = [];
-        $columns_array['wcvm_rare'] = __('<a href = "#">Rare</a>', 'wcvm');
-        $columns_array['_sku'] = __('<a href = "#">CC SKU</a>', 'wcvm');
+        $columns_array['wcvm_rare'] = __('Rare', 'wcvm');
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
         $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
-        $columns_array['_price'] = __('<a href = "#">Our Price</a>', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
         $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
         $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
-        $columns_array['_stock'] = __('<a href = "#">QTY On Hand', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
         $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
-        $columns_array['wcvm_threshold_low'] = __('<a href = "#">Low Thresh</a>', 'wcvm');
-        $columns_array['wcvm_threshold_reorder'] = __('<a href = "#">Reorder Thresh</a>', 'wcvm');
-        $columns_array['wcvm_reorder_qty'] = __('<a href = "#">Reorder QTY</a>', 'wcvm');
+        $columns_array['wcvm_threshold_low'] = __('Low Thresh', 'wcvm');
+        $columns_array['wcvm_threshold_reorder'] = __('Reorder Thresh', 'wcvm');
+        $columns_array['wcvm_reorder_qty'] = __('Reorder QTY', 'wcvm');
         $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
         $columns_array['_wcvm_on_vendor_bo'] = __('On Vendor BO', 'wcvm');
         if ($status == "" || $status == 'draft' || $status == 'auto-draft') {

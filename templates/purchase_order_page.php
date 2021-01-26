@@ -21,6 +21,7 @@
 
     $status = $_REQUEST['status'];
     $show_status = $status ? $status : 'draft';
+    
     $status = $show_status;
     global $wpdb;
     $posts_table = $wpdb->prefix . "posts";
@@ -84,6 +85,22 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order'";
         $last_order_id = 0;
         $last_expected_date = '';
         foreach ($orders as $order) {
+            
+            $vendor_price = 0;
+            $vendor_sku = '';
+//            print_r($order);die;
+            $vendors = explode(',', $order->vendor_name);
+            $vendor_Prices = explode(',', $order->vendor_price);
+            $vendor_Skus = explode(',', $order->vendor_sku);
+            $i = 0;
+            while($i<=count($vendors)){
+
+                if($vendors[$i] == $order->primary_vendor_name){
+                    $vendor_price = $vendor_Prices[$i];
+                    $vendor_sku = $vendor_Skus[$i];
+                    break;
+                }$i++;
+            }
             ?>
                         <div style="clear: both;"></div>
                 
@@ -135,7 +152,7 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order'";
                     <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($order->primary_vendor_name)) ?><br>
                     <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->post_date))) ?>
                 </div>
-            </form>
+
             <div style="float: right;padding: 2px;">
                 <button type="button" class="button" data-id="<?= esc_attr($order->ID) ?>" data-role="order-title" data-label="<?php
                 if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
@@ -212,14 +229,14 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order'";
                         ?>                        
                         <!--<span style="background: orange;padding: 5px;">LOW</span>-->
                     </td>
-                    <td><?php echo '$' . $order->regular_price; ?></td>
-                    <td><?php echo trim($order->vendor_sku, ","); ?></td>
-                    <td><?php echo '$' . $vendor_price; ?></td>
+                    <td><?php echo $order->regular_price; ?></td>
+                    <td><?php echo $vendor_sku; ?></td>
+                    <td><?php echo $vendor_price; ?></td>
                     <td><?php echo $order->stock; ?></td>
                     <td>Days</td>
-                    <td><input type="text" value="<?php echo $order->threshold_low; ?>" style="width:60px;"></td>
-                    <td><input type="text" value="<?php echo $order->threshold_reorder; ?>" style="width:60px;"></td>
-                    <td><input type="text" value="<?php echo $order->reorder_qty; ?>" style="width:60px;"></td>
+                    <td><input readonly type="text" value="<?php echo $order->threshold_low; ?>" style="width:60px;"></td>
+                    <td><input readonly type="text" value="<?php echo $order->threshold_reorder; ?>" style="width:60px;"></td>
+                    <td><input readonly type="text" value="<?php echo $order->reorder_qty; ?>" style="width:60px;"></td>
                     <?php
                     global $wpdb;
                     $notFound = false;
@@ -238,7 +255,15 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order'";
                     ?>
 
                     <td>On Vendor Bo</td>
-                    <td><input type="text" value="<?php echo $order->reorder_qty; ?>" style="width:60px;"></td>
+                    <?php $order_Qty = get_post_meta($order->ID,"wcvmgo_".$order->product_id."_qty" );
+                    $order_product_Qty = $order_Qty[0];
+                    $inputType = '';
+
+                    if ($status == 'pending'){
+                        $inputType = 'readonly';
+                    }
+                    ?>
+                    <td><input <?php echo $inputType.' ';?>type="text" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
                     <td><input type="checkbox"></td>
 
                 </tr>
@@ -273,6 +298,7 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order'";
         <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
     </div>
     <?php // endif    ?>
+                            </form>
     <br><br>
     <br><br>
     <?php

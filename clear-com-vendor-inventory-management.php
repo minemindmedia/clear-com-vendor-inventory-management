@@ -10,6 +10,7 @@
 class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function __construct() {
+        register_activation_hook(__FILE__, array($this, 'activate_plugin'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueScript'));
         add_action('admin_menu', array($this, 'wcvimActionAdminMenu'));
         add_action('admin_menu', array($this, 'wcvimSaveAdminMenu'));
@@ -22,31 +23,88 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         add_action('plugins_loaded', array($this, 'wcvmcvoActionPluginsLoaded'));
     }
 
+    public function create_vendor_product_mapping() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'vendor_product_mapping';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+                    `product_mapping_id` int(11) NOT NULL AUTO_INCREMENT,
+                    `post_id` int(11) NOT NULL,
+                    `vendor_id` int(11) NOT NULL,
+                    `vendor_sku` varchar(11) DEFAULT NULL,
+                    `vendor_price` decimal(11,2) DEFAULT NULL,
+                    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+                    PRIMARY KEY id (product_mapping_id)
+    ) $charset_collate;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta($sql);
+    }
+
+    public function create_vendor_po_lookup() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'vendor_po_lookup';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) NOT NULL,
+  `product_title` varchar(100) NOT NULL,
+  `sku` varchar(50) NOT NULL,
+  `regular_price` int(11) NOT NULL,
+  `stock_status` varchar(50) NOT NULL,
+  `stock` int(11) NOT NULL,
+  `threshold_low` double NOT NULL,
+  `threshold_reorder` int(11) NOT NULL,
+  `reorder_qty` int(11) NOT NULL,
+  `rare` int(11) NOT NULL,
+  `category` varchar(100) NOT NULL,
+  `vendor_id` varchar(100) NOT NULL,
+  `vendor_name` varchar(100) NOT NULL,
+  `vendor_sku` varchar(50) NOT NULL,
+  `vendor_link` varchar(100) NOT NULL,
+  `vendor_price_bulk` int(11) NOT NULL,
+  `vendor_price_notes` varchar(50) NOT NULL,
+  `vendor_price` varchar(100) NOT NULL,
+  `primary_vendor_id` int(11) NOT NULL,
+  `primary_vendor_name` varchar(100) NOT NULL,
+  PRIMARY KEY id (id)
+    ) $charset_collate;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta($sql);
+    }
+
+    public function activate_plugin() {
+        flush_rewrite_rules();
+        $this->create_vendor_product_mapping();
+        $this->create_vendor_po_lookup();
+    }
+
     public function enqueueScript() {
         ?>
-<style>
-    th{ 
-        background-color: white !important;
-        font-size: 10px !important;
-        padding: 14px !important;
-    }
-    .wp-list-table.wcvm-orders .manage-column{
-        font-size: 10px !important;
-    }
-    .widefat{
-        background-color: #f9f9f9 !important;
-    }
-    .widefat {
-        vertical-align: middle !important;
-        word-wrap: break-word !important;    
-    }
-    table.fixed{
-        table-layout: fixed !important;
-    }
-</style>					
-<?php
-    wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
-    wp_enqueue_script('jquery-ui-datepicker');
+        <style>
+            th{ 
+                background-color: white !important;
+                font-size: 10px !important;
+                padding: 14px !important;
+            }
+            .wp-list-table.wcvm-orders .manage-column{
+                font-size: 10px !important;
+            }
+            .widefat{
+                background-color: #f9f9f9 !important;
+            }
+            .widefat {
+                vertical-align: middle !important;
+                word-wrap: break-word !important;    
+            }
+            table.fixed{
+                table-layout: fixed !important;
+            }
+        </style>					
+        <?php
+        wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
+        wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('generate-po-script', plugin_dir_url(__FILE__) . 'assets/vendors.js', array('jquery'), '1.0.0', true);
         wp_localize_script('generate-po-script', 'generate_po_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -60,7 +118,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function wcvimgeneratePo() {
 
-        add_submenu_page('vendor-management', __('Generate Purchase Order', 'wcvim'), __('Generate Purchase Order', 'wcvim'), 'manage_options', 'generate-purchase-order', array($this, 'generatePurchaseOrder'),1);
+        add_submenu_page('vendor-management', __('Generate Purchase Order', 'wcvim'), __('Generate Purchase Order', 'wcvim'), 'manage_options', 'generate-purchase-order', array($this, 'generatePurchaseOrder'), 1);
     }
 
     public function wcvimPo() {
@@ -107,9 +165,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 //        }
         require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
     }
+
     public function wcvimReceiveInventoryPage() {
         require_once plugin_dir_path(__FILE__) . 'templates/receive-inventory.php';
     }
+
     public function wcvimReceiveBackOrderItemsPage() {
         require_once plugin_dir_path(__FILE__) . 'templates/receive-back-order-items.php';
     }
@@ -128,24 +188,24 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function extra_tablenav($which) {
         if ($which == 'top') {
-            $product_update_last_date =  get_option('_product_update_last_date');
-            $vendor_management_last_date =  get_option('_vendor_management_last_date');
+            $product_update_last_date = get_option('_product_update_last_date');
+            $vendor_management_last_date = get_option('_vendor_management_last_date');
             ?>
             <div style="padding-bottom: 10px;clear: both;">
                 <?php
                 //echo '<input type="submit" name="wcvm_save" class="button button-primary" value="' . esc_html__('Update') . '">';
                 //echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                 ?>
-                <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__);?>">
-                    <?php                
-                echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-                if($product_update_last_date >= $vendor_management_last_date) {
                 ?>
-                <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
-                <div style="margin-top:10px;" class="text-danger">
-                    <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
-                </div>
-                <?php } ?>
+                <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
+                <?php
+                echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
+                if ($product_update_last_date >= $vendor_management_last_date) {
+                    ?>
+                    <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
+                    <div style="margin-top:10px;" class="text-danger">
+                        <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
+                    </div>
+            <?php } ?>
             </div>
             <div style="float: left;vertical-align: top">
                 <select name="new_item_filter" class="vendor_details" id="new_item_filter">
@@ -244,7 +304,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 foreach ($uniquer_vendor_ids as $uniquer_vendor_id) {
                     update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo', $vendor_product_ids_data[$uniquer_vendor_id]);
                     foreach ($vendor_product_ids_data[$uniquer_vendor_id] as $vendor_single_product) {
-                    $productIDs = '';
+                        $productIDs = '';
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_qty', $vendor_product_quantities[$uniquer_vendor_id][$vendor_single_product]);
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_onorder', serialize($vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]));
                         $productIDs = $vendor_single_product;
@@ -254,7 +314,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 //                            $productIDs .= ',' . $vendor_single_product;
 //                        }
                         add_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_product_id', $productIDs);
-                        
                     }
                 }
                 $ajaxResponse['redirect_url'] = admin_url() . 'admin.php?page=wcvm-epo&status=auto-draft';
@@ -414,7 +473,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         <?php $this->extra_tablenav('top'); ?>
             </form>
             <div id="my-content-id" style="display:none;">
-                <img id="loading_image" src="<?php plugin_dir_path(__FILE__) .'/assets/img/loader.gif'?>"/>
+                <img id="loading_image" src="<?php plugin_dir_path(__FILE__) . '/assets/img/loader.gif' ?>"/>
                 <div id="vendor_details">
 
                 </div>
@@ -484,11 +543,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                     if ($vendor_ids[$i] == $orderDetail->primary_vendor_id) {
                                         $selected = 'selected';
                                     }
-                                    if($selected = 'selected') {
+                                    if ($selected = 'selected') {
                                         $selected_vendor_price = $vendor_prices[$i];
                                     }
                                     ?>
-                                    <option <?php echo $selected; ?> data-vendor_price="<?php echo  get_woocommerce_currency_symbol() . $vendor_prices[$i]; ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
+                                    <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . $vendor_prices[$i]; ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
             <?php } ?>
                             </select>
                         </td>
@@ -503,10 +562,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <td class="center seventh-cell"><?php echo 'ask' ?></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
-            <?php
-            $even_odd_counter++;
-        }
-        ?>
+                    <?php
+                    $even_odd_counter++;
+                }
+                ?>
             </tbody>
         </table>
 
@@ -755,7 +814,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 				) v on v.post_id = p.id
 				where p.post_type = 'product'";
         $sync_data = $wpdb->query($sql);
-        if($sync_data) {
+        if ($sync_data) {
             $ajaxResponse['success'] = true;
             update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
         }
@@ -847,16 +906,16 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             <td><textarea id="post_content" name="post_content" style="width: 100%;height:100px;"></textarea></td>
                         </tr>
                     </table>
-        <?php submit_button(__('Save Vendor', 'wcvim')) ?>
+                    <?php submit_button(__('Save Vendor', 'wcvim')) ?>
                     <div><span style="color: red">*</span> - <?= esc_html__('required field', 'wcvim') ?></div>
                     <input type="hidden" name="ID" value="">
-                <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
+        <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
                 </form>
             </div>
             <form action="" method="post">
-        <?php
-        $this->saveVendorPage();
-        ?>
+                <?php
+                $this->saveVendorPage();
+                ?>
             </form>
             <div id="ajax-response"></div>
             <br class="clear"> 
@@ -899,7 +958,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             ?>
                             <tr>
                                 <td><?php echo $code . ' / ' . $title_short . "<br>"; ?>
-                                    <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
+                <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
                                 </td>
                                 <td><?php echo $post_title . "<br>" . $phone . "<br>" . $website; ?></td>
                                 <td><?php
@@ -916,9 +975,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                 <td><?php echo $post_content; ?></td>
                                 <!--<td></td>-->
                             </tr>
-                <?php
-            }
-            ?>
+                            <?php
+                        }
+                        ?>
                     </tbody>
                 </table>
                 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
@@ -935,9 +994,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     table.dataTable tr.odd { background-color: white;  border:1px lightgrey;}
                     table.dataTable tr.even{ background-color: #F1F1F1; border:1px lightgrey; }
                 </style>					
-            <?php
-        }
-        ?>
+                <?php
+            }
+            ?>
         </div>
         <?php add_thickbox(); ?>
         <script type="text/javascript">
@@ -1008,10 +1067,12 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     }
 
 }
+
 // define the woocommerce_update_product callback 
-function wcvimCustomWoocommerceUpdateProduct( $product_get_id ) { 
+function wcvimCustomWoocommerceUpdateProduct($product_get_id) {
     update_option('_product_update_last_date', date('m-d-Y H:i:s'));
 }
+
 add_action('woocommerce_update_product', 'wcvimCustomWoocommerceUpdateProduct', 10, 1);
 
 return new WC_Clear_Com_Vendor_Inventory_Management();
