@@ -67,6 +67,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
   `vendor_price` varchar(100) NOT NULL,
   `primary_vendor_id` int(11) NOT NULL,
   `primary_vendor_name` varchar(100) NOT NULL,
+    `on_order` int(11) NOT NULL,
+  `sale_30_days` int(11) NOT NULL,
+  `order_qty` int(11) NOT NULL,
+  `on_vendor_bo` int(11) NOT NULL,
+  `new` INT(11) NULL,
   PRIMARY KEY id (id)
     ) $charset_collate;";
 
@@ -152,17 +157,68 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     }
 
     public function wcvimPurchaseOrderPage() {
-//        global $wpdb;
-//        $po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
-//        $po_lookup_table_sql = "SELECT * FROM " . $po_lookup_table ;
-//        $po_lookup = $wpdb->get_results($po_lookup_table_sql);
-//        if($po_lookup){
-//            foreach ($po_lookup as $lookUpData){
-//                $sql = "INSERT INTO `{$wpdb->prefix}purchase_order`(`product_id`, `sku`, `regular_price`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)"
-//                . "Values ('$lookUpData->product_id' ,'$lookUpData->sku','$lookUpData->regular_price','$lookUpData->stock','$lookUpData->threshold_low','$lookUpData->threshold_reorder','$lookUpData->reorder_qty','$lookUpData->rare','$lookUpData->vendor_id','$lookUpData->vendor_name','$lookUpData->vendor_sku','$lookUpData->vendor_price')";
-//                $insertPO = $wpdb->query($sql);
-//            }
-//        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+//            print_r($_POST);die;
+            $order = get_post($_POST['ID']);
+            $order->post_status = $order->old_status ? $order->old_status : 'draft';
+            foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
+            }
+            foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
+            }
+            foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
+            }
+            if (!empty($_POST['__order_qty'])) {
+                $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
+                if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
+                    $orderId = $_POST['ID'];
+                } else {
+                    $orderId = wp_insert_post(array(
+                        'post_type' => 'wcvm-order',
+                        'post_status' => 'draft',
+                        'post_parent' => $vendorId,
+                    ));
+                    update_post_meta($orderId, 'wcvmgo', get_post_meta($_POST['ID'], 'wcvmgo', true));
+                }
+                foreach ($_POST['__order_qty'] as $productId => $_) {
+                    update_post_meta($orderId, 'wcvmgo_' . $productId . '_qty', $_POST['__order_qty'][$productId]);
+                    $stamp = strtotime($_POST['__expected_date'][$productId]);
+                    if (!$stamp && !empty($_POST['expected_date'])) {
+                        $stamp = strtotime($_POST['expected_date']);
+                    }
+                    if ($stamp) {
+                        update_post_meta($orderId, 'wcvmgo_' . $productId . '_date', $stamp);
+                    }
+                    update_post_meta($orderId, 'wcvmgo_' . $productId, array(
+                        'product_id' => $productId,
+                        'product_title' => get_post_field('post_title', $productId),
+                        'product_sku' => get_post_meta($productId, '_sku', true),
+                        'product_price' => get_post_meta($productId, '_price', true),
+                        'product_quantity' => $_POST['__order_qty'][$productId],
+                        'product_expected_date' => $stamp,
+                        'product_rare' => get_post_meta($productId, 'wcvm_rare', true),
+                        'product_threshold_low' => get_post_meta($productId, 'wcvm_threshold_low', true),
+                        'product_threshold_reorder' => get_post_meta($productId, 'wcvm_threshold_reorder', true),
+                        'product_reorder_qty' => get_post_meta($productId, 'wcvm_reorder_qty', true),
+                        'vendor_sku' => get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true),
+                        'vendor_link' => get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true),
+                        'vendor_price_last' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true),
+                        'vendor_price_bulk' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true),
+                        'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
+                    ));
+                }
+                if (!empty($_POST['expected_date'])) {
+                    $order = get_post($_POST['ID']);
+                    $order->post_status = 'draft';
+                    update_post_meta($orderId, 'po_expected_date', strtotime($_POST['expected_date']));
+                    wp_update_post($order);
+                    wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $order->post_status) . '#order' . $order->ID);
+                }
+            }
+        }
         require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
     }
 
@@ -199,7 +255,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
                 <?php
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-                if ($product_update_last_date >= $vendor_management_last_date) {
+                if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
                     <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
                     <div style="margin-top:10px;" class="text-danger">
@@ -228,11 +284,15 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     <?php
                     global $wpdb;
                     $posts_table = $wpdb->prefix . "posts";
-                    $posts_table_sql = "SELECT * FROM " . $posts_table . " WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish'";
+                    $posts_table_sql = ""
+                            . "SELECT p.ID,p.post_title, pm.meta_value as title_short
+                                FROM ".$wpdb->prefix."posts p
+                                LEFT JOIN ".$wpdb->prefix."postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
+                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish'";
                     $posts = $wpdb->get_results($posts_table_sql);
                     foreach ($posts as $vendor):
                         ?>
-                        <option value="<?= esc_attr($vendor->ID) ?>"<?php if (isset($_REQUEST['filter']['wcvm_primary']) && in_array($vendor->ID, $_REQUEST['filter']['wcvm_primary'])): ?> selected="selected"<?php endif ?>><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
+                        <option value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
             <?php endforeach ?>
                 </select>
                             <!--<input type="submit" name="filter_action" if="filter_action" class="button" value="<?= esc_attr__('Filter', 'wcvm') ?>">-->
@@ -532,9 +592,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <td class="center first-cell"><?php echo ($orderDetail->rare) ? "&#10004;" : ""; ?></td>
                         <td class="center third-cell"><?php echo $orderDetail->sku ?></td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
-                        <td class="center fifth-cell"><?php print_r($orderDetail->category) ?></td>
+                        <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
                         <td class="center sixth-cell"><?php echo $orderDetail->stock_status ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->regular_price ?></td>
+                        <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
                                 <?php
@@ -552,14 +612,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             </select>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($selected_vendor_price); ?></td>
-                        <td class="center tenth-cell"><?php echo $orderDetail->reorder_qty ?></td>
-                        <td class="center eleventh-cell"><?php echo 'ask' ?></td>
+                        <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
+                        <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->threshold_low ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->threshold_reorder ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->reorder_qty ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->on_order ?></td>
                         <td class="center seventh-cell"><?php echo 'ask' ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="<?php echo $orderDetail->reorder_qty; ?>"></td>
-                        <td class="center seventh-cell"><?php echo 'ask' ?></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
                     <?php
@@ -782,42 +842,147 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $truncate = "TRUNCATE TABLE {$wpdb->prefix}vendor_po_lookup";
         $wpdb->query($truncate);
 
-        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)
-				SELECT distinct p.id productid,  pm.meta_value as sku, r.meta_value as regular_price,
-				ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
-				,rr.meta_value as rare,n.name as Cat,
-				v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
-				FROM {$wpdb->prefix}posts p 
-				 join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
-				 join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
+//        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)
+//				SELECT distinct p.id productid,  pm.meta_value as sku, r.meta_value as regular_price,
+//				ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
+//				,rr.meta_value as rare,n.name as Cat,
+//				v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
+//				FROM {$wpdb->prefix}posts p 
+//				 join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
+//				 join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
+//
+//				 join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
+//				 join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
+//				 join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
+//				 join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
+//				 join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
+//				 join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
+//				 join (
+//					select tr.object_id as postid,GROUP_CONCAT(te.name) as name
+//				from {$wpdb->prefix}term_relationships tr
+//				join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
+//				join {$wpdb->prefix}terms te on te.term_id = t.term_id
+//
+//
+//				group by tr.object_id   
+//				) n on n.postid = p.id
+//				join (
+//				select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
+//				from {$wpdb->prefix}vendor_product_mapping  vp
+//				join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor' 
+//				group by post_id
+//				) v on v.post_id = p.id
+//				where p.post_type = 'product'";
+        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `product_title`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`, `primary_vendor_id`, `primary_vendor_name`)
+SELECT distinct p.id productid, p.post_title as product_title,pm.meta_value as sku, r.meta_value as regular_price,
+ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
+,rr.meta_value as rare,n.name as Cat,
+v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
+,z.Primary_vendor_id,z.primary_vendor_name
+FROM {$wpdb->prefix}posts p
+join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
+join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
 
-				 join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
-				 join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
-				 join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
-				 join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
-				 join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
-				 join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
-				 join (
-					select tr.object_id as postid,GROUP_CONCAT(te.name) as name
-				from {$wpdb->prefix}term_relationships tr
-				join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
-				join {$wpdb->prefix}terms te on te.term_id = t.term_id
+join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
+join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
+join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
+join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
+join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
+join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
+join (
+select tr.object_id as postid,GROUP_CONCAT(te.name) as name
+from {$wpdb->prefix}term_relationships tr
+join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
+join {$wpdb->prefix}terms te on te.term_id = t.term_id
 
 
-				group by tr.object_id   
-				) n on n.postid = p.id
-				join (
-				select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
-				from {$wpdb->prefix}vendor_product_mapping  vp
-				join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor' 
-				group by post_id
-				) v on v.post_id = p.id
-				where p.post_type = 'product'";
+group by tr.object_id
+) n on n.postid = p.id
+join (
+select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
+from {$wpdb->prefix}vendor_product_mapping vp
+join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor'
+group by post_id
+) v on v.post_id = p.id
+join (
+select p.ID as postid, pm.meta_value as Primary_vendor_id,pp.post_title as primary_vendor_name
+from {$wpdb->prefix}posts p
+join {$wpdb->prefix}postmeta pm on p.ID = pm.post_id and pm.meta_key = 'wcvm_primary'
+join {$wpdb->prefix}posts pp on pp.ID = pm.meta_value and pp.post_type= 'wcvm-vendor'
+where p.post_type = 'product'
+) z on z.postid = p.ID
+where p.post_type = 'product'";
         $sync_data = $wpdb->query($sql);
         if ($sync_data) {
             $ajaxResponse['success'] = true;
             update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
         }
+        $sql = "SELECT
+                    items.meta_value product_id,
+                    SUM(quantity.meta_value) quantity
+                FROM
+                    wp_posts orders
+                JOIN
+                    wp_woocommerce_order_items carts
+                ON
+                    carts.order_id = orders.id AND carts.order_item_type = 'line_item'
+                JOIN
+                    wp_woocommerce_order_itemmeta items
+                ON
+                    items.order_item_id = carts.order_item_id AND items.meta_key = '_product_id'
+                JOIN
+                    wp_woocommerce_order_itemmeta quantity
+                ON
+                    quantity.order_item_id = items.order_item_id AND quantity.meta_key = '_qty'
+                WHERE
+                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
+                GROUP BY product_id";
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateData['sale_30_days'] = $single_row->quantity;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateData,$where);
+            }
+        }
+        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
+                FROM
+                    wp_posts orders
+                JOIN
+                    wp_postmeta quantity
+                ON
+                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
+                WHERE
+                    orders.post_type = "wcvm-order" AND orders.post_status IN ("draft", "pending")
+                GROUP BY
+                    quantity.meta_key, orders.post_status';
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateOnOrderData = [];
+                if($single_row->post_status == 'draft'){
+                    $updateOnOrderData['on_order'] = $single_row->quantity;
+                }else if($single_row->post_status == 'pending'){
+                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
+                }
+                
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateOnOrderData,$where);
+            }
+        }
+        $sql = "select p.id as product_id
+                from wp_posts p 
+                join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
+                where p.post_type = 'product' and m.meta_value = 1";
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateNewData['new'] = 1;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateNewData,$where);
+            }
+        }
+        
         exit(json_encode($ajaxResponse));
     }
 
@@ -906,7 +1071,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             <td><textarea id="post_content" name="post_content" style="width: 100%;height:100px;"></textarea></td>
                         </tr>
                     </table>
-                    <?php submit_button(__('Save Vendor', 'wcvim')) ?>
+        <?php submit_button(__('Save Vendor', 'wcvim')) ?>
                     <div><span style="color: red">*</span> - <?= esc_html__('required field', 'wcvim') ?></div>
                     <input type="hidden" name="ID" value="">
         <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>

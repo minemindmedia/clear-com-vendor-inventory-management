@@ -101,11 +101,5 @@ jQuery(document).ready(function ($) {
             $('#wcvm-delete-all-form').submit();
         }
     });
-    jQuery(".delete_entire").bind("click", function () {
-        var txt;
-        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
-        if (r == true) {
-            jQuery("#" + this.id).submit();
-        }
-    });
+
 });
