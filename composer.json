@@ -1,0 +1,19 @@
+{
+    "name": "minemindmedia/clear-com-vendor-inventory-management",
+    "description": "Management of vendors who provide keys.",
+    "keywords": [
+        "wordpress",
+        "plugin"
+    ],
+    "homepage": "https://github.com/minemindmedia/clear-com-vendor-inventory-management",
+    "authors": [
+        {
+            "name": "Joshua Busnelli",
+            "homepage": "https://hybridinteractive.io"
+        }
+    ],
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=5.6"
+    }
+}
