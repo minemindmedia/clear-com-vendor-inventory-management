@@ -49,7 +49,10 @@ class Vendor_Management_Columns {
     }
 
     public function get_columns_vendors_list() {
-        $status = $_REQUEST['status'];
+        $status = "";
+        if (array_key_exists('status', $_REQUEST)) {
+            $status = $_REQUEST['status'];
+        }
         $columns_array = [];
         $columns_array['wcvm_rare'] = __('Rare', 'wcvm');
         $columns_array['_sku'] = __('CC SKU', 'wcvm');

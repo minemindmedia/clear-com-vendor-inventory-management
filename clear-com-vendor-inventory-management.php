@@ -157,12 +157,13 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     }
 
     public function wcvimPurchaseOrderPage() {
+        
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //            print_r($_POST);die;
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
-            foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
+            /*foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
                 update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
             }
             foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
@@ -170,7 +171,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             }
             foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
                 update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
-            }
+            }*/
             if (!empty($_POST['__order_qty'])) {
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
                 if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
