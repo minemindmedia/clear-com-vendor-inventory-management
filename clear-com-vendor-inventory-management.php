@@ -255,7 +255,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
                 <?php
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-                if ($product_update_last_date >= $vendor_management_last_date || 1) {
+                if ($product_update_last_date >= $vendor_management_last_date) {
                     ?>
                     <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
                     <div style="margin-top:10px;" class="text-danger">
@@ -284,11 +284,15 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     <?php
                     global $wpdb;
                     $posts_table = $wpdb->prefix . "posts";
-                    $posts_table_sql = "SELECT * FROM " . $posts_table . " WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish'";
+                    $posts_table_sql = ""
+                            . "SELECT p.ID,p.post_title, pm.meta_value as title_short
+                                FROM ".$wpdb->prefix."posts p
+                                LEFT JOIN ".$wpdb->prefix."postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
+                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish'";
                     $posts = $wpdb->get_results($posts_table_sql);
                     foreach ($posts as $vendor):
                         ?>
-                        <option value="<?= esc_attr($vendor->ID) ?>"<?php if (isset($_REQUEST['filter']['wcvm_primary']) && in_array($vendor->ID, $_REQUEST['filter']['wcvm_primary'])): ?> selected="selected"<?php endif ?>><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
+                        <option value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
             <?php endforeach ?>
                 </select>
                             <!--<input type="submit" name="filter_action" if="filter_action" class="button" value="<?= esc_attr__('Filter', 'wcvm') ?>">-->
@@ -588,9 +592,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <td class="center first-cell"><?php echo ($orderDetail->rare) ? "&#10004;" : ""; ?></td>
                         <td class="center third-cell"><?php echo $orderDetail->sku ?></td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
-                        <td class="center fifth-cell"><?php print_r($orderDetail->category) ?></td>
+                        <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
                         <td class="center sixth-cell"><?php echo $orderDetail->stock_status ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->regular_price ?></td>
+                        <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
                                 <?php
@@ -608,14 +612,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             </select>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($selected_vendor_price); ?></td>
-                        <td class="center tenth-cell"><?php echo $orderDetail->reorder_qty ?></td>
-                        <td class="center eleventh-cell"><?php echo 'ask' ?></td>
+                        <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
+                        <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->threshold_low ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->threshold_reorder ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->reorder_qty ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->on_order ?></td>
                         <td class="center seventh-cell"><?php echo 'ask' ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="<?php echo $orderDetail->reorder_qty; ?>"></td>
-                        <td class="center seventh-cell"><?php echo 'ask' ?></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
                     <?php
@@ -912,6 +916,71 @@ where p.post_type = 'product'";
         if ($sync_data) {
             $ajaxResponse['success'] = true;
             update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
+        }
+        $sql = "SELECT
+                    items.meta_value product_id,
+                    SUM(quantity.meta_value) quantity
+                FROM
+                    wp_posts orders
+                JOIN
+                    wp_woocommerce_order_items carts
+                ON
+                    carts.order_id = orders.id AND carts.order_item_type = 'line_item'
+                JOIN
+                    wp_woocommerce_order_itemmeta items
+                ON
+                    items.order_item_id = carts.order_item_id AND items.meta_key = '_product_id'
+                JOIN
+                    wp_woocommerce_order_itemmeta quantity
+                ON
+                    quantity.order_item_id = items.order_item_id AND quantity.meta_key = '_qty'
+                WHERE
+                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
+                GROUP BY product_id";
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateData['sale_30_days'] = $single_row->quantity;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateData,$where);
+            }
+        }
+        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
+                FROM
+                    wp_posts orders
+                JOIN
+                    wp_postmeta quantity
+                ON
+                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
+                WHERE
+                    orders.post_type = "wcvm-order" AND orders.post_status IN ("draft", "pending")
+                GROUP BY
+                    quantity.meta_key, orders.post_status';
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateOnOrderData = [];
+                if($single_row->post_status == 'draft'){
+                    $updateOnOrderData['on_order'] = $single_row->quantity;
+                }else if($single_row->post_status == 'pending'){
+                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
+                }
+                
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateOnOrderData,$where);
+            }
+        }
+        $sql = "select p.id as product_id
+                from wp_posts p 
+                join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
+                where p.post_type = 'product' and m.meta_value = 1";
+        $data = $wpdb->get_results($sql);
+        if($data){
+            foreach ($data as $single_row){
+                $updateNewData['new'] = 1;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup',$updateNewData,$where);
+            }
         }
         
         exit(json_encode($ajaxResponse));
