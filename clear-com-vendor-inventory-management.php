@@ -255,7 +255,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
                 <?php
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-                if ($product_update_last_date >= $vendor_management_last_date) {
+                if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
                     <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
                     <div style="margin-top:10px;" class="text-danger">
