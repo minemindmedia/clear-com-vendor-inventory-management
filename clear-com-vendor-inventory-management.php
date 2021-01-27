@@ -67,6 +67,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
   `vendor_price` varchar(100) NOT NULL,
   `primary_vendor_id` int(11) NOT NULL,
   `primary_vendor_name` varchar(100) NOT NULL,
+    `on_order` int(11) NOT NULL,
+  `sale_30_days` int(11) NOT NULL,
+  `order_qty` int(11) NOT NULL,
+  `on_vendor_bo` int(11) NOT NULL,
   PRIMARY KEY id (id)
     ) $charset_collate;";
 
@@ -152,17 +156,68 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     }
 
     public function wcvimPurchaseOrderPage() {
-//        global $wpdb;
-//        $po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
-//        $po_lookup_table_sql = "SELECT * FROM " . $po_lookup_table ;
-//        $po_lookup = $wpdb->get_results($po_lookup_table_sql);
-//        if($po_lookup){
-//            foreach ($po_lookup as $lookUpData){
-//                $sql = "INSERT INTO `{$wpdb->prefix}purchase_order`(`product_id`, `sku`, `regular_price`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)"
-//                . "Values ('$lookUpData->product_id' ,'$lookUpData->sku','$lookUpData->regular_price','$lookUpData->stock','$lookUpData->threshold_low','$lookUpData->threshold_reorder','$lookUpData->reorder_qty','$lookUpData->rare','$lookUpData->vendor_id','$lookUpData->vendor_name','$lookUpData->vendor_sku','$lookUpData->vendor_price')";
-//                $insertPO = $wpdb->query($sql);
-//            }
-//        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+//            print_r($_POST);die;
+            $order = get_post($_POST['ID']);
+            $order->post_status = $order->old_status ? $order->old_status : 'draft';
+            foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
+            }
+            foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
+            }
+            foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
+                update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
+            }
+            if (!empty($_POST['__order_qty'])) {
+                $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
+                if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
+                    $orderId = $_POST['ID'];
+                } else {
+                    $orderId = wp_insert_post(array(
+                        'post_type' => 'wcvm-order',
+                        'post_status' => 'draft',
+                        'post_parent' => $vendorId,
+                    ));
+                    update_post_meta($orderId, 'wcvmgo', get_post_meta($_POST['ID'], 'wcvmgo', true));
+                }
+                foreach ($_POST['__order_qty'] as $productId => $_) {
+                    update_post_meta($orderId, 'wcvmgo_' . $productId . '_qty', $_POST['__order_qty'][$productId]);
+                    $stamp = strtotime($_POST['__expected_date'][$productId]);
+                    if (!$stamp && !empty($_POST['expected_date'])) {
+                        $stamp = strtotime($_POST['expected_date']);
+                    }
+                    if ($stamp) {
+                        update_post_meta($orderId, 'wcvmgo_' . $productId . '_date', $stamp);
+                    }
+                    update_post_meta($orderId, 'wcvmgo_' . $productId, array(
+                        'product_id' => $productId,
+                        'product_title' => get_post_field('post_title', $productId),
+                        'product_sku' => get_post_meta($productId, '_sku', true),
+                        'product_price' => get_post_meta($productId, '_price', true),
+                        'product_quantity' => $_POST['__order_qty'][$productId],
+                        'product_expected_date' => $stamp,
+                        'product_rare' => get_post_meta($productId, 'wcvm_rare', true),
+                        'product_threshold_low' => get_post_meta($productId, 'wcvm_threshold_low', true),
+                        'product_threshold_reorder' => get_post_meta($productId, 'wcvm_threshold_reorder', true),
+                        'product_reorder_qty' => get_post_meta($productId, 'wcvm_reorder_qty', true),
+                        'vendor_sku' => get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true),
+                        'vendor_link' => get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true),
+                        'vendor_price_last' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true),
+                        'vendor_price_bulk' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true),
+                        'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
+                    ));
+                }
+                if (!empty($_POST['expected_date'])) {
+                    $order = get_post($_POST['ID']);
+                    $order->post_status = 'draft';
+                    update_post_meta($orderId, 'po_expected_date', strtotime($_POST['expected_date']));
+                    wp_update_post($order);
+                    wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $order->post_status) . '#order' . $order->ID);
+                }
+            }
+        }
         require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
     }
 
@@ -199,7 +254,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
                 <?php
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-                if ($product_update_last_date >= $vendor_management_last_date) {
+                if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
                     <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
                     <div style="margin-top:10px;" class="text-danger">
@@ -818,6 +873,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             $ajaxResponse['success'] = true;
             update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
         }
+        
         exit(json_encode($ajaxResponse));
     }
 
@@ -906,7 +962,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             <td><textarea id="post_content" name="post_content" style="width: 100%;height:100px;"></textarea></td>
                         </tr>
                     </table>
-                    <?php submit_button(__('Save Vendor', 'wcvim')) ?>
+        <?php submit_button(__('Save Vendor', 'wcvim')) ?>
                     <div><span style="color: red">*</span> - <?= esc_html__('required field', 'wcvim') ?></div>
                     <input type="hidden" name="ID" value="">
         <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
