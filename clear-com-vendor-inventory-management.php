@@ -71,6 +71,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
   `sale_30_days` int(11) NOT NULL,
   `order_qty` int(11) NOT NULL,
   `on_vendor_bo` int(11) NOT NULL,
+  `new` INT(11) NULL,
   PRIMARY KEY id (id)
     ) $charset_collate;";
 
@@ -837,37 +838,76 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $truncate = "TRUNCATE TABLE {$wpdb->prefix}vendor_po_lookup";
         $wpdb->query($truncate);
 
-        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)
-				SELECT distinct p.id productid,  pm.meta_value as sku, r.meta_value as regular_price,
-				ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
-				,rr.meta_value as rare,n.name as Cat,
-				v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
-				FROM {$wpdb->prefix}posts p 
-				 join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
-				 join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
+//        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)
+//				SELECT distinct p.id productid,  pm.meta_value as sku, r.meta_value as regular_price,
+//				ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
+//				,rr.meta_value as rare,n.name as Cat,
+//				v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
+//				FROM {$wpdb->prefix}posts p 
+//				 join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
+//				 join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
+//
+//				 join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
+//				 join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
+//				 join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
+//				 join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
+//				 join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
+//				 join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
+//				 join (
+//					select tr.object_id as postid,GROUP_CONCAT(te.name) as name
+//				from {$wpdb->prefix}term_relationships tr
+//				join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
+//				join {$wpdb->prefix}terms te on te.term_id = t.term_id
+//
+//
+//				group by tr.object_id   
+//				) n on n.postid = p.id
+//				join (
+//				select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
+//				from {$wpdb->prefix}vendor_product_mapping  vp
+//				join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor' 
+//				group by post_id
+//				) v on v.post_id = p.id
+//				where p.post_type = 'product'";
+        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `product_title`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`, `primary_vendor_id`, `primary_vendor_name`)
+SELECT distinct p.id productid, p.post_title as product_title,pm.meta_value as sku, r.meta_value as regular_price,
+ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
+,rr.meta_value as rare,n.name as Cat,
+v.vendor_id,v.vendor_name,v.vendor_sku,v.vendor_price
+,z.Primary_vendor_id,z.primary_vendor_name
+FROM {$wpdb->prefix}posts p
+join {$wpdb->prefix}postmeta pm on pm.post_id = p.id and pm.meta_key = '_sku'
+join {$wpdb->prefix}postmeta r on r.post_id = p.id and r.meta_key = '_regular_price'
 
-				 join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
-				 join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
-				 join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
-				 join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
-				 join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
-				 join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
-				 join (
-					select tr.object_id as postid,GROUP_CONCAT(te.name) as name
-				from {$wpdb->prefix}term_relationships tr
-				join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
-				join {$wpdb->prefix}terms te on te.term_id = t.term_id
+join {$wpdb->prefix}postmeta ss on ss.post_id = p.id and ss.meta_key = '_stock_status'
+join {$wpdb->prefix}postmeta s on s.post_id = p.id and s.meta_key = '_stock'
+join {$wpdb->prefix}postmeta tl on tl.post_id = p.id and tl.meta_key = 'wcvm_threshold_low'
+join {$wpdb->prefix}postmeta tr on tr.post_id = p.id and tr.meta_key = 'wcvm_threshold_reorder'
+join {$wpdb->prefix}postmeta tq on tq.post_id = p.id and tq.meta_key = 'wcvm_reorder_qty'
+join {$wpdb->prefix}postmeta rr on rr.post_id = p.id and rr.meta_key = 'wcvm_rare'
+join (
+select tr.object_id as postid,GROUP_CONCAT(te.name) as name
+from {$wpdb->prefix}term_relationships tr
+join {$wpdb->prefix}term_taxonomy t on t.term_taxonomy_id = tr.term_taxonomy_id and t.taxonomy in ('product_cat','product_tag')
+join {$wpdb->prefix}terms te on te.term_id = t.term_id
 
 
-				group by tr.object_id   
-				) n on n.postid = p.id
-				join (
-				select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
-				from {$wpdb->prefix}vendor_product_mapping  vp
-				join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor' 
-				group by post_id
-				) v on v.post_id = p.id
-				where p.post_type = 'product'";
+group by tr.object_id
+) n on n.postid = p.id
+join (
+select post_id,GROUP_CONCAT(vendor_id) as vendor_id,GROUP_CONCAT(vendor_sku) as vendor_sku,GROUP_CONCAT(vendor_price) as vendor_price,GROUP_CONCAT(p.post_title) as vendor_name
+from {$wpdb->prefix}vendor_product_mapping vp
+join {$wpdb->prefix}posts p on p.ID = vp.vendor_id and p.post_type = 'wcvm-vendor'
+group by post_id
+) v on v.post_id = p.id
+join (
+select p.ID as postid, pm.meta_value as Primary_vendor_id,pp.post_title as primary_vendor_name
+from {$wpdb->prefix}posts p
+join {$wpdb->prefix}postmeta pm on p.ID = pm.post_id and pm.meta_key = 'wcvm_primary'
+join {$wpdb->prefix}posts pp on pp.ID = pm.meta_value and pp.post_type= 'wcvm-vendor'
+where p.post_type = 'product'
+) z on z.postid = p.ID
+where p.post_type = 'product'";
         $sync_data = $wpdb->query($sql);
         if ($sync_data) {
             $ajaxResponse['success'] = true;
