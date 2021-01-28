@@ -157,21 +157,49 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     }
 
     public function wcvimPurchaseOrderPage() {
-        
+        global $wpdb;
+//        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+//            print_r($_POST);die;
+//        }
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['unarchive'])) {
+            $order = get_post($_POST['ID']);
+            $order->post_status = $order->old_status ? $order->old_status : 'draft';
+            wp_update_post($order);
+            delete_post_meta($order->ID, 'old_status');
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
+            $order = get_post($_POST['ID']);
+            update_post_meta($order->ID, 'old_status', $order->post_status);
+            $order->post_status = 'trash';
+            wp_update_post($order);
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
+//                echo 'here 2';die;
+            wp_delete_post($_POST['ID']);
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete-all'])) {
+//             $sql = "DELETE FROM `wp_posts` WHERE post_type = 'wcvm-order' AND `post_status` = 'trash'";
+//                     $wpdb->get_results($sql);
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $query = new WP_Query();
+            foreach ($query->query(array(
+                'post_type' => 'wcvm-order',
+                'suppress_filters' => true,
+                'post_status' => 'trash',
+                'fields' => 'ids',
+            )) as $id) {
+                wp_delete_post($id);
+            }
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //            print_r($_POST);die;
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
-            /*foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
-                update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
-            }
-            foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
-                update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
-            }
-            foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
-                update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
-            }*/
+            /* foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
+              update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
+              }
+              foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
+              update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
+              }
+              foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
+              update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
+              } */
             if (!empty($_POST['__order_qty'])) {
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
                 if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
@@ -262,7 +290,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     <div style="margin-top:10px;" class="text-danger">
                         <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
                     </div>
-            <?php } ?>
+                <?php } ?>
             </div>
             <div style="float: left;vertical-align: top">
                 <select name="new_item_filter" class="vendor_details" id="new_item_filter">
@@ -287,14 +315,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     $posts_table = $wpdb->prefix . "posts";
                     $posts_table_sql = ""
                             . "SELECT p.ID,p.post_title, pm.meta_value as title_short
-                                FROM ".$wpdb->prefix."posts p
-                                LEFT JOIN ".$wpdb->prefix."postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
-                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish'";
+                                FROM " . $wpdb->prefix . "posts p
+                                LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
+                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish' ORDER BY p.post_title";
                     $posts = $wpdb->get_results($posts_table_sql);
                     foreach ($posts as $vendor):
                         ?>
                         <option value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
-            <?php endforeach ?>
+                    <?php endforeach ?>
                 </select>
                             <!--<input type="submit" name="filter_action" if="filter_action" class="button" value="<?= esc_attr__('Filter', 'wcvm') ?>">-->
                 <a href="#" class="btn btn-primary button" id="filter-vendor"><?= esc_attr__('Filter', 'wcvm') ?></a>
@@ -531,7 +559,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <form action="" method="post">
                 <!-- <input type="hidden" name="new_item" id="wcvm_new_item" value="">
                 <input type="hidden" name="rare_item" id="wcvm_rare_item" value=""> -->
-        <?php $this->extra_tablenav('top'); ?>
+                <?php $this->extra_tablenav('top'); ?>
             </form>
             <div id="my-content-id" style="display:none;">
                 <img id="loading_image" src="<?php plugin_dir_path(__FILE__) . '/assets/img/loader.gif' ?>"/>
@@ -609,7 +637,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                     }
                                     ?>
                                     <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . $vendor_prices[$i]; ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
-            <?php } ?>
+                                <?php } ?>
                             </select>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($selected_vendor_price); ?></td>
@@ -939,11 +967,11 @@ where p.post_type = 'product'";
                     orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
                 GROUP BY product_id";
         $data = $wpdb->get_results($sql);
-        if($data){
-            foreach ($data as $single_row){
+        if ($data) {
+            foreach ($data as $single_row) {
                 $updateData['sale_30_days'] = $single_row->quantity;
                 $where['product_id'] = $single_row->product_id;
-                $wpdb->update('wp_vendor_po_lookup',$updateData,$where);
+                $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
             }
         }
         $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
@@ -958,17 +986,17 @@ where p.post_type = 'product'";
                 GROUP BY
                     quantity.meta_key, orders.post_status';
         $data = $wpdb->get_results($sql);
-        if($data){
-            foreach ($data as $single_row){
+        if ($data) {
+            foreach ($data as $single_row) {
                 $updateOnOrderData = [];
-                if($single_row->post_status == 'draft'){
+                if ($single_row->post_status == 'draft') {
                     $updateOnOrderData['on_order'] = $single_row->quantity;
-                }else if($single_row->post_status == 'pending'){
+                } else if ($single_row->post_status == 'pending') {
                     $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
                 }
-                
+
                 $where['product_id'] = $single_row->product_id;
-                $wpdb->update('wp_vendor_po_lookup',$updateOnOrderData,$where);
+                $wpdb->update('wp_vendor_po_lookup', $updateOnOrderData, $where);
             }
         }
         $sql = "select p.id as product_id
@@ -976,14 +1004,14 @@ where p.post_type = 'product'";
                 join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
                 where p.post_type = 'product' and m.meta_value = 1";
         $data = $wpdb->get_results($sql);
-        if($data){
-            foreach ($data as $single_row){
+        if ($data) {
+            foreach ($data as $single_row) {
                 $updateNewData['new'] = 1;
                 $where['product_id'] = $single_row->product_id;
-                $wpdb->update('wp_vendor_po_lookup',$updateNewData,$where);
+                $wpdb->update('wp_vendor_po_lookup', $updateNewData, $where);
             }
         }
-        
+
         exit(json_encode($ajaxResponse));
     }
 
@@ -1072,10 +1100,10 @@ where p.post_type = 'product'";
                             <td><textarea id="post_content" name="post_content" style="width: 100%;height:100px;"></textarea></td>
                         </tr>
                     </table>
-        <?php submit_button(__('Save Vendor', 'wcvim')) ?>
+                    <?php submit_button(__('Save Vendor', 'wcvim')) ?>
                     <div><span style="color: red">*</span> - <?= esc_html__('required field', 'wcvim') ?></div>
                     <input type="hidden" name="ID" value="">
-        <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
+                    <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
                 </form>
             </div>
             <form action="" method="post">
@@ -1124,7 +1152,7 @@ where p.post_type = 'product'";
                             ?>
                             <tr>
                                 <td><?php echo $code . ' / ' . $title_short . "<br>"; ?>
-                <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
+                                    <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
                                 </td>
                                 <td><?php echo $post_title . "<br>" . $phone . "<br>" . $website; ?></td>
                                 <td><?php

@@ -261,8 +261,11 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                             <td><?php echo $order->on_order; ?></td>
                             <td>On Vendor Bo</td>
                             <?php
+                            $order_product_Qty = 0;
                             $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id . "_qty");
-                            $order_product_Qty = $order_Qty[0];
+                            if($order_Qty){
+                            $order_product_Qty = $order_Qty[0];                                
+                            }
                             $inputType = '';
 
                             if ($status == 'pending') {
@@ -291,21 +294,21 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
 
             </table>
 
-            <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):    ?>
+            <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):    ?>
             <div style="padding-top: 5px;width: 300px;float: left">
                 <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                 <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
             </div>
-            <?php // endif    ?>
+            <?php endif    ?>
             <div style="padding-top: 5px;float: left">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
-            <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):   ?>
+            <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):   ?>
             <div style="padding-top: 5px;float: right">
                 <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
                 <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
             </div>
-            <?php // endif    ?>
+            <?php endif    ?>
     </form>
     <br><br>
     <br><br>
@@ -359,13 +362,6 @@ function get_print_status($order = FALSE) {
 }
 ?>
 <script>
-    jQuery(".delete_entire").bind("click", function () {
-        var txt;
-        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
-        if (r == true) {
-            jQuery("#" + this.id).submit();
-        }
-    });
     jQuery(".delete_selected").bind("click", function () {
         console.log('s');
         var ids_to_delete = "";
@@ -375,6 +371,7 @@ function get_print_status($order = FALSE) {
             var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
             if (jQuery(this).is(':checked'))
             {
+                console.log(jQuery(this).is(':checked'));
                 if (ids_to_delete != "")
                 {
                     ids_to_delete += ",";
