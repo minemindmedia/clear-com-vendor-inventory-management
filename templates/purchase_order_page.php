@@ -94,12 +94,11 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
         $last_order_id = 0;
         $last_expected_date = '';
         foreach ($orders as $order) {
-            $post_id = wp_get_single_post($order->ID);
+            $post_id = get_post($order->ID);
             $post_parent_id = $post_id->post_parent;
-            $parent_post_title = wp_get_single_post($post_parent_id);
+            $parent_post_title = get_post($post_parent_id);
             $vendor_price = 0;
             $vendor_sku = '';
-//            print_r($order);die;
             $vendors = explode(',', $order->vendor_name);
             $vendor_Prices = explode(',', $order->vendor_price);
             $vendor_Skus = explode(',', $order->vendor_sku);
