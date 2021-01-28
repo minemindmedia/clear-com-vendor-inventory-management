@@ -6,33 +6,102 @@
 ?>
 <div class="wrap">
     <?php
+
+    /* start post request */
     if (isset($_POST['action'])) {
         $post_id = $_POST['ID'];
         $porduct_id = $_POST['product_id'];
-        $received_qty = $_POST['qty_received'];
-        $return_qty = $_POST['qty_ret'];
-        $bo_qty = $_POST['qty_vind_bo'];
-        $cancel_qty = $_POST['qty_cancel'];
-        $expected_date = $_POST['expected_date'];
-        $set_date = $_POST['qty_expected_date'];
-        update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_received', $received_qty);
-        update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_qty', $bo_qty);
-        update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_returned', $return_qty);
-//        update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_qty_vind_bo', $bo_qty);
-        update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_cancelled', $cancel_qty);
-        update_post_meta($post_id, 'expected_date', $expected_date);
-        update_post_meta($post_id, 'set_date', strtotime($set_date));
-        if($_POST['action'] == 'update') {
-            $post_status = 'pending';
-        } elseif ($_POST['action'] == 'archive') {
-            $post_status = 'publish';
+        $product_quantity_received = $_POST['product_quantity_received'];
+        $product_quantity_returned = $_POST['product_quantity_returned'];
+        $product_quantity_back_order = $_POST['product_quantity_back_order'];
+        $product_quantity_cancelled = $_POST['product_quantity_cancelled'];
+        // $expected_date = $_POST['expected_date'];
+        $product_expected_date_back_order = strtotime($_POST['product_expected_date_back_order']);
+
+        $redirect = '';
+        $expected_date = '';
+        // update received quantity
+        if($product_quantity_received > 0) {
+            if ($order->post_status != "") {
+                $order->post_status .= "|";
+            }
+            $order->post_status = 'publish';
+            if ($redirect == "") {
+                $redirect = "publish";
+            }
+            update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_received', $product_quantity_received);
+            $qty_to_update = get_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_received');
+            update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_qty', $qty_to_update[0] - $product_quantity_received);
+            update_post_meta($porduct_id,'_stock_status','instock');
         }
-        wp_update_post(array(
-            'ID'    =>  $post_id,
-            'post_status'   =>  $post_status,
-        ));
-        wp_redirect( get_site_url() . '/wp-admin/admin.php?page=wcvm-epo&status='.$post_status.'#order'.$post_id);
+
+        // update qty or back order quantity
+        if($product_quantity_back_order > 0) {
+            if ($order->post_status != "") {
+                $order->post_status .= "|";
+            }
+            $order->post_status .= 'pending';
+            update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_qty', $product_quantity_back_order);
+            if ($product_expected_date_back_order) {
+                if (!$expected_date || $expected_date > $product_expected_date_back_order) {
+                    $expected_date = $product_expected_date_back_order;
+                }
+                update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_date', $product_expected_date_back_order);
+            } else {
+                delete_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_date');
+            }
+            if ($redirect == "") {
+                $redirect = "pending";
+            }
+        } else {
+            delete_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_qty');
+        }
+
+        // update returned quantity
+        if($product_quantity_returned > 0) {
+            if ($order->post_status != "") {
+                $order->post_status .= "|";
+            }
+            $order->post_status .= 'returned';
+            if ($redirect == "") {
+                $redirect = "returned";
+            }
+            update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_returned', $product_quantity_returned);
+        }
+
+        // update cancelled quantity
+        if($product_quantity_cancelled > 0) {
+            if ($order->post_status != "") {
+                $order->post_status .= "|";
+            }
+            $order->post_status .= 'private';
+            if ($redirect == "") {
+                $redirect = "private";
+            }
+            update_post_meta($post_id, 'wcvmgo_' . $porduct_id . '_cancelled', $product_quantity_cancelled);
+        }
+
+        // update expected date
+        if($expected_date) {
+            update_post_meta($post_id, 'expected_date', $expected_date);
+        } else {
+            delete_post_meta($post_id, 'expected_date');
+        }
+
+        // update set date
+        if(!empty($product_expected_date_back_order)) {
+            update_post_meta($post_id, 'set_date', time());
+            // update_post_meta($post_id, 'set_date', strtotime($product_expected_date_back_order));
+        }
+
+        // update post status
+        global $wpdb;
+        $query = "UPDATE wp_posts SET post_status = '" . $order->post_status . "' WHERE ID = " . $post_id;
+        $wpdb->query($query);
+        wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $redirect) . '#order' . $post_id);
+        exit();
     }
+    /* end post request */
 
     global $wpdb;
     $status = "";
@@ -54,14 +123,17 @@
         $vendor_ids = explode(',', $order->vendor_id);
         $vendor_prices = explode(',', $order->vendor_price);
         $vendor_skus = explode(',', $order->vendor_sku);
+        $wcvmgo_qty = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_qty');
         $wcvmgo_received = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_received');
         $wcvmgo_returned = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_returned');
-//        $wcvmgo_qty_vind_bo = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_qty_vind_bo');
         $wcvmgo_cancelled = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_cancelled');
         $wcvmgo_set_date = get_post_meta($order->ID, 'set_date');
-        $wcvmgo_qty = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_qty');
         $wcvmgo_date = get_post_meta($order->ID, 'wcvmgo_' . $order->product_id . '_date');
-        
+        $defaul_value = '';
+        if($wcvmgo_received || $wcvmgo_returned|| $wcvmgo_cancelled) {
+            $defaul_value = 0;
+        }
+
         $vendor_price = 0;
         $vendor_sku = '';
         $i = 0;
@@ -86,13 +158,11 @@
             <?php $table = new Vendor_Management_Columns(); ?>
             <?php $table_headers = $table->get_columns_receive_inventory(); ?>
             <table class="wp-list-table widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
-
                 <thead>
                     <tr bgcolor="#e8e8e8" style="font-size:11px;">
-                        <?php foreach ($table_headers as $header) {
-                            ?>
-                            <th><?php echo $header; ?></th><?php }
-                ?>
+                        <?php foreach ($table_headers as $header) { ?>
+                            <th><?php echo $header; ?></th>
+                        <?php } ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,24 +175,22 @@
                         <td><?php echo $vendor_sku; ?></td>
                         <td><?php echo wc_price($vendor_price); ?></td>
                         <td id="quantity_<?php echo $order->ID; ?>" data-quantity="<?php echo $wcvmgo_qty[0] ? $wcvmgo_qty[0] : ''; ?>"><?php echo $wcvmgo_qty[0] ? $wcvmgo_qty[0] : ''; ?></td>
-                        <td><input type="text" id="qty_received_<?php echo $order->ID; ?>" name="qty_received" value="<?php echo $wcvmgo_received ? $wcvmgo_received[0] : ''; ?>" style="width:60px;"></td>
-                        <td><input type="text" id="qty_ret_<?php echo $order->ID; ?>" name="qty_ret" value="<?php echo $wcvmgo_returned ? $wcvmgo_returned[0] : ''; ?>" style="width:60px;"></td>
-                        <td><input type="text" id="qty_vind_bo_<?php echo $order->ID; ?>" name="qty_vind_bo" value="<?php // echo $wcvmgo_qty_vind_bo ? $wcvmgo_qty_vind_bo[0] : ''; ?>" style="width:60px;"></td>
-                        <td><input type="text" id="qty_cancel_<?php echo $order->ID; ?>" name="qty_cancel" value="<?php echo $wcvmgo_cancelled ? $wcvmgo_cancelled[0] : ''; ?>" style="width:60px;"></td>
-                        <td><input type="text" id="qty_expected_date_<?php echo $order->ID; ?>" name="qty_expected_date" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $wcvmgo_set_date ? date('Y-m-d', $wcvmgo_set_date[0]) : ''; ?>"></td>                    
+                        <td><input type="text" id="product_quantity_received_<?php echo $order->ID; ?>" name="product_quantity_received" value="<?php echo $wcvmgo_received ? $wcvmgo_received[0] : $defaul_value; ?>" style="width:60px;"></td>
+                        <td><input type="text" id="product_quantity_returned_<?php echo $order->ID; ?>" name="product_quantity_returned" value="<?php echo $wcvmgo_returned ? $wcvmgo_returned[0] : $defaul_value; ?>" style="width:60px;"></td>
+                        <td><input type="text" id="product_quantity_back_order_<?php echo $order->ID; ?>" name="product_quantity_back_order" value="<?php // echo $wcvmgo_product_quantity_back_order ? $wcvmgo_product_quantity_back_order[0] : $defaul_value; ?>" style="width:60px;"></td>
+                        <td><input type="text" id="product_quantity_cancelled_<?php echo $order->ID; ?>" name="product_quantity_cancelled" value="<?php echo $wcvmgo_cancelled ? $wcvmgo_cancelled[0] : $defaul_value; ?>" style="width:60px;"></td>
+                        <td><input type="text" id="product_expected_date_back_order_<?php echo $order->ID; ?>" name="product_expected_date_back_order" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $wcvmgo_set_date ? date('Y-m-d', $wcvmgo_set_date[0]) : ''; ?>"></td>                    
     <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
                         <td></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr bgcolor="#e8e8e8" style="font-size:11px;">
-                        <?php foreach ($table_headers as $header) {
-                            ?>
-                            <th><?php echo $header; ?></th><?php }
-                ?>
+                        <?php foreach ($table_headers as $header) { ?>
+                            <th><?php echo $header; ?></th>
+                        <?php } ?>
                     </tr>
                 </tfoot>
-
             </table>                
             <div style="padding-top: 5px;">
                 <button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><?= esc_html__('Set Inventory', 'wcvm') ?></button>
@@ -130,7 +198,6 @@
                 <button type="submit" name="action" value="archive" data-role="receive-inventory" class="button"><?= esc_html__('Set Inventory & Archive', 'wcvm') ?></button>
             </div>
             <br><br>
-            <!-- <a href="#" class="qty_role">QTY Role</a> -->
         </form>
         <br><br>
     <?php } ?>
@@ -140,15 +207,14 @@
     jQuery(document).ready(function ($) {
         "use strict";
         $(document).on('click', 'button[data-role="receive-inventory"]', function () {
-            // e.preventDefault();
             var form = $(this).closest('form')[0];
             var id = form.id.replace('form_', '');
             var isValid = true;
             var quantity = parseInt($('#quantity_' + id).data('quantity'));
-            var received = $('#qty_received_' + id).val();
-            var backOrder = $('#qty_ret_' + id).val();
-            var cancel = $('#qty_vind_bo_' + id).val();
-            var returned = $('#qty_cancel_' + id).val();
+            var received = $('#product_quantity_received_' + id).val();
+            var backOrder = $('#product_quantity_returned_' + id).val();
+            var cancel = $('#product_quantity_back_order_' + id).val();
+            var returned = $('#product_quantity_cancelled_' + id).val();
             received = received ? parseInt(received) : 0;
             backOrder = backOrder ? parseInt(backOrder) : 0;
             cancel = cancel ? parseInt(cancel) : 0;
@@ -159,12 +225,6 @@
             if (!isValid) {
                 alert('Sum of "QTY Rcv", "Vnd BO", "Cancel", "Returns Open" should equal "Order QTY"');
             }
-            console.log(id);
-            console.log(quantity);
-            console.log(received);
-            console.log(backOrder);
-            console.log(cancel);
-            console.log(returned);
             return isValid;
         });
     });
