@@ -293,10 +293,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
                 if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
-                    <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
+                    <!-- <a href="#" class="button button-primary" id="sync-vendor"><?= esc_attr__('Sync Data', 'wcvm') ?></a>
                     <div style="margin-top:10px;" class="text-danger">
-                        <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
-                    </div>
+                        <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php // echo $product_update_last_date; ?> Vendor Management Last Date: <?php // echo $vendor_management_last_date; ?></span>
+                    </div> -->
                 <?php } ?>
             </div>
             <div style="float: left;vertical-align: top">
