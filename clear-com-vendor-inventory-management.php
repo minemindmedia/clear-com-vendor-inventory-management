@@ -171,8 +171,15 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             update_post_meta($order->ID, 'old_status', $order->post_status);
             $order->post_status = 'trash';
             wp_update_post($order);
-        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
-//                echo 'here 2';die;
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
+//        $order = get_post($_POST['ID']);
+//        $wcvmgo_manual = get_post_meta($_POST['ID'], "wcvmgo");
+//        $order->wcvmgo = $wcvmgo_manual[0];
+//        $vendor = get_post($order->post_parent);
+        wp_redirect(site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po='.$order->ID));
+//        include plugin_dir_u(__FILE__) .'/templates/print-template-page.php?po=1';
+        exit();
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
             wp_delete_post($_POST['ID']);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete-all'])) {
 //             $sql = "DELETE FROM `wp_posts` WHERE post_type = 'wcvm-order' AND `post_status` = 'trash'";
