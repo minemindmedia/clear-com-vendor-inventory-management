@@ -94,8 +94,9 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
         $last_order_id = 0;
         $last_expected_date = '';
         foreach ($orders as $order) {
-
-
+            $post_id = wp_get_single_post($order->ID);
+            $post_parent_id = $post_id->post_parent;
+            $parent_post_title = wp_get_single_post($post_parent_id);
             $vendor_price = 0;
             $vendor_sku = '';
 //            print_r($order);die;
@@ -165,7 +166,7 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                     <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->ID)) ?>
                 </div>
                 <div style="float: left;width: 250px; padding: 2px;">
-                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($order->primary_vendor_name)) ?><br>
+                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($parent_post_title->post_title)) ?><br>
                     <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->post_date))) ?>
                 </div>
 
@@ -207,7 +208,7 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                 if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'publish' || $status == 'private' || $status == 'trash') {
                     $display = "none";
                 }
-                ?> style="display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->ID) ?>" id="<?= esc_attr($order->ID) ?>">
+                ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->ID) ?>" id="<?= esc_attr($order->ID) ?>">
                     <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
 
                         <thead>
