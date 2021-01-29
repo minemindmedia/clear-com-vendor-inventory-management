@@ -11,6 +11,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function __construct() {
         register_activation_hook(__FILE__, array($this, 'activate_plugin'));
+                add_action('wp_head', array($this, 'my_custom_public_page'));
+                add_filter('init', array($this, 'filter_func'));
+                add_filter('template_redirect', array($this, 'load_template'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueScript'));
         add_action('admin_menu', array($this, 'wcvimActionAdminMenu'));
         add_action('admin_menu', array($this, 'wcvimSaveAdminMenu'));
@@ -18,6 +21,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         add_action('admin_menu', array($this, 'wcvimReceiveInventory'));
         add_action('admin_menu', array($this, 'wcvimReceiveBackOrderItems'));
         add_action('admin_menu', array($this, 'wcvimgeneratePo'));
+
         add_action("wp_ajax_generate_po", array($this, "generate_po"));
         add_action("wp_ajax_updateVendorProductMapping", array($this, "updateVendorProductMapping"));
         add_action('plugins_loaded', array($this, 'wcvmcvoActionPluginsLoaded'));
@@ -135,7 +139,30 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
         add_submenu_page('vendor-management', __('Receive Inventory', 'wcvim'), __('Receive Inventory', 'wcvim'), 'manage_options', 'wcvm-ri', array($this, 'wcvimReceiveInventoryPage'));
     }
-
+    public function my_custom_public_page()
+      {
+            if(isset($_GET['room_type'])){      
+                  $dir = plugin_dir_path( __FILE__ );print_r($dir) ;die;
+            include($dir."custom_page.php");
+           
+            }
+      }
+      public function filter_func() {
+//          if ( isset( $_GET['invoice_id'] ) ) {
+//        $invoice_id = $_GET['invoice_id'];
+//        include plugin_dir_path( __FILE__ ) . 'templates/print-template-page.php';
+//        die;
+//    }
+          add_rewrite_endpoint( 'print', EP_PERMALINK );
+      } 
+      public function load_template() {
+          global $wp_query;
+//    if (! isset( $wp_query->query_vars['print'] ) ) {
+//        return;
+//    }
+    include plugin_dir_path( __FILE__ ) . 'templates/print-template-page.php';
+    die;
+      }
     public function wcvimReceiveBackOrderItems() {
 
         add_submenu_page('vendor-management', __('Receive Back Order Items', 'wcvim'), __('Receive Back Order Items', 'wcvim'), 'manage_options', 'wcvm-rboi', array($this, 'wcvimReceiveBackOrderItemsPage'));
@@ -158,9 +185,40 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function wcvimPurchaseOrderPage() {
         global $wpdb;
-//        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-//            print_r($_POST);die;
-//        }
+        if ($_SERVER['REQUEST_METHOD'] == 'GET'){
+    $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
+    $queryStatus = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
+    $query = new WP_Query();
+    $queryString = "";
+    $redirectURL = "";
+    $getStatus = $queryStatus != "" ? $_REQUEST['status'] : 'auto-draft';
+    if ($queryStatus == "draft" || $queryStatus == "auto-draft") {
+        $queryStatus = "='" . $queryStatus . "'";
+    } else {
+        $queryStatus = "LIKE '%" . $queryStatus . "%'";
+    }
+    if (isset($_REQUEST['search_po'])) {
+        $queryString = "SELECT   wp_posts.* FROM wp_posts  WHERE 1=1  AND wp_posts.post_type = 'wcvm-order' AND wp_posts.ID = " . $_REQUEST['search_po'] . " ORDER BY wp_posts.post_date DESC ";
+    } else {
+        $queryString = "SELECT   wp_posts.* FROM wp_posts  WHERE 1=1  AND wp_posts.post_type = 'wcvm-order' AND wp_posts.post_status " . $queryStatus . " ORDER BY wp_posts.post_date DESC ";
+    }
+    $orders = $wpdb->get_results($queryString, TRUE);
+    if($orders){
+    if (isset($_REQUEST['search_po']) && $orders[0]->post_status != $getStatus) {
+        $redirect_status = $orders[0]->post_status;
+        if (strpos($orders[0]->post_status, "|") !== false) {
+            $redirect_status = 'multiple';
+        }
+        if ($_REQUEST['status'] != $redirect_status) {
+            $redirectURL = get_site_url() . '/wp-admin/admin.php?page=wcvm-epo&status=' . $redirect_status . '&search_po=' . $_REQUEST['search_po'];
+            wp_redirect($redirectURL);
+        }
+    }
+        }
+        }
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+            print_r($_POST);die;
+        }
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['unarchive'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
@@ -172,12 +230,13 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             $order->post_status = 'trash';
             wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
+
 //        $order = get_post($_POST['ID']);
 //        $wcvmgo_manual = get_post_meta($_POST['ID'], "wcvmgo");
 //        $order->wcvmgo = $wcvmgo_manual[0];
 //        $vendor = get_post($order->post_parent);
-        wp_redirect(site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po='.$order->ID));
-//        include plugin_dir_u(__FILE__) .'/templates/print-template-page.php?po=1';
+//        header('Location:'.site_url('/wp-admin/print='.$_POST['ID']));
+        header('Location:'.site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po='.$_POST['ID']));
         exit();
     } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
             wp_delete_post($_POST['ID']);
