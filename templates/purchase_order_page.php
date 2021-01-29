@@ -23,7 +23,7 @@
         $status = $_REQUEST['status'];
     }
 
-    $show_status = $status ? $status : 'draft';
+    $show_status = $status ? $status : 'auto-draft';
 
     $status = $show_status;
     global $wpdb;
@@ -34,9 +34,16 @@ LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = '
 LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
 where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
     $orders = $wpdb->get_results($posts_table_sql);
-    ?>
-    <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
-    <?php $table = new Vendor_Management_Columns(); ?>
+    if (isset($_GET['search_po'])) {
+        ?>
+        <h1><?= "Details for PO # " . $_GET['search_po']; ?></h1>
+        <?php
+    } else {
+        ?>
+        <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
+        <?php
+    }
+     $table = new Vendor_Management_Columns(); ?>
     <?php $table_headers = $table->get_columns_vendors_list(); ?>
 
 
