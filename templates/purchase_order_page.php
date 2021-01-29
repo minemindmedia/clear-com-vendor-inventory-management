@@ -139,10 +139,10 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
             <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):     ?>
-            <div style="padding-top: 5px;float: right">
+            <!-- <div style="padding-top: 5px;float: right">
                 <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
                 <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
-            </div>
+            </div> -->
             <?php // endif      ?>
             </div>
             <div style="clear: both;"></div>
@@ -262,9 +262,9 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                             <td>On Vendor Bo</td>
                             <?php
                             $order_product_Qty = 0;
-                            $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id . "_qty");
+                            $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id);
                             if($order_Qty){
-                            $order_product_Qty = $order_Qty[0];                                
+                            $order_product_Qty = $order_Qty[0]['product_quantity'];                                
                             }
                             $inputType = '';
 
@@ -304,10 +304,10 @@ where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDE
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
             <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):   ?>
-            <div style="padding-top: 5px;float: right">
+            <!-- <div style="padding-top: 5px;float: right">
                 <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
                 <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
-            </div>
+            </div> -->
             <?php endif    ?>
     </form>
     <br><br>
