@@ -116,7 +116,10 @@
     // }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        global $wpdb;
+        $wcvmgo_product_quantity = 0;
         $order = get_post($_POST['ID']);
+        $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_order';
         if ($order && $order->post_type == 'wcvm-order') {
             $isValid = true;
             foreach ($order->wcvmgo as $productId) {
@@ -161,8 +164,10 @@
 
                         update_post_meta($order->ID, 'wcvmgo_' . $productId . '_qty', $qtyToUpdate[0] - $data['product_quantity_received']);
                         update_post_meta($productId,'_stock_status','instock');
+                        $wcvmgo_product_quantity = $qtyToUpdate[0] - $data['product_quantity_received'];
                     }
                     if ($data['product_quantity_back_order'] > 0) {
+                        $wcvmgo_product_quantity = $data['product_quantity_back_order'];
                         if ($order->post_status != "") {
                             $order->post_status .= "|";
                         }
@@ -211,6 +216,20 @@
                         $stock = $data['product_quantity_received'] + get_post_meta($productId, '_stock', true);
                     }
                     update_post_meta($productId, '_stock', $stock);
+
+                    $update_data['product_quantity'] = $wcvmgo_product_quantity;
+                    $update_data['product_quantity_received'] = $data['product_quantity_received'];
+                    $update_data['product_quantity_received'] = $data['product_quantity_received'];
+                    $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
+                    $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
+                    $update_data['product_quantity_returned'] = $data['product_quantity_returned'];
+                    $update_data['product_expected_date_back_order'] = $data['product_expected_date_back_order'];
+                    $update_data['expected_date'] = $expectedDate;
+                    $update_data['set_date'] = time();
+                    $update_data['updated_date'] = date('Y/m/d H:i:s a');
+                    $where_data['product_id'] = $productId;
+                    $where_data['order_id'] = $order->ID;
+                    $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
                 }
                 if ($expectedDate) {
                     update_post_meta($order->ID, 'expected_date', $expectedDate);
@@ -229,11 +248,10 @@
                     }
                 }
 
-                global $wpdb;
                 $query = "UPDATE wp_posts SET post_status = '" . $order->post_status . "' WHERE ID = " . $order->ID;
 
                 $wpdb->query($query);
-
+                // die;
                 wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $redirect) . '#order' . $order->ID);
                 exit();
             }
