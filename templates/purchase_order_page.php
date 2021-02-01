@@ -18,21 +18,20 @@
 </style>
 <div class="wrap">
     <?php
-    $status = "";
-    if (array_key_exists('status', $_REQUEST)) {
-        $status = $_REQUEST['status'];
-    }
-
-    $show_status = $status ? $status : 'auto-draft';
-
-    $status = $show_status;
     global $wpdb;
+    $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
+    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
+    if ($show_status == "draft" || $show_status == "auto-draft") {
+        $query_status = "='" . $show_status . "'";
+    } else {
+        $query_status = "LIKE '%" . $show_status . "%'";
+    }
+    $status = $show_status;
     $posts_table = $wpdb->prefix . "posts";
-    $posts_table_sql = "SELECT * 
-FROM `" . $posts_table . "` p
-LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
-LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
-where p.post_status = '" . $show_status . "' and p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
+    $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
+                        LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+                        LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
+                        WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
     $orders = $wpdb->get_results($posts_table_sql);
     if (isset($_GET['search_po'])) {
         ?>

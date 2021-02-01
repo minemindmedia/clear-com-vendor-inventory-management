@@ -34,25 +34,10 @@
                     <td>RK-CHY-4</td>
                     <td>100</td>
                     <td>100</td>
-                    <td><input type="text" value="8" style="width:60px;"></td>
-                    <td><input type="text" value="" style="width:60px;"></td>
-                    <td><input type="text" value="" style="width:60px;"></td>
-                    <td><input type="text" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" name="" value=""></td>
-                    <td>0</td>
-
-                </tr>
-                <tr>
-                    <td><a href="">CHRY052</a></td>
-                    <td><a href="">Chrysler Remote Head 3 Button L,U,Px</a></td>
-                    <td>Kigo</td>
-                    <td>C</td>
-                    <td>RK-CHY-4</td>
-                    <td>100</td>
-                    <td>100</td>
-                    <td><input type="text" value="8" style="width:60px;"></td>
-                    <td><input type="text" value="" style="width:60px;"></td>
-                    <td><input type="text" value="" style="width:60px;"></td>
-                    <td><input type="text" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" name="" value=""></td>
+                    <td><input type="text" data-role="__product_quantity_received" name="__product_quantity_received[]" value="" style="width:60px;"></td>
+                    <td><input type="text" data-role="__product_quantity_back_order" name="__product_quantity_back_order[]" value="" style="width:60px;"></td>
+                    <td><input type="text" data-role="__product_quantity_canceled" name="__product_quantity_canceled[]" value="" style="width:60px;"></td>
+                    <td><input type="text" data-role="datetime" name="product_expected_date_back_order[278][]"  value="" style="text-align: center;width: 70px;font-size: 10px;"></td>
                     <td>0</td>
 
                 </tr>
@@ -65,9 +50,7 @@
                     ?>
                 </tr>
             </tfoot>
-
         </table>
-
         <div style="padding-top: 5px;">
             <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__('Set Inventory', 'wcvm') ?></button>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
