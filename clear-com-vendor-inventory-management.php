@@ -188,7 +188,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             )) as $id) {
                 wp_delete_post($id);
             }
-        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
             /* foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {

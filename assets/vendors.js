@@ -113,6 +113,8 @@ jQuery(document).ready(function ($) {
                 $("form#" + searchValue).show();
 
             }
+        }else{
+             $("form.purchase-order").show();
         }
     });
 
