@@ -213,7 +213,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 }
                 foreach ($_POST['__order_qty'] as $productId => $_) {
                     update_post_meta($orderId, 'wcvmgo_' . $productId . '_qty', $_POST['__order_qty'][$productId]);
-                    $stamp = strtotime($_POST['__expected_date'][$productId]);
+                    $stamp = strtotime($_POST['__expected_date']);
                     if (!$stamp && !empty($_POST['expected_date'])) {
                         $stamp = strtotime($_POST['expected_date']);
                     }

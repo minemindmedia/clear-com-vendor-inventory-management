@@ -18,6 +18,7 @@
 </style>
 <div class="wrap">
     <?php
+    $records = false;
     $status = "";
     if (array_key_exists('status', $_REQUEST)) {
         $status = $_REQUEST['status'];
@@ -116,6 +117,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
             $ordersIDArr = $postmeta_result[0]->meta_value;
             $ordersIDs = unserialize($ordersIDArr);
             if (in_array($order->meta_value, $ordersIDs)) {
+                $records = true;
                 $post_id = get_post($order->ID);
                 $post_parent_id = $post_id->post_parent;
                 $parent_post_title = get_post($post_parent_id);
@@ -138,6 +140,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
 
                 <?php
                 if ($last_order_id > 0 && $last_order_id != $order->ID) {
+                    $records = true;
                     ?>
                 </tbody>
                 <tfoot>
@@ -154,6 +157,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
                 <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):       ?>
                 <div style="padding-top: 5px;width: 300px;float: left">
                     <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
+                    <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
                 <?php // endif       ?>
@@ -176,6 +180,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
                 <?php
             }
             if (!in_array($order->ID, $printed_po_numbers)) {
+                $records = true;
                 ?>
                 <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->ID) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
                     <input type="hidden" name="ID" value="<?= esc_attr($order->ID) ?>">
@@ -305,6 +310,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
                             <?php
                         }
                     }
+                    if($records){
                     ?>
                 </tbody>
                 <tfoot>
@@ -337,7 +343,8 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
     <br><br>
     <br><br>
     <?php
-} else {
+    }
+} if(!$records) {
     echo 'No Orders Found';
 }
 ?>
