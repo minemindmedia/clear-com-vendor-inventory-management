@@ -31,7 +31,7 @@ jQuery(document).ready(function ($) {
     });
     $('#generate-po-button').on('click', function (e) {
         e.preventDefault();
-   
+
         $("body").append("<div id='loading' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
         var purchase_order_data = new Array();
         console.log(selected_ids);
@@ -43,7 +43,7 @@ jQuery(document).ready(function ($) {
             });
         });
         console.log(purchase_order_data);
-//        if (purchase_order_data.length > 0) {
+        if (purchase_order_data.length > 0) {
             var data = {
                 action: 'generate_po',
                 purchase_order_data: purchase_order_data
@@ -54,7 +54,7 @@ jQuery(document).ready(function ($) {
                 var response = jQuery.parseJSON(data);
                 window.location.href = response.redirect_url
             });
-//        }
+        }
     });
     $('.vendor-select').on('keyup change', function (e) {
         e.preventDefault();
@@ -62,9 +62,9 @@ jQuery(document).ready(function ($) {
         var vendor_price = $(this).find('option:selected').data('vendor_price');
         $(this).closest('td').next('td').html(vendor_price);
     });
-        
-     jQuery('[data-role="datetime"]').datepicker({
-        dateFormat : 'yy-mm-dd'
+
+    jQuery('[data-role="datetime"]').datepicker({
+        dateFormat: 'yy-mm-dd'
     });
 
     $('#sync-vendor').on('click', function (e) {
@@ -78,12 +78,12 @@ jQuery(document).ready(function ($) {
             var response = jQuery.parseJSON(data);
             console.log(response);
             $('#wcvim_spinner').remove();
-            if(response.success == true) {
+            if (response.success == true) {
                 window.location.reload();
             }
         });
     });
-    $(document).on('click', '[data-role="order-title"]', function(event) {
+    $(document).on('click', '[data-role="order-title"]', function (event) {
         var element = $(this);
         var label = element.text();
         element.text(element.attr('data-label'));
@@ -95,10 +95,24 @@ jQuery(document).ready(function ($) {
             target.slideUp();
         }
     });
-        $(document).on('click', '#wcvm-delete-all-button', function() {
-            console.log('ddd');
+    $(document).on('click', '#wcvm-delete-all-button', function () {
+        console.log('ddd');
         if (confirm('Are you sure?')) {
             $('#wcvm-delete-all-form').submit();
+        }
+    });
+//        $('#search_po').on('keyup change', function (e) {
+    $('#wcvm-search-form').on('submit', function (e) {
+        e.preventDefault();
+        var searchValue = $("#search_po").val();
+        if (searchValue) {
+            $("form.purchase-order").hide();
+            if ($("form#" + searchValue).length == 0) {
+                console.log('not');
+            } else {
+                $("form#" + searchValue).show();
+
+            }
         }
     });
 
