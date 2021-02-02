@@ -388,10 +388,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
                 if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
-                        <a href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>
-                        <a href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
-                        <a href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>
-                        <div style="margin-top:10px;" class="text-danger">
+                        <a style="display:none;" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>
+                        <a style="display:none;" href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
+                        <a style="display:none;" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>
+                        <div style="margin-top:10px;display:none;" class="text-danger">
                             <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date;  ?> Vendor Management Last Date: <?php echo $vendor_management_last_date;  ?></span>
                         </div>
             <?php } ?>
@@ -559,17 +559,36 @@ class WC_Clear_Com_Vendor_Inventory_Management {
     public function generatePurchaseOrder() {
         $link = admin_url('admin-ajax.php?action=generatePO&post_id=');
         global $wpdb;
-        $order_details_table = $wpdb->prefix . "vendor_po_lookup";
-        $order_details_table_sql = "SELECT *,
-					CASE
-						WHEN stock IS NULL THEN 'OUT'
-						WHEN CAST(stock as signed) <= 0 THEN 'OUT'
-						WHEN CAST(stock as signed) <= threshold_low THEN 'LOW'
-						WHEN CAST(stock as signed) <= threshold_reorder THEN 'REORDER'
-						ELSE 'OK'
-					END stock_status
-					FROM " . $order_details_table . "";
+        $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
+        $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_order";
+        // $order_details_table_sql = "SELECT *,
+		// 			CASE
+		// 				WHEN stock IS NULL THEN 'OUT'
+		// 				WHEN CAST(stock as signed) <= 0 THEN 'OUT'
+		// 				WHEN CAST(stock as signed) <= threshold_low THEN 'LOW'
+		// 				WHEN CAST(stock as signed) <= threshold_reorder THEN 'REORDER'
+		// 				ELSE 'OK'
+		// 			END stock_status
+		// 			FROM " . $order_details_table . "";
+        // $orderDetails = $wpdb->get_results($order_details_table_sql);
+        $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
+        v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.rare, v.category, v.vendor_id, v.vendor_name, 
+        v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
+        v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty, v.stock_status, 
+        CASE WHEN v.stock IS NULL THEN 'OUT' 
+        WHEN CAST(v.stock as signed) <= 0 THEN 'OUT' 
+        WHEN CAST(v.stock as signed) <= v.threshold_low THEN 'LOW' 
+        WHEN CAST(v.stock as signed) <= v.threshold_reorder THEN 'REORDER' ELSE 'OK' END product_stock_status,
+        sum(p.product_quantity) as total_quantity
+        FROM " . $vendor_po_lookup_table . " v
+        left join " . $vendor_purchase_order_table . " p on p.product_id = v.product_id
+        group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
+        v.threshold_reorder, v.reorder_qty, v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
+        v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
+        v.sale_30_days, v.order_qty, v.stock_status";
         $orderDetails = $wpdb->get_results($order_details_table_sql);
+        // echo $wpdb->last_query;
+        //print_r($orderDetails);
         ?>
         <style>
             /*thead{
@@ -759,7 +778,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     } else {
                         $row_classes .= " non_new_item";
                     }
-                    $row_classes .= " " . strtolower($orderDetail->stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id;
+                    $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id;
                     ?>
                     <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>'>
                         <td class="center first-cell"><?php echo ($orderDetail->new) ? "&#10004;" : ""; ?></td>
@@ -767,7 +786,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <td class="center third-cell"><?php echo $orderDetail->sku ?></td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
                         <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
-                        <td class="center sixth-cell"><?php echo $orderDetail->stock_status ?></td>
+                        <td class="center sixth-cell"><?php echo $orderDetail->product_stock_status ?></td>
                         <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
@@ -792,7 +811,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <td class="center seventh-cell"><?php echo $orderDetail->threshold_reorder ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->reorder_qty ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order ?></td>
-                        <td class="center seventh-cell"><?php echo 'ask' ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="<?php echo $orderDetail->reorder_qty; ?>"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
