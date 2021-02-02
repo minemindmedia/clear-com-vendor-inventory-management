@@ -196,6 +196,15 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
                         <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($parent_post_title->post_title)) ?><br>
                         <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->post_date))) ?>
                     </div>
+                <?php
+                if ($status == "returned") {
+                    ?>
+                    <div style="float: right;padding: 2px;">
+                        <button type="button" class="button" onclick="mark_closed('<?php echo $order->ID ?>')">Mark Selected Closed</button>
+                    </div>
+                    <?php
+                }
+                ?>
 
                     <div style="float: right;padding: 2px;">
                         <button type="button" class="button" data-id="<?= esc_attr($order->ID) ?>" data-role="order-title" data-label="<?php
@@ -294,14 +303,17 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
                                 if ($order_Qty) {
                                     $order_product_Qty = $order_Qty[0]['product_quantity'];
                                 }
+if($status != 'trash'){                                
                                 $inputType = '';
 
                                 if ($status == 'pending') {
                                     $inputType = 'readonly';
                                 }
                                 ?>
-
                                 <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
+<?php
+}
+?>
                                 <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
 
 
@@ -394,6 +406,41 @@ function get_print_status($order = FALSE) {
 }
 ?>
 <script>
+        function mark_closed(id)
+    {
+        var ids_to_delete = "";
+        var order_to_process = id;
+        jQuery(".deleting").each(function (index) {
+            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
+            if (jQuery(this).is(':checked'))
+            {
+                if (ids_to_delete != "")
+                {
+                    ids_to_delete += ",";
+                }
+                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
+            }
+        });
+        jQuery.ajax({
+            type: "POST",
+            data: {
+                ids_to_delete: ids_to_delete,
+                order_to_process: order_to_process
+            },
+            url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/extras/close_selected_returns.php",
+            beforeSend: function () {
+                // setting a timeout
+                //$(placeholder).addClass('loading');
+            },
+            success: function (data)
+            {
+                if (data == 1)
+                {
+                    location.reload();
+                }
+            }
+        });
+    }
     jQuery(".delete_selected").bind("click", function () {
         console.log('s');
         var ids_to_delete = "";
