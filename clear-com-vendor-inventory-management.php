@@ -286,8 +286,12 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
                     ));
                     $update_data['product_quantity'] = $_POST['__order_qty'][$productId];
-                    $update_data['po_expected_date'] = strtotime($_POST['expected_date']);
+                    $update_data['product_expected_date'] = $stamp;
+                    if (!empty($_POST['expected_date'])) {
+                        $update_data['po_expected_date'] = strtotime($_POST['expected_date']);
+                    }
                     $update_data['updated_date'] = date('Y/m/d H:i:s a');
+                    $update_data['updated_by'] = get_current_user_id();
                     $where_data['product_id'] = $productId;
                     $where_data['order_id'] = $orderId;
                     $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
@@ -340,9 +344,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
                 if ($product_update_last_date >= $vendor_management_last_date || 1) {
                     ?>
-                        <a href="#" class="button button-primary" id="sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>
-                        <a href="#" class="button button-primary" id="sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
-                        <a href="#" class="button button-primary" id="update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>
+                        <a href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>
+                        <a href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
+                        <a href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>
                         <div style="margin-top:10px;" class="text-danger">
                             <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date;  ?> Vendor Management Last Date: <?php echo $vendor_management_last_date;  ?></span>
                         </div>
@@ -463,17 +467,18 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         $insert_data['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
                         $insert_data['product_price'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_price'];
                         $insert_data['product_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
-                        // $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
-                        // $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
-                        // $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
-                        // $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
+                        $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
+                        $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
+                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
+                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
                         // $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
-                        // $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
-                        // $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
-                        // $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
-                        // $insert_data['vendor_price_notes'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_notes'];
+                        $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
+                        $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
+                        $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
+                        $insert_data['vendor_price_notes'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_notes'];
                         $insert_data['order_date'] = date('Y/m/d H:i:s a');
                         $insert_data['created_date'] = date('Y/m/d H:i:s a');
+                        $insert_data['created_by'] = get_current_user_id();
                         $inserted = $wpdb->insert($vendor_purchase_order_table, $insert_data);
                         if($inserted) {
                             $ajaxResponse['purchase_order'] = true;
@@ -907,31 +912,21 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         <?php
     }
 
+    // sync vendor product mapping table
     public function sync_vendor_product_mapping_table() {
         global $wpdb;
+        $table = $wpdb->prefix . 'vendor_product_mapping';
         $ajaxResponse = [];
         $ajaxResponse['success'] = false;
-        $truncate = "TRUNCATE TABLE {$wpdb->prefix}vendor_product_mapping";
+        $truncate = "TRUNCATE TABLE " . $table;
         $wpdb->query($truncate);
 
         $sql = "SELECT * FROM " . $wpdb->prefix . "postmeta pm join {$wpdb->prefix}posts p on p.id = pm.post_id WHERE meta_key LIKE 'wcvm'";
-
         $results = $wpdb->get_results($sql);
-        $table = $wpdb->prefix . 'vendor_product_mapping';
-        $count = 0;
-        // $delete = $wpdb->query("TRUNCATE TABLE `".$table."`");
-        // die;
-
+ 
         foreach ($results as $result) {
-            # code...
             $metaValues = unserialize($result->meta_value);
             foreach ($metaValues as $metaValue) {
-                # code...
-                // print_r("Post ID " . $result->post_id . "-----" . "vendor id " . $metaValue);
-                //   	$data = array('post_id' => $result->post_id, 'vendor_id' => $metaValue);
-                // $format = array('%d','%d');
-                // $wpdb->insert($table,$data,$format);
-                // $count++;
                 $skuKey = "wcvm_" . $metaValue . "_sku";
                 $sql = "SELECT * FROM {$wpdb->prefix}postmeta pm WHERE meta_key = '" . $skuKey . "' and post_id = " . $result->post_id;
                 $vendorSku = $wpdb->get_results($sql);
@@ -940,28 +935,26 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 $sql = "SELECT * FROM {$wpdb->prefix}postmeta pm WHERE meta_key = '" . $priceKey . "' and post_id = " . $result->post_id;
                 $vendorPrice = $wpdb->get_results($sql);
 
-                //print_r("Post ID " . $result->post_id . "-----" . "vendor id " . $metaValue . "-------" . "SKU" . $vendorSku[0]->meta_value . "-------" . "Price" . $vendorPrice[0]->meta_value);
-
                 $data = array('post_id' => $result->post_id, 'vendor_id' => $metaValue, 'vendor_sku' => $vendorSku[0]->meta_value, 'vendor_price' => $vendorPrice[0]->meta_value);
                 $format = array('%d', '%d', '%s', '%d');
                 $insert = $wpdb->insert($table, $data, $format);
             }
-            // print_r("<br/>");
         }
         if($insert) {
             $total_rows = $wpdb->get_results("SELECT count(*) AS total_rows FROM " . $table);
-
             $ajaxResponse['success'] = true;
-            $ajaxResponse['total_rows'] = $total_rows;
+            $ajaxResponse['inserted_rows'] = $total_rows[0]->total_rows;
         }
-        exit(json_decode($ajaxResponse));
+        exit(json_encode($ajaxResponse));
     }
 
+    // sync vendor po lookup table
     public function sync_vendor_po_lookup_table() {
         global $wpdb;
+        $table = $wpdb->prefix . 'vendor_po_lookup';
         $ajaxResponse = [];
         $ajaxResponse['success'] = false;
-        $truncate = "TRUNCATE TABLE {$wpdb->prefix}vendor_po_lookup";
+        $truncate = "TRUNCATE TABLE " . $table;
         $wpdb->query($truncate);
 
 //        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`)
@@ -1033,14 +1026,17 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         where p.post_type = 'product'
         ) z on z.postid = p.ID
         where p.post_type = 'product'";
-        $sync_data = $wpdb->query($sql);
-        if ($sync_data) {
-            $ajaxResponse['success'] = true;
-            update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
-        }
-        exit(json_decode($ajaxResponse));
-    }
+        $insert = $wpdb->query($sql);
 
+        if($insert) {
+            $total_rows = $wpdb->get_results("SELECT count(*) AS total_rows FROM " . $table);
+            $ajaxResponse['success'] = true;
+            $ajaxResponse['inserted_rows'] = $total_rows[0]->total_rows;
+        }
+        exit(json_encode($ajaxResponse));
+    }
+    
+    // update vendor product mapping table
     public function update_vendor_po_lookup() {
         global $wpdb;
         $ajaxResponse = [];
@@ -1109,8 +1105,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 $where['product_id'] = $single_row->product_id;
                 $wpdb->update('wp_vendor_po_lookup', $updateNewData, $where);
             }
+            update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
+            $ajaxResponse['success'] = true;
         }
-        exit(json_decode($ajaxResponse));
+        exit(json_encode($ajaxResponse));
     }
 
     public function saveVendorPage() {
