@@ -383,7 +383,7 @@ function wcvmcpActionSavePostProduct($productId) {
                     $update_data['product_threshold_reorder'] = get_post_meta($productId, 'wcvm_threshold_reorder', true);
                     $update_data['product_reorder_qty'] = get_post_meta($productId, 'wcvm_reorder_qty', true);
                     $update_data['vendor_sku'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true);
-                    $update_data['vendor_link'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true);
+                    // $update_data['vendor_link'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true);
                     $update_data['vendor_price_last'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true);
                     $update_data['vendor_price_bulk'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true);
                     $update_data['vendor_price_notes'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true);
@@ -395,7 +395,18 @@ function wcvmcpActionSavePostProduct($productId) {
                     $where_data['product_id'] = $productId;
                     $where_data['order_id'] = $orderId;
                     $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
+                    global $wpdb;
+
+                    // Print last SQL query string
                     // echo $wpdb->last_query;
+
+                    // // Print last SQL query result
+                    // echo $wpdb->last_result;
+
+                    // Print last SQL query Error
+                    // echo $wpdb->last_error;
+                    // print_r('productID ' .$productId . "orderID " . $orderId . "vendorID " . $vendorId);
+                    // die;
                 }
                 if (!empty($_POST['expected_date'])) {
                     $order = get_post($_POST['ID']);
