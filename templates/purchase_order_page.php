@@ -68,7 +68,7 @@
       |
      */ ?>
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php if ($status == 'trash'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Trash', 'wcvm') ?></a>    
-    <?php if ($status == 'trash' && $records): ?>
+    <?php if ($status == 'trash'): ?>
         |
         <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
         <form action="" method="post" id="wcvm-delete-all-form">
@@ -82,7 +82,6 @@
         if (array_key_exists('status', $_GET)) {
             $get_status = $_GET['status'];
         }
-        if($records) {
         ?>
         <div style="float: right;margin-bottom: 20px;">
             <form action="" method="get" id="wcvm-search-form">
@@ -98,7 +97,7 @@
             </form>
         </div>
 
-        <?php } // add_thickbox();      ?>
+        <?php  // add_thickbox();      ?>
         <!--    <div id="my-content-id" style="display:none;">
                 <img id="loading_image" src="../wp-content/plugins/woocommerce-vendor-management/templates/loading2.gif"/>
                 <div id="vendor_details">

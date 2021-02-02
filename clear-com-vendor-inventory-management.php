@@ -28,6 +28,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         
         add_filter('woocommerce_product_data_tabs', array($this,'wcvmcpFilterWcProductDataTabs'));        
         add_action('woocommerce_product_data_panels', array($this, 'wcvmcpActionWcProductDataPanels'));        
+        add_action('save_post_product', array($this,'wcvmcpActionSavePostProduct'));        
     }
     public function wcvmcpFilterWcProductDataTabs($data) {
     $data['wcvm-product'] = array(
@@ -47,7 +48,73 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         'nopaging' => true,
     ));
     include plugin_dir_path(__FILE__) . '/templates/admin-product.php';
-}    
+}
+function wcvmcpActionSavePostProduct($productId) {
+    if (empty($_POST['ID'])) {
+        return false;
+    }
+    if ($_POST['ID'] != $productId) {
+        return false;
+    }
+    if (!isset($_POST['wcvm'])) {
+        return false;
+    }
+
+    $query = new WP_Query();
+    $vendorIds = $query->query(array(
+        'post_type' => 'wcvm-vendor',
+        'orderby' => 'post_title',
+        'order' => 'ASC',
+        'suppress_filters' => true,
+        'nopaging' => true,
+        'fields' => 'ids'
+    ));
+
+    $_POST['wcvm'] = array_filter($_POST['wcvm']);
+    $removeIds = get_post_meta($productId, 'wcvm', true);
+    $vendorIds = array_intersect($vendorIds, $_POST['wcvm']);
+    $removeIds = array_diff($removeIds, $vendorIds);
+    $_POST['wcvm_primary'] = in_array($_POST['wcvm_primary'], $vendorIds) ? $_POST['wcvm_primary'] : '';
+    if ($_POST['wcvm_primary']) {
+        array_unshift($vendorIds, $_POST['wcvm_primary']);
+        $vendorIds = array_unique($vendorIds);
+    }
+    if ($vendorIds) {
+        update_post_meta($productId, 'wcvm', $vendorIds);
+    } else {
+        delete_post_meta($productId, 'wcvm');
+    }
+    update_post_meta($productId, 'wcvm_rare', $_POST['wcvm_rare']);
+    update_post_meta($productId, 'wcvm_discontinued', $_POST['wcvm_discontinued']);
+    if ($_POST['wcvm_discontinued']) {
+        update_post_meta($productId, 'wcvm_discontinued_date', date("m-d-Y"));
+    } else {
+        delete_post_meta($productId, 'wcvm_discontinued_date');
+    }
+    update_post_meta($productId, 'wcvm_threshold_low', $_POST['wcvm_threshold_low']);
+    update_post_meta($productId, 'wcvm_threshold_reorder', $_POST['wcvm_threshold_reorder']);
+    update_post_meta($productId, 'wcvm_reorder_qty', $_POST['wcvm_reorder_qty']);
+    update_post_meta($productId, 'wcvm_primary', $_POST['wcvm_primary']);
+    print_r($vendorIds);die;
+    foreach ($vendorIds as $vendorId) {
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_sku', $_POST['wcvm_' . $vendorId . '_sku']);
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_link', $_POST['wcvm_' . $vendorId . '_link']);
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', str_replace("$", "", $_POST['wcvm_' . $vendorId . '_price_last']));
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_freight_in', str_replace("$", "", $_POST['wcvm_' . $vendorId . '_freight_in']));
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', $_POST['wcvm_' . $vendorId . '_price_bulk']);
+        update_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', $_POST['wcvm_' . $vendorId . '_price_notes']);
+    }
+    foreach ($removeIds as $vendorId) {
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_sku');
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_link');
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_price_last');
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_freight_in');
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk');
+        delete_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes');
+    }
+
+    return true;
+}
     public function create_vendor_product_mapping() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'vendor_product_mapping';

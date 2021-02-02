@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $where_data['product_id'] = $productId;
                 $where_data['order_id'] = $order->ID;
                 $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
-                echo $wpdb->last_query;
+                // echo $wpdb->last_query;
             }
             if ($expectedDate) {
                 update_post_meta($order->ID, 'expected_date', $expectedDate);
