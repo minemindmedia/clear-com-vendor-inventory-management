@@ -25,8 +25,29 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         add_action("wp_ajax_sync_vendor_po_lookup_table", array($this, "sync_vendor_po_lookup_table"));
         add_action("wp_ajax_update_vendor_po_lookup", array($this, "update_vendor_po_lookup"));
         add_action('plugins_loaded', array($this, 'wcvmcvoActionPluginsLoaded'));
+        
+        add_filter('woocommerce_product_data_tabs', array($this,'wcvmcpFilterWcProductDataTabs'));        
+        add_action('woocommerce_product_data_panels', array($this, 'wcvmcpActionWcProductDataPanels'));        
     }
-
+    public function wcvmcpFilterWcProductDataTabs($data) {
+    $data['wcvm-product'] = array(
+        'label' => __('Vendor Management', 'wcvm'),
+        'target' => 'wcvmcpAdminProduct',
+    );
+    return $data;    
+    }
+    public function wcvmcpActionWcProductDataPanels() {
+    $product = get_post();
+    $query = new WP_Query();
+    $vendors = $query->query(array(
+        'post_type' => 'wcvm-vendor',
+        'suppress_filters' => true,
+        'orderby' => 'post_title',
+        'order' => 'asc',
+        'nopaging' => true,
+    ));
+    include plugin_dir_path(__FILE__) . '/templates/admin-product.php';
+}    
     public function create_vendor_product_mapping() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'vendor_product_mapping';

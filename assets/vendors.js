@@ -135,6 +135,6 @@ jQuery(document).ready(function ($) {
 
 });
 //jQuery(window).load(function() {
-$(window).bind("load", function() {
-    $("#page-loader").fadeOut("slow");
+jQuery(window).bind("load", function() {
+    jQuery("#page-loader").fadeOut("slow");
 });
