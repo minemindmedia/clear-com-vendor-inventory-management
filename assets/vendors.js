@@ -67,20 +67,52 @@ jQuery(document).ready(function ($) {
         dateFormat: 'yy-mm-dd'
     });
 
-    $('#sync-vendor').on('click', function (e) {
+    $('#sync-vendor-product-mapping').on('click', function (e) {
         e.preventDefault();
         $("body").append("<div id='wcvim_spinner' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
         var data = {
-            action: 'updateVendorProductMapping',
+            action: 'sync_vendor_product_mapping_table',
         };
         var ajaxUrl = generate_po_ajax_object.ajax_url;
         jQuery.post(ajaxUrl, data, function (data) {
-            var response = jQuery.parseJSON(data);
-            console.log(response);
+            // var response = jQuery.parseJSON(data);
+            // console.log(response);
             $('#wcvim_spinner').remove();
-            if (response.success == true) {
-                window.location.reload();
-            }
+            // if (response.success == true) {
+            //     window.location.reload();
+            // }
+        });
+    });
+    $('#sync-vendor-po').on('click', function (e) {
+        e.preventDefault();
+        $("body").append("<div id='wcvim_spinner' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
+        var data = {
+            action: 'sync_vendor_po_lookup_table',
+        };
+        var ajaxUrl = generate_po_ajax_object.ajax_url;
+        jQuery.post(ajaxUrl, data, function (data) {
+            // var response = jQuery.parseJSON(data);
+            // console.log(response);
+            $('#wcvim_spinner').remove();
+            // if (response.success == true) {
+            //     window.location.reload();
+            // }
+        });
+    });
+    $('#update-vendor-po').on('click', function (e) {
+        e.preventDefault();
+        $("body").append("<div id='wcvim_spinner' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
+        var data = {
+            action: 'update_vendor_po_lookup',
+        };
+        var ajaxUrl = generate_po_ajax_object.ajax_url;
+        jQuery.post(ajaxUrl, data, function (data) {
+            // var response = jQuery.parseJSON(data);
+            // console.log(response);
+            $('#wcvim_spinner').remove();
+            // if (response.success == true) {
+            //     window.location.reload();
+            // }
         });
     });
     $(document).on('click', '[data-role="order-title"]', function (event) {
