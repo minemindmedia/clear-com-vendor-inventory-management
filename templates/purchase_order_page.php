@@ -19,20 +19,21 @@
 <div class="wrap">
     <?php
     global $wpdb;
+        $records = false;
+
     $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
     $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
     if ($show_status == "draft" || $show_status == "auto-draft") {
         $query_status = "='" . $show_status . "'";
     } else {
     $query_status = "LIKE '%" . $show_status . "%'";
-    $records = false;
     }
     $status = $show_status;
     $posts_table = $wpdb->prefix . "posts";
     $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
                         LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
                         LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
-                        WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
+                        WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
     $orders = $wpdb->get_results($posts_table_sql);
 //    if (isset($_GET['search_po'])) {
     ?>
@@ -153,13 +154,13 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
 
                 </table>
 
-                <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):       ?>
+                <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):       ?>
                 <div style="padding-top: 5px;width: 300px;float: left">
                     <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                     <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
-                <?php // endif       ?>
+                <?php endif       ?>
                 <div style="padding-top: 5px;float: left">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
@@ -326,6 +327,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
             <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'): ?>
                 <div style="padding-top: 5px;width: 300px;float: left">
                     <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
+                    <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
             <?php endif ?>

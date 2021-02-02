@@ -162,6 +162,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function wcvimPurchaseOrderPage() {
         global $wpdb;
+        $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_order';
 //        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 //            print_r($_POST);die;
 //        }
@@ -190,7 +191,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             )) as $id) {
                 wp_delete_post($id);
             }
-        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
             /* foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
@@ -240,6 +241,13 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         'vendor_price_bulk' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true),
                         'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
                     ));
+                    $update_data['product_quantity'] = $_POST['__order_qty'][$productId];
+                    $update_data['po_expected_date'] = strtotime($_POST['expected_date']);
+                    $update_data['updated_date'] = date('Y/m/d H:i:s a');
+                    $where_data['product_id'] = $productId;
+                    $where_data['order_id'] = $orderId;
+                    $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
+                    echo $wpdb->last_query;
                 }
                 if (!empty($_POST['expected_date'])) {
                     $order = get_post($_POST['ID']);
@@ -341,8 +349,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function generate_po() {
         global $wpdb;
-
+        $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_order';
         $ajaxResponse['message'] = 'no post data';
+        $ajaxResponse['purchase_order'] = false;
 //        print_r($_POST);die;
         $product_IDs = [];
         if (isset($_POST)) {
@@ -401,6 +410,30 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_qty', $vendor_product_quantities[$uniquer_vendor_id][$vendor_single_product]);
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_onorder', serialize($vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]));
                         $productIDs = $vendor_single_product;
+
+                        // insert generate po details into wp_vendor_purchase_order
+                        $insert_data['product_id'] = $productIDs;
+                        $insert_data['vendor_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'];
+                        $insert_data['order_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['order'];
+                        $insert_data['product_title'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_title'];
+                        $insert_data['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
+                        $insert_data['product_price'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_price'];
+                        $insert_data['product_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
+                        // $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
+                        // $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
+                        // $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
+                        // $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
+                        // $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
+                        // $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
+                        // $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
+                        // $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
+                        // $insert_data['vendor_price_notes'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_notes'];
+                        $insert_data['order_date'] = date('Y/m/d H:i:s a');
+                        $insert_data['created_date'] = date('Y/m/d H:i:s a');
+                        $inserted = $wpdb->insert($vendor_purchase_order_table, $insert_data);
+                        if($inserted) {
+                            $ajaxResponse['purchase_order'] = true;
+                        }
 //                        if ($productIDs == '') {
 //                            $productIDs .= $vendor_single_product;
 //                        } else {
