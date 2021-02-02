@@ -83,10 +83,54 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         dbDelta($sql);
     }
 
+    public function create_vendor_purchase_order() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'vendor_purchase_order';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `product_id` int(11) NOT NULL,
+        `vendor_id` int(11) NOT NULL,
+        `order_id` int(11) NOT NULL,
+        `product_title` varchar(100) NOT NULL,
+        `product_sku` varchar(20) NOT NULL,
+        `product_price` decimal(10,2) NOT NULL,
+        `product_quantity` INT(11) NULL,
+        `product_expected_date` INT(11) NULL,
+        `product_rare` INT(11) NULL,
+        `product_threshold_low` INT(11) NULL,
+        `product_threshold_reorder` INT(11) NULL,
+        `product_reorder_qty` INT(11) NULL,
+        `vendor_sku` varchar(20) NULL,
+        `vendor_link` varchar(100) NULL,
+        `vendor_price_last` decimal(10,2) NULL,
+        `vendor_price_bulk` decimal(10,2) NULL,
+        `vendor_price_notes` varchar(100) NULL,
+        `product_quantity_received` INT(11) NULL,
+        `product_quantity_back_order` INT(11) NULL,
+        `product_quantity_canceled` INT(11) NULL,
+        `product_quantity_returned` INT(11) NULL,
+        `product_expected_date_back_order` INT(11) NULL,
+        `order_date` datetime NULL,
+        `po_expected_date` INT(11) NULL,
+        `expected_date` INT(11) NULL,
+        `set_date` INT(11) NULL,
+        `created_date` datetime NULL,
+        `created_by` INT(11) NULL,
+        `updated_date` datetime NULL,
+        `updated_by` INT(11) NULL,
+        PRIMARY KEY id (id)
+            ) $charset_collate;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta($sql);
+    }
+
     public function activate_plugin() {
         flush_rewrite_rules();
         $this->create_vendor_product_mapping();
         $this->create_vendor_po_lookup();
+        $this->create_vendor_purchase_order();
     }
 
     public function enqueueScript() {
