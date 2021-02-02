@@ -458,7 +458,22 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_qty', $vendor_product_quantities[$uniquer_vendor_id][$vendor_single_product]);
                         update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_onorder', serialize($vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]));
                         $productIDs = $vendor_single_product;
-
+                        update_post_meta($vendor_post_ids[$uniquer_vendor_id], 'wcvmgo_' . $productIDs, array(
+                        'product_id' => $productIDs,
+                        'product_title' => get_post_field('post_title', $productIDs),
+                        'product_sku' => get_post_meta($productIDs, '_sku', true),
+                        'product_price' => $_POST['__order_qty'][$productIDs],
+                        'product_quantity' => $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'],
+                        'product_rare' => get_post_meta($productIDs, 'wcvm_rare', true),
+                        'product_threshold_low' => get_post_meta($productIDs, 'wcvm_threshold_low', true),
+                        'product_threshold_reorder' => get_post_meta($productIDs, 'wcvm_threshold_reorder', true),
+                        'product_reorder_qty' => get_post_meta($productIDs, 'wcvm_reorder_qty', true),
+                        'vendor_sku' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_sku', true),
+                        'vendor_link' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_link', true),
+                        'vendor_price_last' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_last', true),
+                        'vendor_price_bulk' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_bulk', true),
+                        'vendor_price_notes' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_notes', true),
+                    ));
                         // insert generate po details into wp_vendor_purchase_order
                         $insert_data['product_id'] = $productIDs;
                         $insert_data['vendor_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'];
