@@ -1,5 +1,6 @@
 jQuery(document).ready(function ($) {
     "use strict";
+    $('input:checkbox').removeAttr('disabled');
     var base_url = $("#baseUrl").val();
     var home_url = base_url + 'assets/img/loader.gif';
     function removeArrayValue(arr) {
@@ -54,7 +55,11 @@ jQuery(document).ready(function ($) {
                 var response = jQuery.parseJSON(data);
                 window.location.href = response.redirect_url
             });
-        }
+                }else{
+            $("#loading").remove();
+            alert('Please Select some Products to generate Purchase Order');
+                }
+
     });
     $('.vendor-select').on('keyup change', function (e) {
         e.preventDefault();
@@ -150,4 +155,8 @@ jQuery(document).ready(function ($) {
         }
     });
 
+});
+//jQuery(window).load(function() {
+$(window).bind("load", function() {
+    $("#page-loader").fadeOut("slow");
 });
