@@ -68,7 +68,7 @@
       |
      */ ?>
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php if ($status == 'trash'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Trash', 'wcvm') ?></a>    
-    <?php if ($status == 'trash'): ?>
+    <?php if ($status == 'trash' && $records): ?>
         |
         <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
         <form action="" method="post" id="wcvm-delete-all-form">
@@ -82,6 +82,7 @@
         if (array_key_exists('status', $_GET)) {
             $get_status = $_GET['status'];
         }
+        if($records) {
         ?>
         <div style="float: right;margin-bottom: 20px;">
             <form action="" method="get" id="wcvm-search-form">
@@ -97,7 +98,7 @@
             </form>
         </div>
 
-        <?php // add_thickbox();      ?>
+        <?php } // add_thickbox();      ?>
         <!--    <div id="my-content-id" style="display:none;">
                 <img id="loading_image" src="../wp-content/plugins/woocommerce-vendor-management/templates/loading2.gif"/>
                 <div id="vendor_details">
@@ -110,12 +111,12 @@
         $last_expected_date = '';
         foreach ($orders as $order) {
             $postmeta_table = $wpdb->prefix . "postmeta";
-            $postmeta_table_sql = "SELECT * 
-FROM `" . $postmeta_table . "` pm
-where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
+            $postmeta_table_sql = "SELECT * FROM `" . $postmeta_table . "` pm
+            where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
             $postmeta_result = $wpdb->get_results($postmeta_table_sql);
-            $ordersIDArr = $postmeta_result[0]->meta_value;
-            $ordersIDs = unserialize($ordersIDArr);
+            if($postmeta_result) {
+                $ordersIDArr = $postmeta_result[0]->meta_value;
+                $ordersIDs = unserialize($ordersIDArr);
             if (in_array($order->meta_value, $ordersIDs)) {
                 $records = true;
                 $post_id = get_post($order->ID);
@@ -179,6 +180,7 @@ where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
 
                 <?php
             }
+        }
             if (!in_array($order->ID, $printed_po_numbers)) {
                 $records = true;
                 ?>

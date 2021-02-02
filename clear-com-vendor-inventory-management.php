@@ -97,7 +97,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_price` decimal(10,2) NOT NULL,
         `product_quantity` INT(11) NULL,
         `product_expected_date` INT(11) NULL,
-        `product_rare` INT(11) NULL,
+        `product_rare` TINYINT(1) NULL,
         `product_threshold_low` INT(11) NULL,
         `product_threshold_reorder` INT(11) NULL,
         `product_reorder_qty` INT(11) NULL,
@@ -285,8 +285,20 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         'vendor_price_bulk' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true),
                         'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
                     ));
+                    $update_data['product_title'] =  get_post_field('post_title', $productId);
+                    $update_data['product_sku'] = get_post_meta($productId, '_sku', true);
+                    $update_data['product_price'] = get_post_meta($productId, '_price', true);
                     $update_data['product_quantity'] = $_POST['__order_qty'][$productId];
                     $update_data['product_expected_date'] = $stamp;
+                    $update_data['product_rare'] = get_post_meta($productId, 'wcvm_rare', true);
+                    $update_data['product_threshold_low'] = get_post_meta($productId, 'wcvm_threshold_low', true);
+                    $update_data['product_threshold_reorder'] = get_post_meta($productId, 'wcvm_threshold_reorder', true);
+                    $update_data['product_reorder_qty'] = get_post_meta($productId, 'wcvm_reorder_qty', true);
+                    $update_data['vendor_sku'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true);
+                    $update_data['vendor_link'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true);
+                    $update_data['vendor_price_last'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true);
+                    $update_data['vendor_price_bulk'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true);
+                    $update_data['vendor_price_notes'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true);
                     if (!empty($_POST['expected_date'])) {
                         $update_data['po_expected_date'] = strtotime($_POST['expected_date']);
                     }
@@ -295,7 +307,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     $where_data['product_id'] = $productId;
                     $where_data['order_id'] = $orderId;
                     $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
-                    echo $wpdb->last_query;
+                    // echo $wpdb->last_query;
                 }
                 if (!empty($_POST['expected_date'])) {
                     $order = get_post($_POST['ID']);

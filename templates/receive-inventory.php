@@ -219,12 +219,13 @@
 
                     $update_data['product_quantity'] = $wcvmgo_product_quantity;
                     $update_data['product_quantity_received'] = $data['product_quantity_received'];
-                    $update_data['product_quantity_received'] = $data['product_quantity_received'];
                     $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                     $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
                     $update_data['product_quantity_returned'] = $data['product_quantity_returned'];
                     $update_data['product_expected_date_back_order'] = $data['product_expected_date_back_order'];
-                    $update_data['expected_date'] = $expectedDate;
+                    if(!empty($expectedDate)) {
+                        $update_data['expected_date'] = $expectedDate;
+                    }
                     $update_data['set_date'] = time();
                     $update_data['updated_date'] = date('Y/m/d H:i:s a');
                     $where_data['product_id'] = $productId;
@@ -262,6 +263,7 @@
     <h1><?= esc_html__('Receive Inventory', 'wcvm') ?></h1>
 <?php
     global $wpdb;
+    $records = false;
     $status = "";
     if (array_key_exists('status', $_REQUEST)) {
         $status = $_REQUEST['status'];
@@ -309,8 +311,9 @@
                 break;
             }$i++;
         }
+        if ($last_order_id > 0 && $last_order_id != $order->ID) {
+                $records = true;
         ?>
-         <?php if ($last_order_id > 0 && $last_order_id != $order->ID) { ?>
             </tbody>
                 <tfoot>
                     <tr bgcolor="#e8e8e8" style="font-size:11px;">
@@ -333,6 +336,7 @@
             if (!in_array($order->ID, $printed_po_numbers)) {
                 $printed_po_numbers[] = $order->ID;
                 $last_order_id = $order->ID;
+                $records = true;
         ?>
         <form id="form_<?php echo $order->ID; ?>" action="" method="post">
             <input type="hidden" name="ID" value="<?= esc_attr($order->ID) ?>">
@@ -389,7 +393,9 @@
         </form>
         <br><br>
     <?php
-    } 
+    } if(!$records) {
+        echo 'No Orders Found';
+    }
  ?>
 </div>
 

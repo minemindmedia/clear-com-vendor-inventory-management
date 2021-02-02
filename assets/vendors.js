@@ -90,7 +90,7 @@ jQuery(document).ready(function ($) {
         var ajaxUrl = generate_po_ajax_object.ajax_url;
         jQuery.post(ajaxUrl, data, function (data) {
             var response = jQuery.parseJSON(data);
-            // $('#wcvim_spinner').remove();
+            $('#wcvim_spinner').remove();
             if (response.success == true) {
                 window.location.reload();
             }
