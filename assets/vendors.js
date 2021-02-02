@@ -1,4 +1,63 @@
 jQuery(document).ready(function ($) {
+        var container = $('#wcvmcpAdminProduct');
+        // adding vendor
+    container.on('click', '[data-role="add"]', function() {
+        var select = $('#wcvm_add', container);
+        var id = select.val();
+        if (!id) {
+            return true;
+        }
+        var title = $('[value="' + id + '"]', select).attr('disabled', true).text();
+        select.val('');
+
+        var prototype = $('[data-role="prototype"]', container).clone();
+        prototype.attr('data-role', null);
+        $.each($('[name="wcvm[]"]', prototype), function(key, element) {
+            element = $(element);
+            element.val(id);
+        });
+        $.each($('[data-role="delete"]', prototype), function(key, element) {
+            element = $(element);
+            element.attr('data-id', id);
+        });
+        $.each($('[data-role="primary"]', prototype), function(key, element) {
+            element = $(element);
+            element.val(id);
+        });
+        $.each($('[for*=":ID:"]', prototype), function(key, element) {
+            element = $(element);
+            element.attr('for', element.attr('for').replace(':ID:', id));
+        });
+        $.each($('[id*=":ID:"]', prototype), function(key, element) {
+            element = $(element);
+            element.attr('id', element.attr('id').replace(':ID:', id));
+        });
+        $.each($('[name*=":ID:"]', prototype), function(key, element) {
+            element = $(element);
+            element.attr('name', element.attr('name').replace(':ID:', id));
+        });
+        $.each($('[data-id*=":ID:"]', prototype), function(key, element) {
+            element = $(element);
+            element.attr('data-id', element.attr('data-id').replace(':ID:', id));
+        });
+        $.each($('[data-role="title"]', prototype), function(key, element) {
+            element = $(element);
+            element.text(title);
+        });
+        $('[data-role="border"]', container).before(prototype);
+        prototype.slideDown();
+    });
+        // deleting vendor
+    container.on('click', '[data-role="delete"]', function() {
+        var element = $(this);
+        var select = $('#wcvm_add', container);
+        var id = element.attr('data-id');
+        $('[value="' + id + '"]', select).attr('disabled', null);
+        select.val('');
+        element.parents('div.options_group:first').slideUp(function() {
+            $(this).remove();
+        });
+    });
     "use strict";
     $('input:checkbox').removeAttr('disabled');
     var base_url = $("#baseUrl").val();
@@ -121,9 +180,10 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         var searchValue = $("#search_po").val();
         if (searchValue) {
+            console.log(searchValue);
             $("form.purchase-order").hide();
             if ($("form#" + searchValue).length == 0) {
-                console.log('not');
+//                console.log('not');
             } else {
                 $("form#" + searchValue).show();
 

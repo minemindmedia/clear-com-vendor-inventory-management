@@ -193,8 +193,12 @@
 <script>
     function update_total(vendor_id)
     {
-        var last_price = jQuery("#wcvm_" + vendor_id + "_price_last").val().replace("$", "");
-        var freight_in = jQuery("#wcvm_" + vendor_id + "_freight_in").val().replace("$", "");
+        console.log(vendor_id);
+        if(jQuery("#wcvm_" + vendor_id + "_price_last").val() >0){
+        var last_price = jQuery("#wcvm_" + vendor_id + "_price_last").val();
+        var freight_in = jQuery("#wcvm_" + vendor_id + "_freight_in").val();
+//        var last_price = jQuery("#wcvm_" + vendor_id + "_price_last").val().replace("$", "");
+//        var freight_in = jQuery("#wcvm_" + vendor_id + "_freight_in").val().replace("$", "");
         if (last_price == "")
         {
             last_price = parseFloat(0);
@@ -213,5 +217,6 @@
             total_price = "$" + total_price.toFixed(2);
         }
         jQuery("#" + vendor_id + "_total_price").html("<b>" + total_price + "</b>");
+    }
     }
 </script>
