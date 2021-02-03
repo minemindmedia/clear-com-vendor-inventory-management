@@ -95,7 +95,6 @@ function wcvmcpActionSavePostProduct($productId) {
     update_post_meta($productId, 'wcvm_threshold_reorder', $_POST['wcvm_threshold_reorder']);
     update_post_meta($productId, 'wcvm_reorder_qty', $_POST['wcvm_reorder_qty']);
     update_post_meta($productId, 'wcvm_primary', $_POST['wcvm_primary']);
-    print_r($vendorIds);die;
     foreach ($vendorIds as $vendorId) {
         update_post_meta($productId, 'wcvm_' . $vendorId . '_sku', $_POST['wcvm_' . $vendorId . '_sku']);
         update_post_meta($productId, 'wcvm_' . $vendorId . '_link', $_POST['wcvm_' . $vendorId . '_link']);
