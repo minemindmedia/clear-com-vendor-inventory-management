@@ -54,7 +54,7 @@ class Vendor_Management_Columns {
             $status = $_REQUEST['status'];
         }
         $columns_array = [];
-        $columns_array['wcvm_rare'] = __('Rare', 'wcvm');
+//        $columns_array['wcvm_rare'] = __('Rare', 'wcvm');
         $columns_array['_sku'] = __('CC SKU', 'wcvm');
         $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
         $columns_array['_price'] = __('Our Price', 'wcvm');
@@ -62,11 +62,11 @@ class Vendor_Management_Columns {
         $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
         $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
         $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
-        $columns_array['wcvm_threshold_low'] = __('Low Thresh', 'wcvm');
-        $columns_array['wcvm_threshold_reorder'] = __('Reorder Thresh', 'wcvm');
-        $columns_array['wcvm_reorder_qty'] = __('Reorder QTY', 'wcvm');
+//        $columns_array['wcvm_threshold_low'] = __('Low Thresh', 'wcvm');
+//        $columns_array['wcvm_threshold_reorder'] = __('Reorder Thresh', 'wcvm');
+//        $columns_array['wcvm_reorder_qty'] = __('Reorder QTY', 'wcvm');
         $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
-        $columns_array['_wcvm_on_vendor_bo'] = __('On Vendor BO', 'wcvm');
+//        $columns_array['_wcvm_on_vendor_bo'] = __('On Vendor BO', 'wcvm');
         if ($status == "" || $status == 'draft' || $status == 'auto-draft') {
             $columns_array['__order_qty'] = __('Order QTY', 'wcvm');
         } else if ($status == 'publish') {

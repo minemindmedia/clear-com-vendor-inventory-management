@@ -463,7 +463,7 @@ function wcvmcpActionSavePostProduct($productId) {
             <?php } ?>
             </div>
             <div style="float: left;vertical-align: top">
-                <select name="new_item_filter" class="vendor_details" id="new_item_filter">
+<!--                <select name="new_item_filter" class="vendor_details" id="new_item_filter">
                     <option value="">- <?= esc_html__('New Item', 'wcvm') ?> -</option>
                     <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
                     <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
@@ -472,7 +472,7 @@ function wcvmcpActionSavePostProduct($productId) {
                     <option value="">- <?= esc_html__('Rare Item', 'wcvm') ?> -</option>
                     <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
                     <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
-                </select>
+                </select>-->
                 <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
                     <option value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
                     <option value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
@@ -749,10 +749,12 @@ function wcvmcpActionSavePostProduct($productId) {
                 width: 200px;
             }
             .sixth-cell{
-                width: 65px;
+                width: 85px;
+                /*width: 65px;*/
             }
             .seventh-cell{
-                width: 55px;
+                width: 65px;
+                /*width: 55px;*/
             }
             .eighth-cell{
                 width: 55px;    
@@ -760,10 +762,10 @@ function wcvmcpActionSavePostProduct($productId) {
                 padding-bottom: 5px;
             }
             .tenth-cell{
-                width: 45px;
+/*                width: 45px;*/
             }
             .eleventh-cell{
-                width: 45px;
+                /*width: 45px;*/
             }
             .even{
                 background-color: #f9f9f9;
@@ -773,7 +775,7 @@ function wcvmcpActionSavePostProduct($productId) {
                 padding: 0 15px 0 2px !important;
                 background-size: 8px 8px !important;
                 min-height: 25px !important;
-                width: 85px !important;
+                width: 120px !important;
             }
             table.dataTable thead th, table.dataTable thead td {
                 padding: 0px 4px !important;
@@ -803,8 +805,8 @@ function wcvmcpActionSavePostProduct($productId) {
         <table id="po-items-table" class="" style="margin-top: 25px;">
             <thead>  
                 <tr>
-                    <th class="center first-cell">New</th>
-                    <th class="center first-cell">Rare</th>
+<!--                    <th class="center first-cell">New</th>
+                    <th class="center first-cell">Rare</th>-->
                     <th class="center third-cell">CC SKU</th>
                     <th class="center fourth-cell">Vendor SKU</th>
                     <th class="center fifth-cell">Category/Tags</th>
@@ -814,9 +816,9 @@ function wcvmcpActionSavePostProduct($productId) {
                     <th class="center seventh-cell">Vendor<br>Price</th>
                     <th class="center tenth-cell">QTY<br>On<br>Hand</th>
                     <th class="center eleventh-cell">30<br>Days</th>
-                    <th class="center seventh-cell">Low<br>Thresh</th>
+<!--                    <th class="center seventh-cell">Low<br>Thresh</th>
                     <th class="center seventh-cell">Reorder<br>Thresh</th>
-                    <th class="center seventh-cell">Reorder<br>QTY</th>
+                    <th class="center seventh-cell">Reorder<br>QTY</th>-->
                     <th class="center seventh-cell">On<br>Order</th>
                     <th class="center seventh-cell">On<br>Vendor<br>BO</th>
                     <th class="center seventh-cell">Order<br>QTY</th>
@@ -847,12 +849,18 @@ function wcvmcpActionSavePostProduct($productId) {
                     $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id;
                     ?>
                     <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>'>
-                        <td class="center first-cell"><?php echo ($orderDetail->new) ? "&#10004;" : ""; ?></td>
-                        <td class="center first-cell"><?php echo ($orderDetail->rare) ? "&#10004;" : ""; ?></td>
+                        <!--<td class="center first-cell"><?php // echo ($orderDetail->new) ? "&#10004;" : ""; ?></td>-->
+                        <!--<td class="center first-cell"><?php // echo ($orderDetail->rare) ? "&#10004;" : ""; ?></td>-->
                         <td class="center third-cell"><?php echo $orderDetail->sku ?></td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
                         <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
-                        <td class="center sixth-cell"><?php echo $orderDetail->product_stock_status ?></td>
+                        <td class="center sixth-cell">
+                            <?php if($orderDetail->product_stock_status == 'OUT'){
+                                echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
+                            }else{
+                                echo $orderDetail->product_stock_status ;
+                            }?>
+                        </td>
                         <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
@@ -873,12 +881,12 @@ function wcvmcpActionSavePostProduct($productId) {
                         <td class="center seventh-cell"><?php echo wc_price($selected_vendor_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->threshold_low ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->threshold_reorder ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->reorder_qty ?></td>
+                        <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low ?></td>-->
+                        <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder ?></td>-->
+                        <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty ?></td>-->
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
-                        <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="<?php echo $orderDetail->reorder_qty; ?>"></td>
+                        <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
                     <?php

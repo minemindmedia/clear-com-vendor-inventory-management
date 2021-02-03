@@ -324,8 +324,8 @@
                 </tfoot>
             </table>                
             <div style="padding-top: 5px;">
-                <button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><?= esc_html__('Set Inventory', 'wcvm') ?></button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!--<button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><? esc_html__('Set Inventory', 'wcvm') ?></button>-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
                 <button type="submit" name="action" value="archive" data-role="receive-inventory" class="button"><?= esc_html__('Set Inventory & Archive', 'wcvm') ?></button>
             </div>
             <br><br>
@@ -385,8 +385,8 @@
                 </tfoot>
             </table>                
             <div style="padding-top: 5px;">
-                <button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><?= esc_html__('Set Inventory', 'wcvm') ?></button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<!--                <button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><? esc_html__('Set Inventory', 'wcvm') ?></button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
                 <button type="submit" name="action" value="archive" data-role="receive-inventory" class="button"><?= esc_html__('Set Inventory & Archive', 'wcvm') ?></button>
             </div>
             <br><br>

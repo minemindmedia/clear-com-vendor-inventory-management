@@ -264,26 +264,28 @@
                             }
                             ?>
                             <tr>
-                                <td><?php
-                                    if ($order->rare) {
-                                        echo '&#10004;';
-                                    }
-                                    ?></td>
+<!--                                <td><?php
+//                                    if ($order->rare) {
+//                                        echo '&#10004;';
+//                                    }
+                                    ?></td>-->
                                 <td><?php echo $order->sku; ?></td>
                                 <td><?php
                                     $stock = $order->stock;
 
-                                    if (!$stock) {
+                                    if ($stock <= 0) {
                                         echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
-                                    } elseif ($order->threshold_low && $stock <= 0) {
-                                        echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
-                                    } elseif ($order->threshold_low && $stock <= $order->threshold_low) {
-                                        echo '<span style="background: orange;padding: 5px;">' . esc_html__('LOW', 'wcvm') . '</span>';
-                                    } elseif ($order->threshold_reorder && $stock <= $order->threshold_reorder) {
-                                        echo '<span style="background: yellow;padding: 5px;">' . esc_html__('REORDER', 'wcvm') . '</span>';
-                                    } else {
-                                        echo '<span style="background: green;padding: 5px;color: white">' . esc_html__('OK', 'wcvm') . '</span>';
+                                    }else {
+                                        echo '<span style="background: green;padding: 5px;color: white">' . esc_html__('IN', 'wcvm') . '</span>';
                                     }
+//                                    elseif ($order->threshold_low && $stock <= 0) {
+//                                        echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
+//                                    } elseif ($order->threshold_low && $stock <= $order->threshold_low) {
+//                                        echo '<span style="background: orange;padding: 5px;">' . esc_html__('LOW', 'wcvm') . '</span>';
+//                                    } elseif ($order->threshold_reorder && $stock <= $order->threshold_reorder) {
+//                                        echo '<span style="background: yellow;padding: 5px;">' . esc_html__('REORDER', 'wcvm') . '</span>';
+//                                    }
+
                                     ?>                        
                                     <!--<span style="background: orange;padding: 5px;">LOW</span>-->
                                 </td>
@@ -292,12 +294,12 @@
                                 <td><?php echo wc_price($vendor_price); ?></td>
                                 <td><?php echo $order->stock; ?></td>
                                 <td><?php echo $order->sale_30_days; ?></td>
-                                <td><input readonly type="text" value="<?php echo $order->threshold_low; ?>" style="width:60px;"></td>
-                                <td><input readonly type="text" value="<?php echo $order->threshold_reorder; ?>" style="width:60px;"></td>
-                                <td><input readonly type="text" value="<?php echo $order->reorder_qty; ?>" style="width:60px;"></td>
+<!--                                <td><input readonly type="text" value="<?php // echo $order->threshold_low; ?>" style="width:60px;"></td>
+                                <td><input readonly type="text" value="<?php // echo $order->threshold_reorder; ?>" style="width:60px;"></td>
+                                <td><input readonly type="text" value="<?php // echo $order->reorder_qty; ?>" style="width:60px;"></td>-->
 
                                 <td><?php echo $order->on_order; ?></td>
-                                <td>On Vendor Bo</td>
+                                <!--<td>On Vendor Bo</td>-->
                                 <?php
                                 $order_product_Qty = 0;
                                 $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id);
