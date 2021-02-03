@@ -14,10 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $isValid = true;
         foreach ($order->wcvmgo as $productId) {
             $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
-            $_POST['product_quantity_received'][$productId] = $data['product_quantity_received'] + $_POST['__product_quantity_received'][$productId];
+            $_POST['product_quantity_received'][$productId] = (int)$data['product_quantity_received'] + (int)$_POST['__product_quantity_received'][$productId];
             $_POST['product_quantity_back_order'][$productId] = $_POST['__product_quantity_back_order'][$productId];
             $_POST['product_quantity_canceled'][$productId] = $_POST['__product_quantity_canceled'][$productId];
-            if ($data['product_quantity'] != $_POST['product_quantity_received'][$productId] + $_POST['product_quantity_back_order'][$productId] + $_POST['product_quantity_canceled'][$productId]) {
+            if ($data['product_quantity'] != (int)$_POST['product_quantity_received'][$productId] + (int)$_POST['product_quantity_back_order'][$productId] + (int)$_POST['product_quantity_canceled'][$productId]) {
                 $isValid = false;
                 break;
             }

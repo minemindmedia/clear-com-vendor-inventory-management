@@ -638,7 +638,7 @@ function wcvmcpActionSavePostProduct($productId) {
 		// 			FROM " . $order_details_table . "";
         // $orderDetails = $wpdb->get_results($order_details_table_sql);
         $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
-        v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.rare, v.category, v.vendor_id, v.vendor_name, 
+        v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, 
         v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
         v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty, v.stock_status, 
         CASE WHEN v.stock IS NULL THEN 'OUT' 
@@ -649,7 +649,7 @@ function wcvmcpActionSavePostProduct($productId) {
         FROM " . $vendor_po_lookup_table . " v
         left join " . $vendor_purchase_order_table . " p on p.product_id = v.product_id
         group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
-        v.threshold_reorder, v.reorder_qty, v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
+        v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
         v.sale_30_days, v.order_qty, v.stock_status";
         $orderDetails = $wpdb->get_results($order_details_table_sql);
