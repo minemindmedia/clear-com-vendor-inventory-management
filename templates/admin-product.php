@@ -18,14 +18,14 @@
                 <?php $_stock = (float) $product->_stock ?>
                 <?php if (!$_stock): ?>
                     <span style="background: red;padding: 5px;color: white"><?= esc_html__('OUT', 'wcvm') ?></span>
-                <?php elseif ($product->wcvm_threshold_low && $_stock <= 0): ?>
+<!--                <?php // elseif ($product->wcvm_threshold_low && $_stock <= 0): ?>
                     <span style="background: red;padding: 5px;color: white"><?= esc_html__('OUT', 'wcvm') ?></span>
-                <?php elseif ($product->wcvm_threshold_low && $_stock <= $product->wcvm_threshold_low): ?>
+                <?php // elseif ($product->wcvm_threshold_low && $_stock <= $product->wcvm_threshold_low): ?>
                     <span style="background: orange;padding: 5px;"><?= esc_html__('LOW', 'wcvm') ?></span>
-                <?php elseif ($product->wcvm_threshold_reorder && $_stock <= $product->wcvm_threshold_reorder): ?>
-                    <span style="background: yellow;padding: 5px;"><?= esc_html__('REORDER', 'wcvm') ?></span>
+                <?php // elseif ($product->wcvm_threshold_reorder && $_stock <= $product->wcvm_threshold_reorder): ?>
+                    <span style="background: yellow;padding: 5px;"><?= esc_html__('REORDER', 'wcvm') ?></span>-->
                 <?php else: ?>
-                    <span style="background: green;padding: 5px;color: white"><?= esc_html__('OK', 'wcvm') ?></span>
+                    <span style="background: green;padding: 5px;color: white"><?= esc_html__('IN', 'wcvm') ?></span>
                 <?php endif ?>
             </p>
         </div>
@@ -86,7 +86,7 @@
         <div style="clear: both"></div>
     </div>
 
-    <div class="options_group">
+<!--    <div class="options_group">
         <div style="width: 50%;float: left;">
             <p class="form-field">
                 <label for="wcvm_threshold_low"><?= esc_html__('Low Threshold', 'wcvm') ?></label>
@@ -102,7 +102,7 @@
             </p>
         </div>
         <div style="clear: both"></div>
-    </div>
+    </div>-->
 
     <input type="hidden" name="wcvm_primary" value="">
     <?php $selectedVendors = $product->wcvm ?>

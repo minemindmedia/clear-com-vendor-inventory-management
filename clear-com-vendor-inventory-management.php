@@ -91,9 +91,9 @@ function wcvmcpActionSavePostProduct($productId) {
     } else {
         delete_post_meta($productId, 'wcvm_discontinued_date');
     }
-    update_post_meta($productId, 'wcvm_threshold_low', $_POST['wcvm_threshold_low']);
-    update_post_meta($productId, 'wcvm_threshold_reorder', $_POST['wcvm_threshold_reorder']);
-    update_post_meta($productId, 'wcvm_reorder_qty', $_POST['wcvm_reorder_qty']);
+//    update_post_meta($productId, 'wcvm_threshold_low', $_POST['wcvm_threshold_low']);
+//    update_post_meta($productId, 'wcvm_threshold_reorder', $_POST['wcvm_threshold_reorder']);
+//    update_post_meta($productId, 'wcvm_reorder_qty', $_POST['wcvm_reorder_qty']);
     update_post_meta($productId, 'wcvm_primary', $_POST['wcvm_primary']);
     foreach ($vendorIds as $vendorId) {
         update_post_meta($productId, 'wcvm_' . $vendorId . '_sku', $_POST['wcvm_' . $vendorId . '_sku']);
@@ -363,9 +363,9 @@ function wcvmcpActionSavePostProduct($productId) {
                         'product_quantity' => $_POST['__order_qty'][$productId],
                         'product_expected_date' => $stamp,
                         'product_rare' => get_post_meta($productId, 'wcvm_rare', true),
-                        'product_threshold_low' => get_post_meta($productId, 'wcvm_threshold_low', true),
-                        'product_threshold_reorder' => get_post_meta($productId, 'wcvm_threshold_reorder', true),
-                        'product_reorder_qty' => get_post_meta($productId, 'wcvm_reorder_qty', true),
+//                        'product_threshold_low' => get_post_meta($productId, 'wcvm_threshold_low', true),
+//                        'product_threshold_reorder' => get_post_meta($productId, 'wcvm_threshold_reorder', true),
+//                        'product_reorder_qty' => get_post_meta($productId, 'wcvm_reorder_qty', true),
                         'vendor_sku' => get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true),
                         'vendor_link' => get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true),
                         'vendor_price_last' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true),
@@ -378,9 +378,9 @@ function wcvmcpActionSavePostProduct($productId) {
                     $update_data['product_quantity'] = $_POST['__order_qty'][$productId];
                     $update_data['product_expected_date'] = $stamp;
                     $update_data['product_rare'] = get_post_meta($productId, 'wcvm_rare', true);
-                    $update_data['product_threshold_low'] = get_post_meta($productId, 'wcvm_threshold_low', true);
-                    $update_data['product_threshold_reorder'] = get_post_meta($productId, 'wcvm_threshold_reorder', true);
-                    $update_data['product_reorder_qty'] = get_post_meta($productId, 'wcvm_reorder_qty', true);
+//                    $update_data['product_threshold_low'] = get_post_meta($productId, 'wcvm_threshold_low', true);
+//                    $update_data['product_threshold_reorder'] = get_post_meta($productId, 'wcvm_threshold_reorder', true);
+//                    $update_data['product_reorder_qty'] = get_post_meta($productId, 'wcvm_reorder_qty', true);
                     $update_data['vendor_sku'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true);
                     // $update_data['vendor_link'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true);
                     $update_data['vendor_price_last'] = get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true);
@@ -474,10 +474,10 @@ function wcvmcpActionSavePostProduct($productId) {
                     <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
                 </select>-->
                 <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                    <option value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
-                    <option value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
-                    <option value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                    <option value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                    <option value="stock"><?= esc_html__('On Hand Quantity', 'wcvm') ?></option>
+                    <option value="30_days"><?= esc_html__('30 Days Sale', 'wcvm') ?></option>
+<!--                    <option value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
+                    <option value="ok"><?= esc_html__('OK', 'wcvm') ?></option>-->
                 </select>
                 <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple">
                     <?php
@@ -537,10 +537,10 @@ function wcvmcpActionSavePostProduct($productId) {
                         'product_sku' => $productData['sku'],
                         'product_price' => $productData['regular_price'],
                         'product_quantity' => $productQty,
-                        'product_rare' => $productData['rare'],
-                        'product_threshold_low' => $productData['threshold_low'],
-                        'product_threshold_reorder' => $productData['threshold_reorder'],
-                        'product_reorder_qty' => $productData['reorder_qty'],
+//                        'product_rare' => $productData['rare'],
+//                        'product_threshold_low' => $productData['threshold_low'],
+//                        'product_threshold_reorder' => $productData['threshold_reorder'],
+//                        'product_reorder_qty' => $productData['reorder_qty'],
                         'vendor_sku' => $productData['vendor_sku'],
                         'vendor_price_last' => $productData['vendor_price'],
                         'vendor_link' => $productData['vendor_link'],
@@ -575,9 +575,9 @@ function wcvmcpActionSavePostProduct($productId) {
                         'product_price' => $_POST['__order_qty'][$productIDs],
                         'product_quantity' => $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'],
                         'product_rare' => get_post_meta($productIDs, 'wcvm_rare', true),
-                        'product_threshold_low' => get_post_meta($productIDs, 'wcvm_threshold_low', true),
-                        'product_threshold_reorder' => get_post_meta($productIDs, 'wcvm_threshold_reorder', true),
-                        'product_reorder_qty' => get_post_meta($productIDs, 'wcvm_reorder_qty', true),
+//                        'product_threshold_low' => get_post_meta($productIDs, 'wcvm_threshold_low', true),
+//                        'product_threshold_reorder' => get_post_meta($productIDs, 'wcvm_threshold_reorder', true),
+//                        'product_reorder_qty' => get_post_meta($productIDs, 'wcvm_reorder_qty', true),
                         'vendor_sku' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_sku', true),
                         'vendor_link' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_link', true),
                         'vendor_price_last' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_last', true),
@@ -592,11 +592,11 @@ function wcvmcpActionSavePostProduct($productId) {
                         $insert_data['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
                         $insert_data['product_price'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_price'];
                         $insert_data['product_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
-                        $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
-                        $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
-                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
-                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
-                        // $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
+//                        $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
+//                        $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
+//                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
+//                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
+//                        // $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
                         $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
                         $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
                         $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
@@ -835,23 +835,41 @@ function wcvmcpActionSavePostProduct($productId) {
                     $vendor_ids = explode(',', $orderDetail->vendor_id);
                     $vendor_prices = explode(',', $orderDetail->vendor_price);
                     $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
-                    if ($orderDetail->rare) {
-                        $row_classes .= " rare_item";
-                    } else {
-                        $row_classes .= " non_rare_item";
+//                    if ($orderDetail->rare) {
+//                        $row_classes .= " rare_item";
+//                    } else {
+//                        $row_classes .= " non_rare_item";
+//                    }
+//
+//                    if ($orderDetail->new) {
+//                        $row_classes .= " new_item";
+//                    } else {
+//                        $row_classes .= " non_new_item";
+//                    }
+                    if($orderDetail->sale_30_days){
+                        $row_classes .= " 30_days";
                     }
-
-                    if ($orderDetail->new) {
-                        $row_classes .= " new_item";
-                    } else {
-                        $row_classes .= " non_new_item";
+                    if($orderDetail->stock){
+                        $row_classes .= " stock";
                     }
                     $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id;
                     ?>
                     <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>'>
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->new) ? "&#10004;" : ""; ?></td>-->
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->rare) ? "&#10004;" : ""; ?></td>-->
-                        <td class="center third-cell"><?php echo $orderDetail->sku ?></td>
+                        <?php 
+                            $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
+                            $product_url = get_permalink( $orderDetail->product_id );
+                            if($thumnailID){
+                                $image = woocommerce_get_product_thumbnail();
+//                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
+                            }
+                        ?>                            
+                        <td class="center third-cell">
+                            <!--<a class="sku-thumbnail" href="<?php echo $product_url;?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku ?></a>-->
+                            <a class="sku-thumbnail" href="#" data-image="<?php echo $image;?>"><?php echo $orderDetail->sku ?></a>
+
+                        </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
                         <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
                         <td class="center sixth-cell">
@@ -920,8 +938,15 @@ function wcvmcpActionSavePostProduct($productId) {
                 // $('.wm-vm-go input[name="filter_action"]').on('click', function() {
                 // 	$(this.form).attr('method', 'get');
                 // });
-
-                var unselect_stock_status = '';
+                $(".sku-thumbnail").mouseenter(function(){
+                    var image_name=$(this).data('image');
+                    var imageTag='<div class="image" style="position:absolute;">'+'<img src="'+image_name+'" alt="image" height="100" />'+'</div>';
+                    $(this).parent('td').append(imageTag);
+                });
+                $(".sku-thumbnail").mouseleave(function(){
+                    $(this).parent('td').children('div.image').hide();
+                });                    
+            var unselect_stock_status = '';
                 //displays datatable with sticky header
                 /*var table = $('#po-items-table').DataTable({
                  responsive: true,
@@ -945,11 +970,11 @@ function wcvmcpActionSavePostProduct($productId) {
 
                 //stock status multiselect
                 $('#stock_status_filter').multiselect({
-                    buttonWidth: '400px'
+                    buttonWidth: '540px'
                 });
                 //vendor multiselect
                 $('#primary_vendor_filter').multiselect({
-                    buttonWidth: '400px',
+                    buttonWidth: '540px',
                     includeSelectAllOption: true,
                     enableFiltering: true,
                     enableCaseInsensitiveFiltering: true,
@@ -958,20 +983,20 @@ function wcvmcpActionSavePostProduct($productId) {
                 });
                 // document.getElementsByClassName("btn dropdown-toggle btn-default")[0].style.borderColor = "red";
                 $('#filter-vendor').on('click', function (e) {
-                    var new_item_filter = '';
-                    var rare_item_filter = '';
+//                    var new_item_filter = '';
+//                    var rare_item_filter = '';
                     var selected_statuses = new Array();
                     var selected_vendors = new Array();
-                    if ($("#new_item_filter").val() == 1) {
-                        new_item_filter = "new_item";
-                    } else if ($("#new_item_filter").val() == 0) {
-                        new_item_filter = "non_new_item";
-                    }
-                    if ($("#rare_item_filter").val() == 1) {
-                        rare_item_filter = "rare_item";
-                    } else if ($("#rare_item_filter").val() == 0 && $("#rare_item_filter").val() != "") {
-                        rare_item_filter = "non_rare_item";
-                    }
+//                    if ($("#new_item_filter").val() == 1) {
+//                        new_item_filter = "new_item";
+//                    } else if ($("#new_item_filter").val() == 0) {
+//                        new_item_filter = "non_new_item";
+//                    }
+//                    if ($("#rare_item_filter").val() == 1) {
+//                        rare_item_filter = "rare_item";
+//                    } else if ($("#rare_item_filter").val() == 0 && $("#rare_item_filter").val() != "") {
+//                        rare_item_filter = "non_rare_item";
+//                    }
                     if ($("#stock_status_filter").val().length) {
                         selected_statuses = $("#stock_status_filter").val();
                     }
@@ -982,12 +1007,12 @@ function wcvmcpActionSavePostProduct($productId) {
                     e.preventDefault();
                     $(".generate-po-row").each(function () {
                         var show_row = true;
-                        if (new_item_filter != "" && !$(this).hasClass(new_item_filter)) {
-                            show_row = false;
-                        }
-                        if (rare_item_filter != "" && !$(this).hasClass(rare_item_filter)) {
-                            show_row = false;
-                        }
+//                        if (new_item_filter != "" && !$(this).hasClass(new_item_filter)) {
+//                            show_row = false;
+//                        }
+//                        if (rare_item_filter != "" && !$(this).hasClass(rare_item_filter)) {
+//                            show_row = false;
+//                        }
 
                         if (selected_statuses.length) {
                             var status_class_found = 0;
