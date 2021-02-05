@@ -30,11 +30,20 @@
     }
     $status = $show_status;
     $posts_table = $wpdb->prefix . "posts";
+    $postmeta_table = $wpdb->prefix . "postmeta";
+    $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
+    $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_order";
     $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
-                        LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
-                        LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
-                        WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
+    LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+    LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
+    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
+    // $posts_table_sql = "SELECT *, sum(po.product_quantity) as total_quantity FROM `" . $posts_table . "` p
+    //                     LEFT JOIN " . $postmeta_table . " pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+    //                     LEFT JOIN " . $vendor_po_lookup_table . " wvpl ON wvpl.product_id = pm.meta_value
+    //                     LEFT JOIN " . $vendor_purchase_order_table . " po on po.product_id = wvpl.product_id
+    //                     WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
     $orders = $wpdb->get_results($posts_table_sql);
+    // echo $wpdb->last_query;
 //    if (isset($_GET['search_po'])) {
     ?>
         <!--<h1><? "Details for PO # " . $_GET['search_po']; ?></h1>-->

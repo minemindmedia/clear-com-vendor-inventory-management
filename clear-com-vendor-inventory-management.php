@@ -462,41 +462,6 @@ function wcvmcpActionSavePostProduct($productId) {
                         </div>
             <?php } ?>
             </div>
-            <div style="float: left;vertical-align: top">
-<!--                <select name="new_item_filter" class="vendor_details" id="new_item_filter">
-                    <option value="">- <?= esc_html__('New Item', 'wcvm') ?> -</option>
-                    <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
-                    <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
-                </select>
-                <select name="rare_item_filter" class="vendor_details" id="rare_item_filter">
-                    <option value="">- <?= esc_html__('Rare Item', 'wcvm') ?> -</option>
-                    <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
-                    <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
-                </select>-->
-                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                    <option value="stock"><?= esc_html__('On Hand Quantity', 'wcvm') ?></option>
-                    <option value="30_days"><?= esc_html__('30 Days Sale', 'wcvm') ?></option>
-<!--                    <option value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                    <option value="ok"><?= esc_html__('OK', 'wcvm') ?></option>-->
-                </select>
-                <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple">
-                    <?php
-                    global $wpdb;
-                    $posts_table = $wpdb->prefix . "posts";
-                    $posts_table_sql = ""
-                            . "SELECT p.ID,p.post_title, pm.meta_value as title_short
-                                FROM " . $wpdb->prefix . "posts p
-                                LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
-                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish' ORDER BY p.post_title";
-                    $posts = $wpdb->get_results($posts_table_sql);
-                    foreach ($posts as $vendor):
-                        ?>
-                        <option value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
-            <?php endforeach ?>
-                </select>
-                            <!--<input type="submit" name="filter_action" if="filter_action" class="button" value="<?= esc_attr__('Filter', 'wcvm') ?>">-->
-                <a href="#" class="btn btn-primary button" id="filter-vendor"><?= esc_attr__('Filter', 'wcvm') ?></a>
-            </div>
             <?php
         } else {
             //echo '<input type="submit" name="wcvm_save" class="button button-primary" value="' . esc_html__('Update') . '">';
@@ -651,8 +616,30 @@ function wcvmcpActionSavePostProduct($productId) {
         group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
         v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
-        v.sale_30_days, v.order_qty, v.stock_status";
-        $orderDetails = $wpdb->get_results($order_details_table_sql);
+        v.sale_30_days, v.order_qty, v.stock_status ";
+        $order_by = [];
+        $selected_days = '';
+        $selected_qty = '';
+        $thirty_days_filter = '';
+        $qty_on_hand_filter = '';
+        if(isset($_REQUEST['filter_action'])) {
+            // print_r($_GET);
+            if(array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET)) {
+                $thirty_days_filter = $_GET['30_days']; 
+                $qty_on_hand_filter = $_GET['qty_on_hand'];
+                if(!empty($thirty_days_filter)) {
+                    $order_by[] = "v.sale_30_days " . $thirty_days_filter;
+                }
+                if(!empty($qty_on_hand_filter)) {
+                    $order_by[] = "v.stock " . $qty_on_hand_filter;
+                }
+            }
+        }
+        $sql = $order_details_table_sql;
+        if(count($order_by) > 0) {
+            $sql .= " ORDER BY " . implode(', ', $order_by);
+        }
+        $orderDetails = $wpdb->get_results($sql);
         // echo $wpdb->last_query;
         //print_r($orderDetails);
         ?>
@@ -793,6 +780,65 @@ function wcvmcpActionSavePostProduct($productId) {
                 <input type="hidden" name="rare_item" id="wcvm_rare_item" value=""> -->
         <?php $this->extra_tablenav('top'); ?>
             </form>
+
+            <!-- start filter section -->
+            <form action="" method="get">
+                <input type="hidden" name="page" value="generate-purchase-order">
+            <div style="float: left;vertical-align: top">
+<!--                <select name="new_item_filter" class="vendor_details" id="new_item_filter">
+                    <option value="">- <?= esc_html__('New Item', 'wcvm') ?> -</option>
+                    <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
+                    <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
+                </select>
+                <select name="rare_item_filter" class="vendor_details" id="rare_item_filter">
+                    <option value="">- <?= esc_html__('Rare Item', 'wcvm') ?> -</option>
+                    <option value="1"><?= esc_html__('Yes', 'wcvm') ?></option>
+                    <option value="0"><?= esc_html__('No', 'wcvm') ?></option>
+                </select>-->
+                <!-- <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                    <option value="stock"><?= esc_html__('On Hand Quantity', 'wcvm') ?></option>
+                    <option value="30_days"><?= esc_html__('30 Days Sale', 'wcvm') ?></option>
+                  <option value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
+                    <option value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                </select> -->
+                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                    <option value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
+                    <option value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
+                    <option value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
+                    <option value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                </select>
+                <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple">
+                    <?php
+                    global $wpdb;
+                    $posts_table = $wpdb->prefix . "posts";
+                    $posts_table_sql = ""
+                            . "SELECT p.ID,p.post_title, pm.meta_value as title_short
+                                FROM " . $wpdb->prefix . "posts p
+                                LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
+                                WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish' ORDER BY p.post_title";
+                    $posts = $wpdb->get_results($posts_table_sql);
+                    foreach ($posts as $vendor):
+                        ?>
+                        <option value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
+            <?php endforeach ?>
+                </select>
+                            <!--<input type="submit" name="filter_action" if="filter_action" class="button" value="<?= esc_attr__('Filter', 'wcvm') ?>">-->
+                <!-- <a href="#" class="btn btn-primary button" id="filter-vendor"><?= esc_attr__('Filter', 'wcvm') ?></a> -->
+            </div>
+                <select name="30_days" class="30_days_filter" id="30_days_filter">
+                    <option value=""><?= esc_html__('30 Days Sale', 'wcvm') ?></option>
+                    <option <?php if($thirty_days_filter == 'asc') { echo 'selected'; } ?> value="asc"><?= esc_html__('ASC', 'wcvm') ?></option>
+                    <option <?php if($thirty_days_filter == 'desc') { echo 'selected'; } ?> value="desc"><?= esc_html__('DESC', 'wcvm') ?></option>
+                </select>
+                <select name="qty_on_hand" class="qty_on_hand_filter" id="qty_on_hand_filter">
+                    <option value=""><?= esc_html__('On Hand Quantity', 'wcvm') ?></option>
+                    <option <?php if($qty_on_hand_filter == 'asc') { echo 'selected'; } ?> value="asc"><?= esc_html__('ASC', 'wcvm') ?></option>
+                    <option <?php if($qty_on_hand_filter == 'desc') { echo 'selected'; } ?> value="desc"><?= esc_html__('DESC', 'wcvm') ?></option>
+                </select>
+                <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>">
+            </form>
+            <!-- end filter section -->
+
             <div id="my-content-id" style="display:none;">
                 <img id="loading_image" src="<?php plugin_dir_path(__FILE__) . '/assets/img/loader.gif' ?>"/>
                 <div id="vendor_details">
@@ -970,19 +1016,39 @@ function wcvmcpActionSavePostProduct($productId) {
 
                 //stock status multiselect
                 $('#stock_status_filter').multiselect({
-                    buttonWidth: '540px'
+                    buttonWidth: '240px',
+                    nonSelectedText: 'Select Stock Statuses',
                 });
                 //vendor multiselect
                 $('#primary_vendor_filter').multiselect({
-                    buttonWidth: '540px',
+                    buttonWidth: '440px',
                     includeSelectAllOption: true,
                     enableFiltering: true,
                     enableCaseInsensitiveFiltering: true,
                     maxHeight: 350,
                     filterPlaceholder: 'Search for Vendor',
+                    nonSelectedText: 'Select Vendors',
                 });
                 // document.getElementsByClassName("btn dropdown-toggle btn-default")[0].style.borderColor = "red";
                 $('#filter-vendor').on('click', function (e) {
+                    var prevent_default = false;
+                    var thirty_days_filter = $("#30_days_filter").val().length;
+                    var qty_on_hand_filter = $("#qty_on_hand_filter").val().length;
+                    if(thirty_days_filter == 0 && qty_on_hand_filter == 0) {
+                        prevent_default = true;
+                        console.log('inside');
+                    } else if(thirty_days_filter == 1) {
+                        prevent_default = false;
+                        console.log('thirty_days_filter');
+                    } else if(qty_on_hand_filter == 1) {
+                        prevent_default = false;
+                        console.log('qty_on_hand_filter');
+                    }
+                    console.log(qty_on_hand_filter + ' ' + thirty_days_filter);
+                    if(prevent_default) {
+                        e.preventDefault();
+                    }
+                    console.log(prevent_default);
 //                    var new_item_filter = '';
 //                    var rare_item_filter = '';
                     var selected_statuses = new Array();
@@ -1003,8 +1069,6 @@ function wcvmcpActionSavePostProduct($productId) {
                     if ($("#primary_vendor_filter").val().length) {
                         selected_vendors = $("#primary_vendor_filter").val();
                     }
-
-                    e.preventDefault();
                     $(".generate-po-row").each(function () {
                         var show_row = true;
 //                        if (new_item_filter != "" && !$(this).hasClass(new_item_filter)) {
@@ -1035,6 +1099,7 @@ function wcvmcpActionSavePostProduct($productId) {
                             if (!selected_vendor_class_found) {
                                 show_row = false;
                             }
+                            console.log(selected_vendors);
                         }
 
 
