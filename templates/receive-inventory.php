@@ -127,7 +127,7 @@
                     continue;
                 }
                 $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
-                if ($data['product_quantity'] != $_POST['product_quantity_received'][$productId] + $_POST['product_quantity_back_order'][$productId] + $_POST['product_quantity_canceled'][$productId] + $_POST['product_quantity_returned'][$productId]) {
+                if ($data['product_quantity'] != (int)$_POST['product_quantity_received'][$productId] + (int)$_POST['product_quantity_back_order'][$productId] + (int)$_POST['product_quantity_canceled'][$productId] + (int)$_POST['product_quantity_returned'][$productId]) {
                     $isValid = false;
                     break;
                 }

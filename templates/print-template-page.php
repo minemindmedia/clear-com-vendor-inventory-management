@@ -111,6 +111,8 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                                 $vendor_Prices = explode(',', $poData->vendor_price);
                                                                                                 $vendor_Skus = explode(',', $poData->vendor_sku);
                                                                                                 $i = 0;
+                                                                                                $vendor_price = 0;
+                                                                                                $vendor_sku = '';
                                                                                                 while ($i < count($vendors)) {
 
                                                                                                     if ($vendors[$i] == $poData->primary_vendor_name) {
@@ -125,9 +127,9 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                                 <td style="text-align: left"><?php echo $poData->sku; ?></td>
                                                                                                 <td style="text-align: left"><?php echo $poData->product_title; ?></td>
                                                                                                 <td style="text-align: right"><?php echo $vendor_price; ?></td>
-                                                                                                <td style="text-align: right"><?php echo $vendor_price * (float) $data->meta_value; ?></td>
+                                                                                                <td style="text-align: right"><?php echo (float) $vendor_price * (float) $data->meta_value; ?></td>
                                                                                             </tr>
-                                                                                            <?php $total += (float) $poData->vendor_price * (float) $data->meta_value ?>  
+                                                                                            <?php $total += (float) $vendor_price * (float) $data->meta_value ?>  
                                                                                         <?php endif ?>                                                                                    
                                                                                     <?php endforeach ?>                                                                                    
                                                                                     <tr>
