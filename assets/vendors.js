@@ -1,4 +1,6 @@
 jQuery(document).ready(function ($) {
+    $("#filter-vendor").show();
+    $("#filter_action").show();
         var container = $('#wcvmcpAdminProduct');
         // adding vendor
     container.on('click', '[data-role="add"]', function() {
@@ -78,13 +80,13 @@ jQuery(document).ready(function ($) {
         var selected_id = $(this).val();
         if ($(this).is(':checked')) {
             selected_ids.push(selected_id);
-            console.log('checkbox');
+//            console.log('checkbox');
         } else {
-            console.log(selected_ids);
+//            console.log(selected_ids);
             var valueExsists = selected_ids.includes(selected_id);
             if (valueExsists) {
                 removeArrayValue(selected_ids, selected_id);
-                console.log(selected_ids);
+//                console.log(selected_ids);
             }
         }
 
@@ -94,7 +96,7 @@ jQuery(document).ready(function ($) {
 
         $("body").append("<div id='loading' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
         var purchase_order_data = new Array();
-        console.log(selected_ids);
+//        console.log(selected_ids);
         $.each(selected_ids, function (key, value) {
             purchase_order_data.push({
                 selected_id: value,
@@ -102,14 +104,14 @@ jQuery(document).ready(function ($) {
                 selected_vendor: $("#row-selected-vendor-" + value).val()
             });
         });
-        console.log(purchase_order_data);
+//        console.log(purchase_order_data);
         if (purchase_order_data.length > 0) {
             var data = {
                 action: 'generate_po',
                 purchase_order_data: purchase_order_data
             };
             var ajaxUrl = generate_po_ajax_object.ajax_url;
-            console.log(ajaxUrl);
+//            console.log(ajaxUrl);
             jQuery.post(ajaxUrl, data, function (data) {
                 var response = jQuery.parseJSON(data);
                 window.location.href = response.redirect_url
@@ -170,7 +172,7 @@ jQuery(document).ready(function ($) {
         }
     });
     $(document).on('click', '#wcvm-delete-all-button', function () {
-        console.log('ddd');
+//        console.log('ddd');
         if (confirm('Are you sure?')) {
             $('#wcvm-delete-all-form').submit();
         }
@@ -180,7 +182,7 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         var searchValue = $("#search_po").val();
         if (searchValue) {
-            console.log(searchValue);
+//            console.log(searchValue);
             $("form.purchase-order").hide();
             if ($("form#" + searchValue).length == 0) {
 //                console.log('not');

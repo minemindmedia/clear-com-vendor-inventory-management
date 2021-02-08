@@ -623,15 +623,15 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 $order_by[] = "v.stock " . $qty_on_hand_filter;
             }
         }
-        $where = "";
+        $where = " WHERE v.stock_status IN ('outofstock','instock')";
         if (array_key_exists('selected_vendors', $_GET)) {
             if ($_GET['selected_vendors'] != "") {
                 $vendors_selected = $_GET['selected_vendors'];
                 $selected_vendors = explode("|", $_GET['selected_vendors']);
-                $where = " WHERE v.primary_vendor_id IN (" . implode(",", $selected_vendors) . ")";
+                $where = " AND v.primary_vendor_id IN (" . implode(",", $selected_vendors) . ")";
             }
         }
-        if (array_key_exists('selected_status', $_GET)) {
+        /*if (array_key_exists('selected_status', $_GET)) {
             if ($_GET['selected_status'] != "") {
                 $status_selected = $_GET['selected_status'];
                 $selected_status = explode("|", $_GET['selected_status']);
@@ -642,15 +642,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 }
                 $where .= " v.stock_status IN (" . implode(",", $selected_status) . ")";
             }
-        }
+        }*/
         $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
         v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, 
         v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
         v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty, v.stock_status, 
         CASE WHEN v.stock IS NULL THEN 'OUT' 
         WHEN CAST(v.stock as signed) <= 0 THEN 'OUT' 
-        WHEN CAST(v.stock as signed) <= v.threshold_low THEN 'LOW' 
-        WHEN CAST(v.stock as signed) <= v.threshold_reorder THEN 'REORDER' ELSE 'OK' END product_stock_status,
+        ELSE 'IN' END product_stock_status,
         sum(p.product_quantity) as total_quantity
         FROM " . $vendor_po_lookup_table . " v
         left join " . $vendor_purchase_order_table . " p on p.product_id = v.product_id " . $where . "
@@ -658,6 +657,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
         v.sale_30_days, v.order_qty, v.stock_status ";
+        
 
 
         $sql = $order_details_table_sql;
@@ -943,21 +943,21 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
             <div style="float: left;vertical-align: top">
 
-                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                    <option <?php if (in_array('out', $selected_status)) {
-                    echo 'selected';
-                } ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
-                    <option <?php if (in_array('low', $selected_status)) {
-                    echo 'selected';
-                } ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
-                    <option <?php if (in_array('reorder', $selected_status)) {
-                    echo 'selected';
-                } ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                    <option <?php if (in_array('ok', $selected_status)) {
-                echo 'selected';
-            } ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
-                </select>
-                <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple">
+<!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                    <option <?php // if (in_array('out', $selected_status)) {
+//                    echo 'selected';
+//                } ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
+                    <option <?php // if (in_array('low', $selected_status)) {
+//                    echo 'selected';
+//                } ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
+                    <option <?php // if (in_array('reorder', $selected_status)) {
+//                    echo 'selected';
+//                } ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
+                    <option <?php // if (in_array('ok', $selected_status)) {
+//                echo 'selected';
+//            } ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                </select>-->
+<select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
                     <?php
                     global $wpdb;
                     $posts_table = $wpdb->prefix . "posts";
@@ -980,11 +980,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>"/>
-                <input type="hidden" name="selected_status" id="selected_status" value="<?php echo $status_selected; ?>"/>
+                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected; ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
 
-                <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>">
+                <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="display:none">
             </form>
             <!-- end filter section -->
 
@@ -1258,18 +1258,18 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     }
                     var vendors_selected = $("#primary_vendor_filter").val().join('|');
                     $("#selected_vendors").val(vendors_selected);
-                    var status_selected = $("#stock_status_filter").val().join('|');
-                    $("#selected_status").val(status_selected);
+//                    var status_selected = $("#stock_status_filter").val().join('|');
+//                    $("#selected_status").val(status_selected);
                     $("#page-loader").show();
                     $("#sort-form").submit();
                 });
                 var unselect_stock_status = '';
 
                 //stock status multiselect
-                $('#stock_status_filter').multiselect({
-                    buttonWidth: '240px',
-                    nonSelectedText: 'Select Stock Statuses',
-                });
+//                $('#stock_status_filter').multiselect({
+//                    buttonWidth: '240px',
+//                    nonSelectedText: 'Select Stock Statuses',
+//                });
                 //vendor multiselect
                 $('#primary_vendor_filter').multiselect({
                     buttonWidth: '440px',
@@ -1296,9 +1296,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     //                    } else if ($("#rare_item_filter").val() == 0 && $("#rare_item_filter").val() != "") {
                     //                        rare_item_filter = "non_rare_item";
                     //                    }
-                    if ($("#stock_status_filter").val().length) {
-                        selected_statuses = $("#stock_status_filter").val();
-                    }
+//                    if ($("#stock_status_filter").val().length) {
+//                        selected_statuses = $("#stock_status_filter").val();
+//                    }
                     if ($("#primary_vendor_filter").val().length) {
                         selected_vendors = $("#primary_vendor_filter").val();
                     }

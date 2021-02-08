@@ -34,9 +34,9 @@
     $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
     $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_order";
     $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
-    LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+    JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
     LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
-    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
+    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
     // $posts_table_sql = "SELECT *, sum(po.product_quantity) as total_quantity FROM `" . $posts_table . "` p
     //                     LEFT JOIN " . $postmeta_table . " pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
     //                     LEFT JOIN " . $vendor_po_lookup_table . " wvpl ON wvpl.product_id = pm.meta_value
@@ -117,7 +117,7 @@
         $printed_po_numbers = [];
         $last_order_id = 0;
         $last_expected_date = '';
-        foreach ($orders as $order) {
+       foreach ($orders as $order) {
             $postmeta_table = $wpdb->prefix . "postmeta";
             $postmeta_table_sql = "SELECT * FROM `" . $postmeta_table . "` pm
             where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
@@ -311,9 +311,16 @@
                                 <!--<td>On Vendor Bo</td>-->
                                 <?php
                                 $order_product_Qty = 0;
-                                $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id);
-                                if ($order_Qty) {
-                                    $order_product_Qty = $order_Qty[0]['product_quantity'];
+                                if($status == 'return_closed'){
+                                    $order_Qty = get_post_meta($order->ID, "wcvmgo_".$order->product_id."_return_closed");
+                                     if ($order_Qty) {
+                                         $order_product_Qty = $order_Qty[0];
+                                     }
+                                }else{
+                                    $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id);
+                                    if ($order_Qty) {
+                                        $order_product_Qty = $order_Qty[0]['product_quantity'];
+                                    }
                                 }
 if($status != 'trash'){                                
                                 $inputType = '';
