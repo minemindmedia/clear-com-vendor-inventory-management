@@ -193,6 +193,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_threshold_reorder` INT(11) NULL,
         `product_reorder_qty` INT(11) NULL,
         `vendor_sku` varchar(20) NULL,
+        `vendor_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,        
         `vendor_link` varchar(100) NULL,
         `vendor_price_last` decimal(10,2) NULL,
         `vendor_price_bulk` decimal(10,2) NULL,
@@ -567,7 +568,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         ));
 $sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = ".$productIDs;                        
 $orderDetails = $wpdb->get_results($sql);
-//print_r($orderDetails);die;
                         // insert generate po details into wp_vendor_purchase_order
                         $insert_data['product_id'] = $productIDs;
                         $insert_data['vendor_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'];
@@ -581,9 +581,11 @@ $orderDetails = $wpdb->get_results($sql);
                         //                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
                         //                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
 //                        $insert_data['product_stock'] = get_post_meta($productIDs, '_stock', true);
-//                        $insert_data['on_order'] = ;
-//                        $insert_data['sale_30_days'] = ;
-                        $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
+                        $insert_data['product_stock'] = $orderDetails[0]->stock;
+                        $insert_data['on_order'] = $orderDetails[0]->on_order;
+                        $insert_data['vendor_name'] = $orderDetails[0]->primary_vendor_name;
+                        $insert_data['sale_30_days'] = $orderDetails[0]->sale_30_days;
+//                        $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
                         $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
                         $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
                         $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];

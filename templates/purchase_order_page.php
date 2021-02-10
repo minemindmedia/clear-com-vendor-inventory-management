@@ -208,7 +208,7 @@
                         <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
                     </div>
                     <div style="float: left;width: 250px; padding: 2px;">
-                        <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($parent_post_title->post_title)) ?><br>
+                        <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($order->vendor_name)) ?><br>
                         <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                     </div>
                 <?php
@@ -285,8 +285,7 @@
                                     ?></td>-->
                                 <td><?php echo $order->product_sku; ?></td>
                                 <td><?php
-//                                    $stock = $order->stock;
-                                    $stock = 0;
+                                    $stock = $order->product_stock;
 
                                     if ($stock <= 0) {
                                         echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
@@ -307,8 +306,8 @@
                                 <td><?php echo wc_price($order->product_price); ?></td>
                                 <td><?php echo $order->vendor_sku; ?></td>
                                 <td><?php echo wc_price($order->vendor_price_last); ?></td>
-                                <td><?php // echo $order->stock; ?></td>
-                                <td><?php // echo $order->sale_30_days; ?></td>
+                                <td><?php echo $order->product_stock; ?></td>
+                                <td><?php echo $order->sale_30_days; ?></td>
 <!--                                <td><input readonly type="text" value="<?php // echo $order->threshold_low; ?>" style="width:60px;"></td>
                                 <td><input readonly type="text" value="<?php // echo $order->threshold_reorder; ?>" style="width:60px;"></td>
                                 <td><input readonly type="text" value="<?php // echo $order->reorder_qty; ?>" style="width:60px;"></td>-->
