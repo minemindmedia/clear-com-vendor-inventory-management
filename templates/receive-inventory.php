@@ -117,7 +117,6 @@
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         global $wpdb;
-        print_r($_POST);die;
         $wcvmgo_product_quantity = 0;
         $order = get_post($_POST['ID']);
         $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_order';
