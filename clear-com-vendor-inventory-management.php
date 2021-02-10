@@ -317,6 +317,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
+//            print_r($_POST);die;
             update_post_meta($order->ID, 'old_status', $order->post_status);
             $order->post_status = 'trash';
             wp_update_post($order);
@@ -585,7 +586,7 @@ $orderDetails = $wpdb->get_results($sql);
                         $insert_data['on_order'] = $orderDetails[0]->on_order;
                         $insert_data['vendor_name'] = $orderDetails[0]->primary_vendor_name;
                         $insert_data['sale_30_days'] = $orderDetails[0]->sale_30_days;
-//                        $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
+                        $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
                         $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
                         $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
                         $insert_data['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
@@ -597,14 +598,16 @@ $orderDetails = $wpdb->get_results($sql);
                         $inserted = $wpdb->insert($vendor_purchase_order_table, $insert_data);
                         if ($inserted) {
                             $ajaxResponse['purchase_order'] = true;
-                        }else{
+                        }
+//                        else{
+                            $ajaxResponse['insert'] = $insert_data;
 //                            echo '-'.$inserted.'<br>';
 //                            print_r($insert_data);
 //                            echo '<br>';
 //                            echo $wpdb->last_query.'<br>';
 //                            echo $wpdb->show_errors().'<br>';
 //                            print_r($wpdb->insert);die;
-                        }
+//                        }
                         //                        if ($productIDs == '') {
                         //                            $productIDs .= $vendor_single_product;
                         //                        } else {

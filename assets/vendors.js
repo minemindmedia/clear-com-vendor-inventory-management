@@ -115,6 +115,7 @@ jQuery(document).ready(function ($) {
             jQuery.post(ajaxUrl, data, function (data) {
                 var response = jQuery.parseJSON(data);
                 console.log(response);
+                console.log(response.insert);
                 window.location.href = response.redirect_url
             });
                 }else{
