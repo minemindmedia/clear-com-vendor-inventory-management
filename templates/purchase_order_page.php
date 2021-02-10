@@ -37,12 +37,17 @@
     JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
     LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
     WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
+    
+    $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
+            . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
+    
     // $posts_table_sql = "SELECT *, sum(po.product_quantity) as total_quantity FROM `" . $posts_table . "` p
     //                     LEFT JOIN " . $postmeta_table . " pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
     //                     LEFT JOIN " . $vendor_po_lookup_table . " wvpl ON wvpl.product_id = pm.meta_value
     //                     LEFT JOIN " . $vendor_purchase_order_table . " po on po.product_id = wvpl.product_id
     //                     WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
-    $orders = $wpdb->get_results($posts_table_sql);
+    $orders = $wpdb->get_results($purchase_order_table_sql);
+//    $orders = $wpdb->get_results($posts_table_sql);
     // echo $wpdb->last_query;
 //    if (isset($_GET['search_po'])) {
     ?>
@@ -118,37 +123,37 @@
         $last_order_id = 0;
         $last_expected_date = '';
        foreach ($orders as $order) {
-            $postmeta_table = $wpdb->prefix . "postmeta";
-            $postmeta_table_sql = "SELECT * FROM `" . $postmeta_table . "` pm
-            where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->ID . "'";
-            $postmeta_result = $wpdb->get_results($postmeta_table_sql);
-            if($postmeta_result) {
-                $ordersIDArr = $postmeta_result[0]->meta_value;
-                $ordersIDs = unserialize($ordersIDArr);
-            if (in_array($order->meta_value, $ordersIDs)) {
-                $records = true;
-                $post_id = get_post($order->ID);
-                $post_parent_id = $post_id->post_parent;
-                $parent_post_title = get_post($post_parent_id);
-                $vendor_price = 0;
-                $vendor_sku = '';
-                $vendors = explode(',', $order->vendor_name);
-                $vendor_Prices = explode(',', $order->vendor_price);
-                $vendor_Skus = explode(',', $order->vendor_sku);
-                $i = 0;
-                while ($i < count($vendors)) {
-
-                    if ($vendors[$i] == $order->primary_vendor_name) {
-                        $vendor_price = $vendor_Prices[$i];
-                        $vendor_sku = $vendor_Skus[$i];
-                        break;
-                    }$i++;
-                }
+//            $postmeta_table = $wpdb->prefix . "postmeta";
+//            $postmeta_table_sql = "SELECT * FROM `" . $postmeta_table . "` pm
+//            where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->order_id . "'";
+//            $postmeta_result = $wpdb->get_results($postmeta_table_sql);
+////            if($postmeta_result) {
+//                $ordersIDArr = $postmeta_result[0]->meta_value;
+//                $ordersIDs = unserialize($ordersIDArr);
+////            if (in_array($order->meta_value, $ordersIDs)) {
+//                $records = true;
+//                $post_id = get_post($order->order_id);
+//                $post_parent_id = $post_id->post_parent;
+//                $parent_post_title = get_post($post_parent_id);
+//                $vendor_price = 0;
+//                $vendor_sku = '';
+//                $vendors = explode(',', $order->vendor_name);
+//                $vendor_Prices = explode(',', $order->vendor_price);
+//                $vendor_Skus = explode(',', $order->vendor_sku);
+//                $i = 0;
+//                while ($i < count($vendors)) {
+//
+//                    if ($vendors[$i] == $order->primary_vendor_name) {
+//                        $vendor_price = $vendor_Prices[$i];
+//                        $vendor_sku = $vendor_Skus[$i];
+//                        break;
+//                    }$i++;
+//                }
                 ?>
                 <div style="clear: both;"></div>
 
                 <?php
-                if ($last_order_id > 0 && $last_order_id != $order->ID) {
+                if ($last_order_id > 0 && $last_order_id != $order->order_id) {
                     $records = true;
                     ?>
                 </tbody>
@@ -188,36 +193,36 @@
 
                 <?php
             }
-        }
-            if (!in_array($order->ID, $printed_po_numbers)) {
+//        }
+            if (!in_array($order->order_id, $printed_po_numbers)) {
                 $records = true;
                 ?>
-                <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->ID) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
-                    <input type="hidden" name="ID" value="<?= esc_attr($order->ID) ?>">
+                <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
+                    <input type="hidden" name="ID" value="<?= esc_attr($order->order_id) ?>">
                     <input type="hidden" name="status" value="<?= esc_attr($status) ?>">
 
 
 
                     <div style="float: left;width: 200px; padding: 2px;">
                         <?php get_print_status($order); ?>
-                        <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->ID)) ?>
+                        <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
                     </div>
                     <div style="float: left;width: 250px; padding: 2px;">
                         <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($parent_post_title->post_title)) ?><br>
-                        <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->post_date))) ?>
+                        <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                     </div>
                 <?php
                 if ($status == "returned") {
                     ?>
                     <div style="float: right;padding: 2px;">
-                        <button type="button" class="button" onclick="mark_closed('<?php echo $order->ID ?>')">Mark Selected Closed</button>
+                        <button type="button" class="button" onclick="mark_closed('<?php echo $order->order_id ?>')">Mark Selected Closed</button>
                     </div>
                     <?php
                 }
                 ?>
 
                     <div style="float: right;padding: 2px;">
-                        <button type="button" class="button" data-id="<?= esc_attr($order->ID) ?>" data-role="order-title" data-label="<?php
+                        <button type="button" class="button" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php
                         if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
                             echo 'Close';
                         } else if ($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) {
@@ -243,9 +248,9 @@
                                 <button type="submit" name="delete" value="delete" class="button"><?= esc_html__('Delete', 'wcvm') ?></button>
                             <?php else: ?>
                                 <input type="hidden" name="archive" value="archive" />
-                        <!--                            <button style="display: none;" type="submit" name="archive" id="order_<?= esc_attr($order->ID) ?>" value="archive" class="button"><?= esc_html__('Delete Entire PO', 'wcvm') ?></button>-->
-                                <a href="javascript:void(0);" id="<?= esc_attr($order->ID) ?>" class="button delete_entire">Delete Entire PO</a>
-                                <a href="javascript:void(0);" id="<?= esc_attr($order->ID) ?>" class="button delete_selected">Delete Selected Lines</a>
+                        <!--                            <button style="display: none;" type="submit" name="archive" id="order_<?= esc_attr($order->order_id) ?>" value="archive" class="button"><?= esc_html__('Delete Entire PO', 'wcvm') ?></button>-->
+                                <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_entire">Delete Entire PO</a>
+                                <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_selected">Delete Selected Lines</a>
                             <?php endif ?>
                         </div>
                     <?php endif ?>
@@ -254,7 +259,7 @@
                     if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'publish' || $status == 'private' || $status == 'trash') {
                         $display = "none";
                     }
-                    ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->ID) ?>" id="<?= esc_attr($order->ID) ?>">
+                    ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
                         <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
 
                             <thead>
@@ -267,8 +272,8 @@
                             </thead>
                             <tbody>
                                 <?php
-                                $printed_po_numbers[] = $order->ID;
-                                $last_order_id = $order->ID;
+                                $printed_po_numbers[] = $order->order_id;
+                                $last_order_id = $order->order_id;
                                 //$last_expected_date = $order->po_expected_date;
                             }
                             ?>
@@ -278,9 +283,10 @@
 //                                        echo '&#10004;';
 //                                    }
                                     ?></td>-->
-                                <td><?php echo $order->sku; ?></td>
+                                <td><?php echo $order->product_sku; ?></td>
                                 <td><?php
-                                    $stock = $order->stock;
+//                                    $stock = $order->stock;
+                                    $stock = 0;
 
                                     if ($stock <= 0) {
                                         echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
@@ -298,11 +304,11 @@
                                     ?>                        
                                     <!--<span style="background: orange;padding: 5px;">LOW</span>-->
                                 </td>
-                                <td><?php echo wc_price($order->regular_price); ?></td>
-                                <td><?php echo $vendor_sku; ?></td>
-                                <td><?php echo wc_price($vendor_price); ?></td>
-                                <td><?php echo $order->stock; ?></td>
-                                <td><?php echo $order->sale_30_days; ?></td>
+                                <td><?php echo wc_price($order->product_price); ?></td>
+                                <td><?php echo $order->vendor_sku; ?></td>
+                                <td><?php echo wc_price($order->vendor_price_last); ?></td>
+                                <td><?php // echo $order->stock; ?></td>
+                                <td><?php // echo $order->sale_30_days; ?></td>
 <!--                                <td><input readonly type="text" value="<?php // echo $order->threshold_low; ?>" style="width:60px;"></td>
                                 <td><input readonly type="text" value="<?php // echo $order->threshold_reorder; ?>" style="width:60px;"></td>
                                 <td><input readonly type="text" value="<?php // echo $order->reorder_qty; ?>" style="width:60px;"></td>-->
@@ -312,12 +318,12 @@
                                 <?php
                                 $order_product_Qty = 0;
                                 if($status == 'return_closed'){
-                                    $order_Qty = get_post_meta($order->ID, "wcvmgo_".$order->product_id."_return_closed");
+                                    $order_Qty = get_post_meta($order->order_id, "wcvmgo_".$order->product_id."_return_closed");
                                      if ($order_Qty) {
                                          $order_product_Qty = $order_Qty[0];
                                      }
                                 }else{
-                                    $order_Qty = get_post_meta($order->ID, "wcvmgo_" . $order->product_id);
+                                    $order_Qty = get_post_meta($order->order_id, "wcvmgo_" . $order->product_id);
                                     if ($order_Qty) {
                                         $order_product_Qty = $order_Qty[0]['product_quantity'];
                                     }
@@ -329,7 +335,8 @@ if($status != 'trash'){
                                     $inputType = 'readonly';
                                 }
                                 ?>
-                                <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
+                                <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order->product_quantity; ?>" style="width:60px;"></td>
+                                <!--<td><input <?php echo $inputType . ' '; ?>type="text" name="<?php // echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php // echo $order_product_Qty; ?>" style="width:60px;"></td>-->
 <?php
 }
 ?>
@@ -339,7 +346,7 @@ if($status != 'trash'){
                             </tr>
 
                             <?php
-                        }
+//                        }
                     }
                     if($records){
                     ?>

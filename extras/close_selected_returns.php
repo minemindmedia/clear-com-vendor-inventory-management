@@ -57,5 +57,12 @@ foreach ($products as $product) {
 global $wpdb;
 $query = "UPDATE wp_posts SET post_status = '" . $status . "' WHERE ID = " . $orderId;
 $wpdb->query($query);
+$vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_order';
+$update_data['post_status'] = $status;
+$update_data['updated_date'] = date('Y/m/d H:i:s a');
+$update_data['updated_by'] = get_current_user_id();
+$where_data['order_id'] = $orderId;
+$updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);            
+
 echo $deleted;
 ?>

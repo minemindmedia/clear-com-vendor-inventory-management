@@ -216,7 +216,7 @@
                         $stock = $data['product_quantity_received'] + get_post_meta($productId, '_stock', true);
                     }
                     update_post_meta($productId, '_stock', $stock);
-
+                    $update_data['post_status'] = $order->post_status;
                     $update_data['product_quantity'] = $wcvmgo_product_quantity;
                     $update_data['product_quantity_received'] = $data['product_quantity_received'];
                     $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
