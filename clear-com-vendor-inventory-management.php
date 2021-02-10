@@ -562,8 +562,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             'vendor_price_notes' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_notes', true),
                         ));
 $sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = ".$productIDs;                        
-//echo $sql;die;
 $orderDetails = $wpdb->get_results($sql);
+//print_r($orderDetails);die;
                         // insert generate po details into wp_vendor_purchase_order
                         $insert_data['product_id'] = $productIDs;
                         $insert_data['vendor_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'];
@@ -576,9 +576,9 @@ $orderDetails = $wpdb->get_results($sql);
                         //                        $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
                         //                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
                         //                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
-                        $insert_data['product_stock'] = get_post_meta($productIDs, '_stock', true);
-                        $insert_data['on_order'] = ;
-                        $insert_data['sale_30_days'] = ;
+//                        $insert_data['product_stock'] = get_post_meta($productIDs, '_stock', true);
+//                        $insert_data['on_order'] = ;
+//                        $insert_data['sale_30_days'] = ;
                         $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
                         $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
                         $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
