@@ -312,7 +312,7 @@
                                 <td><input readonly type="text" value="<?php // echo $order->threshold_reorder; ?>" style="width:60px;"></td>
                                 <td><input readonly type="text" value="<?php // echo $order->reorder_qty; ?>" style="width:60px;"></td>-->
 
-                                <td><?php echo $order->on_order; ?></td>
+                                <td><?php echo $order->on_order_quantity; ?></td>
                                 <!--<td>On Vendor Bo</td>-->
                                 <?php
                                 $order_product_Qty = 0;
@@ -327,7 +327,7 @@
 //                                    if ($order_Qty) {
 //                                        $order_product_Qty = $order_Qty[0]['product_quantity'];
 //                                    }
-                                    $order_product_Qty = $order->product_quantity;
+                                    $order_product_Qty = $order->product_ordered_quantity;
                                 }
 if($status != 'trash'){                                
                                 $inputType = '';
