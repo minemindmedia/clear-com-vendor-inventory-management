@@ -321,25 +321,25 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
             $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
-            
+
             wp_update_post($order);
             delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
 //            print_r($_POST);die;
-                        $update_data['post_status'] = 'trash';
+            $update_data['post_status'] = 'trash';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
             $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
             update_post_meta($order->ID, 'old_status', $order->post_status);
             $order->post_status = 'trash';
-            wp_update_post($order);            
+            wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
             header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
-            $wpdb->delete( $vendor_purchase_order_table, array( 'order_id' => $_POST['ID'] ) );            
+            $wpdb->delete($vendor_purchase_order_table, array('order_id' => $_POST['ID']));
             wp_delete_post($_POST['ID']);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete-all'])) {
             $query = new WP_Query();
@@ -351,7 +351,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             )) as $id) {
                 wp_delete_post($id);
             }
-            $wpdb->delete( $vendor_purchase_order_table, array( 'post_status' => 'trash' ) );
+            $wpdb->delete($vendor_purchase_order_table, array('post_status' => 'trash'));
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
@@ -443,8 +443,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     $order->post_status = 'draft';
                     update_post_meta($orderId, 'po_expected_date', strtotime($_POST['expected_date']));
                     wp_update_post($order);
-                    
-                    
+
+
                     wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $order->post_status) . '#order' . $order->ID);
                 }
             }
@@ -578,8 +578,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             'vendor_price_bulk' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_bulk', true),
                             'vendor_price_notes' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_notes', true),
                         ));
-$sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = ".$productIDs;                        
-$orderDetails = $wpdb->get_results($sql);
+                        $sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = " . $productIDs;
+                        $orderDetails = $wpdb->get_results($sql);
                         // insert generate po details into wp_vendor_purchase_order
                         $insert_data['product_id'] = $productIDs;
                         $insert_data['vendor_id'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'];
@@ -607,8 +607,8 @@ $orderDetails = $wpdb->get_results($sql);
                         $insert_data['order_date'] = date('Y/m/d H:i:s a');
                         $insert_data['created_date'] = date('Y/m/d H:i:s a');
                         $insert_data['created_by'] = get_current_user_id();
-//                        print_r($insert_data);
-//                        die;
+                        print_r($insert_data);
+                        die;
                         $inserted = $wpdb->insert($vendor_purchase_order_table, $insert_data);
                         if ($inserted) {
                             $ajaxResponse['purchase_order'] = true;
@@ -679,18 +679,18 @@ $orderDetails = $wpdb->get_results($sql);
                 $where = " AND v.primary_vendor_id IN (" . implode(",", $selected_vendors) . ")";
             }
         }
-        /*if (array_key_exists('selected_status', $_GET)) {
-            if ($_GET['selected_status'] != "") {
-                $status_selected = $_GET['selected_status'];
-                $selected_status = explode("|", $_GET['selected_status']);
-                if ($where) {
-                    $where .= " AND ";
-                } else {
-                    $where = " WHERE ";
-                }
-                $where .= " v.stock_status IN (" . implode(",", $selected_status) . ")";
-            }
-        }*/
+        /* if (array_key_exists('selected_status', $_GET)) {
+          if ($_GET['selected_status'] != "") {
+          $status_selected = $_GET['selected_status'];
+          $selected_status = explode("|", $_GET['selected_status']);
+          if ($where) {
+          $where .= " AND ";
+          } else {
+          $where = " WHERE ";
+          }
+          $where .= " v.stock_status IN (" . implode(",", $selected_status) . ")";
+          }
+          } */
         $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
         v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, 
         v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
@@ -698,7 +698,7 @@ $orderDetails = $wpdb->get_results($sql);
         CASE WHEN v.stock IS NULL THEN 'OUT' 
         WHEN CAST(v.stock as signed) <= 0 THEN 'OUT' 
         ELSE 'IN' END product_stock_status,
-        sum(p.product_quantity) as on_order_quantity
+        sum(p.product_ordered_quantity) as on_order_quantity
         FROM " . $vendor_po_lookup_table . " v
         left join " . $vendor_purchase_order_table . " p on p.product_id = v.product_id " . $where . "
         group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
@@ -991,21 +991,29 @@ $orderDetails = $wpdb->get_results($sql);
 
             <div style="float: left;vertical-align: top">
 
-<!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                    <option <?php // if (in_array('out', $selected_status)) {
+        <!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                            <option <?php
+                // if (in_array('out', $selected_status)) {
 //                    echo 'selected';
-//                } ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
-                    <option <?php // if (in_array('low', $selected_status)) {
+//                } 
+                ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
+                            <option <?php
+        // if (in_array('low', $selected_status)) {
 //                    echo 'selected';
-//                } ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
-                    <option <?php // if (in_array('reorder', $selected_status)) {
+//                } 
+                ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
+                            <option <?php
+                // if (in_array('reorder', $selected_status)) {
 //                    echo 'selected';
-//                } ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                    <option <?php // if (in_array('ok', $selected_status)) {
+//                } 
+                ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
+                            <option <?php
+                    // if (in_array('ok', $selected_status)) {
 //                echo 'selected';
-//            } ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
-                </select>-->
-<select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
+//            } 
+                    ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                        </select>-->
+                <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
                     <?php
                     global $wpdb;
                     $posts_table = $wpdb->prefix . "posts";
@@ -1028,7 +1036,7 @@ $orderDetails = $wpdb->get_results($sql);
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>"/>
-                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected; ?>"/>-->
+                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;  ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
 
@@ -1121,17 +1129,17 @@ $orderDetails = $wpdb->get_results($sql);
                     ?></td>-->
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->rare) ? "&#10004;" : ""; 
                     ?></td>-->
-                        <?php
-                        $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
-                        $product_url = get_permalink($orderDetail->product_id);
-                        if ($thumnailID) {
-                            $image = woocommerce_get_product_thumbnail();
-                            //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
-                        }
-                        ?>
+            <?php
+            $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
+            $product_url = get_permalink($orderDetail->product_id);
+            if ($thumnailID) {
+                $image = woocommerce_get_product_thumbnail();
+                //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
+            }
+            ?>
                         <td class="center third-cell">
                             <!--<a class="sku-thumbnail" href="<?php echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku 
-                        ?></a>-->
+            ?></a>-->
                             <a class="sku-thumbnail" href="#" data-image="<?php echo $image; ?>"><?php echo $orderDetail->sku ?></a>
 
                         </td>
@@ -1169,10 +1177,10 @@ $orderDetails = $wpdb->get_results($sql);
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low 
             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder 
-            ?></td>-->
+                        ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty 
                         ?></td>-->
-                        <td class="center seventh-cell"><?php echo $orderDetail->on_order_quantity?$orderDetail->on_order_quantity:0 ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->on_order_quantity ? $orderDetail->on_order_quantity : 0 ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
@@ -1306,18 +1314,18 @@ $orderDetails = $wpdb->get_results($sql);
                     }
                     var vendors_selected = $("#primary_vendor_filter").val().join('|');
                     $("#selected_vendors").val(vendors_selected);
-//                    var status_selected = $("#stock_status_filter").val().join('|');
-//                    $("#selected_status").val(status_selected);
+        //                    var status_selected = $("#stock_status_filter").val().join('|');
+        //                    $("#selected_status").val(status_selected);
                     $("#page-loader").show();
                     $("#sort-form").submit();
                 });
                 var unselect_stock_status = '';
 
                 //stock status multiselect
-//                $('#stock_status_filter').multiselect({
-//                    buttonWidth: '240px',
-//                    nonSelectedText: 'Select Stock Statuses',
-//                });
+        //                $('#stock_status_filter').multiselect({
+        //                    buttonWidth: '240px',
+        //                    nonSelectedText: 'Select Stock Statuses',
+        //                });
                 //vendor multiselect
                 $('#primary_vendor_filter').multiselect({
                     buttonWidth: '440px',
@@ -1344,9 +1352,9 @@ $orderDetails = $wpdb->get_results($sql);
                     //                    } else if ($("#rare_item_filter").val() == 0 && $("#rare_item_filter").val() != "") {
                     //                        rare_item_filter = "non_rare_item";
                     //                    }
-//                    if ($("#stock_status_filter").val().length) {
-//                        selected_statuses = $("#stock_status_filter").val();
-//                    }
+        //                    if ($("#stock_status_filter").val().length) {
+        //                        selected_statuses = $("#stock_status_filter").val();
+        //                    }
                     if ($("#primary_vendor_filter").val().length) {
                         selected_vendors = $("#primary_vendor_filter").val();
                     }
@@ -1418,21 +1426,20 @@ $orderDetails = $wpdb->get_results($sql);
 
         $sql = "SELECT * FROM " . $wpdb->prefix . "postmeta pm join {$wpdb->prefix}posts p on p.id = pm.post_id WHERE meta_key LIKE 'wcvm'";
         $results = $wpdb->get_results($sql);
-
         foreach ($results as $result) {
+
             $metaValues = unserialize($result->meta_value);
             foreach ($metaValues as $metaValue) {
-                $skuKey = "wcvm_" . $metaValue . "_sku";
-                $sql = "SELECT * FROM {$wpdb->prefix}postmeta pm WHERE meta_key = '" . $skuKey . "' and post_id = " . $result->post_id;
-                $vendorSku = $wpdb->get_results($sql);
+                //$primaryVendor = get_post_meta($result->post_id, 'wcvm_primary', TRUE);
+                //if ($metaValue == $primaryVendor) {
+                    $insert_data['post_id'] = $result->post_id;
+                    $insert_data['vendor_id'] = $metaValue;
+                    $insert_data['vendor_sku'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_sku', TRUE);
 
-                $priceKey = "wcvm_" . $metaValue . "_price_last";
-                $sql = "SELECT * FROM {$wpdb->prefix}postmeta pm WHERE meta_key = '" . $priceKey . "' and post_id = " . $result->post_id;
-                $vendorPrice = $wpdb->get_results($sql);
-
-                $data = array('post_id' => $result->post_id, 'vendor_id' => $metaValue, 'vendor_sku' => $vendorSku[0]->meta_value, 'vendor_price' => $vendorPrice[0]->meta_value);
-                $format = array('%d', '%d', '%s', '%d');
-                $insert = $wpdb->insert($table, $data, $format);
+                    $insert_data['vendor_price'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_price_last', TRUE);
+                    $format = array('%d', '%d', '%s', '%d');
+                    $insert = $wpdb->insert($table, $insert_data, $format);
+                //}
             }
         }
         if ($insert) {
