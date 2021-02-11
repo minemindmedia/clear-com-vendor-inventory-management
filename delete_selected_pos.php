@@ -13,6 +13,7 @@ for ($i = 0; $i < count($ids_to_delete); $i++) {
     $orderId = $meta_details[1];
     $productId = $meta_details[0];
     if ($order_to_process == $orderId) {
+        $wpdb->delete( $vendor_purchase_order_table, array( 'order_id' => $orderId ) );        
         delete_post_meta($orderId, 'wcvmgo_' . $productId . '_qty');
         delete_post_meta($orderId, 'wcvmgo_' . $productId . '_date');
         delete_post_meta($orderId, 'wcvmgo_' . $productId);

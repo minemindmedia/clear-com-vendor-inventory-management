@@ -187,6 +187,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_sku` varchar(20) NOT NULL,
         `product_price` decimal(10,2) NOT NULL,
         `product_quantity` INT(11) NULL,
+        `product_category` VARCHAR(100) NULL,
         `product_expected_date` INT(11) NULL,
         `product_rare` TINYINT(1) NULL,
         `product_threshold_low` INT(11) NULL,
@@ -202,8 +203,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_quantity_back_order` INT(11) NULL,
         `product_quantity_canceled` INT(11) NULL,
         `product_quantity_returned` INT(11) NULL,
+        `wp_vendor_purchase_order`  INT(11) NULL,
         `product_expected_date_back_order` INT(11) NULL,
         `post_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+        `post_old_status` VARCHAR(20) NOT NULL,
         `on_order` int(11) NOT NULL,
         `sale_30_days` int(11) NOT NULL,
         `product_stock` int(11) NOT NULL,
@@ -313,24 +316,30 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['unarchive'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
+            $update_data['post_status'] = 'draft';
+            $update_data['updated_date'] = date('Y/m/d H:i:s a');
+            $update_data['updated_by'] = get_current_user_id();
+            $where_data['order_id'] = $_POST['ID'];
+            $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
+            
             wp_update_post($order);
             delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
 //            print_r($_POST);die;
-            update_post_meta($order->ID, 'old_status', $order->post_status);
-            $order->post_status = 'trash';
-            wp_update_post($order);
-            
-            $update_data['post_status'] = 'trash';
+                        $update_data['post_status'] = 'trash';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
-            $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);            
+            $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
+            update_post_meta($order->ID, 'old_status', $order->post_status);
+            $order->post_status = 'trash';
+            wp_update_post($order);            
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
             header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
+            $wpdb->delete( $vendor_purchase_order_table, array( 'order_id' => $_POST['ID'] ) );            
             wp_delete_post($_POST['ID']);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete-all'])) {
             $query = new WP_Query();
@@ -342,6 +351,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             )) as $id) {
                 wp_delete_post($id);
             }
+            $wpdb->delete( $vendor_purchase_order_table, array( 'post_status' => 'trash' ) );
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
@@ -507,6 +517,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             'post_parent' => $selected_vendor['selected_vendor']
                         );
                         $vendor_post_ids[$selected_vendor['selected_vendor']] = wp_insert_post($data);
+//                        echo '--->'.$vendor_post_ids[$selected_vendor['selected_vendor']];die;
                     }
                     $sql = "SELECT * FROM `{$wpdb->prefix}vendor_po_lookup` WHERE id = '" . $selected_vendor['selected_id'] . "'";
                     $productDetails = $wpdb->get_results($sql);
@@ -586,6 +597,7 @@ $orderDetails = $wpdb->get_results($sql);
                         $insert_data['on_order'] = $orderDetails[0]->on_order;
                         $insert_data['vendor_name'] = $orderDetails[0]->primary_vendor_name;
                         $insert_data['sale_30_days'] = $orderDetails[0]->sale_30_days;
+                        $insert_data['product_category'] = $orderDetails[0]->category;
                         $insert_data['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
                         $insert_data['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price'];
                         $insert_data['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
@@ -595,13 +607,15 @@ $orderDetails = $wpdb->get_results($sql);
                         $insert_data['order_date'] = date('Y/m/d H:i:s a');
                         $insert_data['created_date'] = date('Y/m/d H:i:s a');
                         $insert_data['created_by'] = get_current_user_id();
+//                        print_r($insert_data);
+//                        die;
                         $inserted = $wpdb->insert($vendor_purchase_order_table, $insert_data);
                         if ($inserted) {
                             $ajaxResponse['purchase_order'] = true;
                         }
 //                        else{
-                            $ajaxResponse['insert'] = $insert_data;
-//                            echo '-'.$inserted.'<br>';
+//                            print_r($wpdb);
+//                            $ajaxResponse['insert'] = $insert_data;
 //                            print_r($insert_data);
 //                            echo '<br>';
 //                            echo $wpdb->last_query.'<br>';
@@ -684,7 +698,7 @@ $orderDetails = $wpdb->get_results($sql);
         CASE WHEN v.stock IS NULL THEN 'OUT' 
         WHEN CAST(v.stock as signed) <= 0 THEN 'OUT' 
         ELSE 'IN' END product_stock_status,
-        sum(p.product_quantity) as total_quantity
+        sum(p.product_quantity) as on_order_quantity
         FROM " . $vendor_po_lookup_table . " v
         left join " . $vendor_purchase_order_table . " p on p.product_id = v.product_id " . $where . "
         group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
@@ -1158,7 +1172,7 @@ $orderDetails = $wpdb->get_results($sql);
             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty 
                         ?></td>-->
-                        <td class="center seventh-cell"><?php echo $orderDetail->on_order ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->on_order_quantity?$orderDetail->on_order_quantity:0 ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
