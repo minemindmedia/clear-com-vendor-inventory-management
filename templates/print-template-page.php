@@ -11,6 +11,7 @@ if (array_key_exists('po', $_REQUEST)) {
     $orderID = $_REQUEST['po'];
     $order = get_post($orderID);
     $wcvmgo_manual = get_post_meta($orderID, "wcvmgo");
+    $purchaseOrderDetails = $wpdb->get_results('SELECT * FROM wp_vendor_purchase_order WHERE order_id = ' . $orderID);
     $order->wcvmgo = $wcvmgo_manual[0];
     $vendor = get_post($order->post_parent);
 }
@@ -98,39 +99,17 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <?php
-                                                                                        foreach ($order->wcvmgo as $productId):
-                                                                                            $skuKey = "wcvm_" . $productId . "_qty";
-                                                                                            $sql = "SELECT * FROM `wp_vendor_po_lookup` WHERE `product_id` = " . $productId;
-                                                                                            $data = $wpdb->get_results($sql);
-                                                                                            $poData = $data[0];
-                                                                                            $sql = "SELECT meta_value FROM `wp_postmeta` WHERE `post_id` = " . $orderID . " AND `meta_key` LIKE 'wcvmgo_" . $productId . "_qty'";
-                                                                                            $vendorSku = $wpdb->get_results($sql);
-                                                                                            $data = $vendorSku[0];
-                                                                                            if ($data->meta_value):
-                                                                                                $vendors = explode(',', $poData->vendor_name);
-                                                                                                $vendor_Prices = explode(',', $poData->vendor_price);
-                                                                                                $vendor_Skus = explode(',', $poData->vendor_sku);
-                                                                                                $i = 0;
-                                                                                                $vendor_price = 0;
-                                                                                                $vendor_sku = '';
-                                                                                                while ($i < count($vendors)) {
-
-                                                                                                    if ($vendors[$i] == $poData->primary_vendor_name) {
-                                                                                                        $vendor_price = $vendor_Prices[$i];
-                                                                                                        $vendor_sku = $vendor_Skus[$i];
-                                                                                                        break;
-                                                                                                    }$i++;
-                                                                                                }
-                                                                                                ?>
-                                                                                                <td style="text-align: right"><?php echo $data->meta_value; ?></td>
-                                                                                                <td style="text-align: left"><?php echo $vendor_sku; ?>   </td>
-                                                                                                <td style="text-align: left"><?php echo $poData->sku; ?></td>
-                                                                                                <td style="text-align: left"><?php echo $poData->product_title; ?></td>
-                                                                                                <td style="text-align: right"><?php echo $vendor_price; ?></td>
-                                                                                                <td style="text-align: right"><?php echo (float) $vendor_price * (float) $data->meta_value; ?></td>
-                                                                                            </tr>
-                                                                                            <?php $total += (float) $vendor_price * (float) $data->meta_value ?>  
-                                                                                        <?php endif ?>                                                                                    
+                                                                                        foreach ($purchaseOrderDetails as $singleLineItem):
+                                                                                            ?>
+                                                                                            <td style="text-align: right"><?php echo $singleLineItem->product_ordered_quantity; ?></td>
+                                                                                            <td style="text-align: left"><?php echo $singleLineItem->vendor_sku; ?>   </td>
+                                                                                            <td style="text-align: left"><?php echo $singleLineItem->product_sku; ?></td>
+                                                                                            <td style="text-align: left"><?php echo $singleLineItem->product_title; ?></td>
+                                                                                            <td style="text-align: right"><?php echo $singleLineItem->vendor_price_last; ?></td>
+                                                                                            <td style="text-align: right"><?php echo (float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity; ?></td>
+                                                                                        </tr>
+                                                                                        <?php $total += (float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity ?>  
+                                                                                                                                                                            
                                                                                     <?php endforeach ?>                                                                                    
                                                                                     <tr>
                                                                                         <td colspan="5" style="text-align: right">Total</td>
