@@ -705,7 +705,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
         v.sale_30_days, v.order_qty, v.stock_status ";
-//echo $order_details_table_sql;die;       
 
 
         $sql = $order_details_table_sql;
@@ -715,8 +714,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         //echo $sql;
 
         $orderDetails = $wpdb->get_results($sql);
-        // echo $wpdb->last_query;
-        //print_r($orderDetails);
+//         echo $wpdb->last_query;
+//        die;//print_r($orderDetails);
         ?>
         <style>
             /*thead{
@@ -991,28 +990,28 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
             <div style="float: left;vertical-align: top">
 
-        <!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                            <option <?php
+                        <!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                                            <option <?php
                 // if (in_array('out', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
-                            <option <?php
-        // if (in_array('low', $selected_status)) {
+                                            <option <?php
+                // if (in_array('low', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
-                            <option <?php
+                                            <option <?php
                 // if (in_array('reorder', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                            <option <?php
-                    // if (in_array('ok', $selected_status)) {
+                                            <option <?php
+                // if (in_array('ok', $selected_status)) {
 //                echo 'selected';
 //            } 
-                    ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
-                        </select>-->
+                ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
+                                        </select>-->
                 <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
                     <?php
                     global $wpdb;
@@ -1030,13 +1029,13 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         }
                         ?>
                         <option <?php echo $selected; ?> value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
-        <?php endforeach ?>
+                    <?php endforeach ?>
                 </select>
             </div>
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>"/>
-                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;  ?>"/>-->
+                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;    ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
 
@@ -1129,30 +1128,30 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     ?></td>-->
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->rare) ? "&#10004;" : ""; 
                     ?></td>-->
-            <?php
-            $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
-            $product_url = get_permalink($orderDetail->product_id);
-            if ($thumnailID) {
-                $image = woocommerce_get_product_thumbnail();
-                //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
-            }
-            ?>
+                        <?php
+                        $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
+                        $product_url = get_permalink($orderDetail->product_id);
+                        if ($thumnailID) {
+                            $image = woocommerce_get_product_thumbnail();
+                            //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
+                        }
+                        ?>
                         <td class="center third-cell">
                             <!--<a class="sku-thumbnail" href="<?php echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku 
-            ?></a>-->
+                        ?></a>-->
                             <a class="sku-thumbnail" href="#" data-image="<?php echo $image; ?>"><?php echo $orderDetail->sku ?></a>
 
                         </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
                         <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
                         <td class="center sixth-cell">
-            <?php
-            if ($orderDetail->product_stock_status == 'OUT') {
-                echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
-            } else {
-                echo $orderDetail->product_stock_status;
-            }
-            ?>
+                            <?php
+                            if ($orderDetail->product_stock_status == 'OUT') {
+                                echo '<span style="background: red;padding: 5px;color: white">' . esc_html__('OUT', 'wcvm') . '</span>';
+                            } else {
+                                echo $orderDetail->product_stock_status;
+                            }
+                            ?>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
                         <td class="eighth-cell">
@@ -1168,27 +1167,27 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                     }
                                     ?>
                                     <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . $vendor_prices[$i]; ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
-                        <?php } ?>
+                                <?php } ?>
                             </select>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($selected_vendor_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low 
-            ?></td>-->
+                                ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder 
-                        ?></td>-->
+                                ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty 
-                        ?></td>-->
+                                ?></td>-->
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order_quantity ? $orderDetail->on_order_quantity : 0 ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
-            <?php
-            $even_odd_counter++;
-        }
-        ?>
+                    <?php
+                    $even_odd_counter++;
+                }
+                ?>
             </tbody>
         </table>
         <div id='page-loader' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'>
@@ -1196,18 +1195,12 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         </div>
         <!-- stylesheet -->
         <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" type="text/css" />
-        <!-- <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.6/css/responsive.dataTables.min.css" type="text/css" /> -->
-        <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css" type="text/css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
 
         <!-- script -->
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
-        <!-- <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script> -->
-        <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
 
         <!--  -->
@@ -1432,13 +1425,13 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             foreach ($metaValues as $metaValue) {
                 //$primaryVendor = get_post_meta($result->post_id, 'wcvm_primary', TRUE);
                 //if ($metaValue == $primaryVendor) {
-                    $insert_data['post_id'] = $result->post_id;
-                    $insert_data['vendor_id'] = $metaValue;
-                    $insert_data['vendor_sku'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_sku', TRUE);
+                $insert_data['post_id'] = $result->post_id;
+                $insert_data['vendor_id'] = $metaValue;
+                $insert_data['vendor_sku'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_sku', TRUE);
 
-                    $insert_data['vendor_price'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_price_last', TRUE);
-                    $format = array('%d', '%d', '%s', '%d');
-                    $insert = $wpdb->insert($table, $insert_data, $format);
+                $insert_data['vendor_price'] = get_post_meta($insert_data['post_id'], 'wcvm_' . $metaValue . '_price_last', TRUE);
+                $format = array('%d', '%d', '%s', '%d');
+                $insert = $wpdb->insert($table, $insert_data, $format);
                 //}
             }
         }
@@ -1698,25 +1691,25 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             <td><textarea id="post_content" name="post_content" style="width: 100%;height:100px;"></textarea></td>
                         </tr>
                     </table>
-                <?php submit_button(__('Save Vendor', 'wcvim')) ?>
+                    <?php submit_button(__('Save Vendor', 'wcvim')) ?>
                     <div><span style="color: red">*</span> - <?= esc_html__('required field', 'wcvim') ?></div>
                     <input type="hidden" name="ID" value="">
-        <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
+                    <?php wp_nonce_field('save', '_wcvim_vendor_save') ?>
                 </form>
             </div>
             <form action="" method="post">
-            <?php
-            $this->saveVendorPage();
-            ?>
+                <?php
+                $this->saveVendorPage();
+                ?>
             </form>
             <div id="ajax-response"></div>
             <br class="clear">
-        <?php
-        global $wpdb;
-        $query = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'wcvm-vendor' AND post_status = 'publish'";
-        $data = $wpdb->get_results($query);
-        if ($data) {
-            ?>
+            <?php
+            global $wpdb;
+            $query = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'wcvm-vendor' AND post_status = 'publish'";
+            $data = $wpdb->get_results($query);
+            if ($data) {
+                ?>
                 <style>
                     .wp-list-table.wcvm-vendors td {
                         vertical-align: middle;
@@ -1769,9 +1762,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                 <td><?php echo $post_content; ?></td>
                                 <!--<td></td>-->
                             </tr>
-                <?php
-            }
-            ?>
+                            <?php
+                        }
+                        ?>
                     </tbody>
                 </table>
                 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
@@ -1795,9 +1788,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         border: 1px lightgrey;
                     }
                 </style>
-            <?php
-        }
-        ?>
+                <?php
+            }
+            ?>
         </div>
         <?php add_thickbox(); ?>
         <script type="text/javascript">
