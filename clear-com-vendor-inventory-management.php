@@ -261,6 +261,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('generate-po-script', plugin_dir_url(__FILE__) . 'assets/vendors.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_script('multiselect-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_style('multiselect-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css');
+        wp_enqueue_script('bootstarp-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js', array('jquery'), '1.0.0', true);        
+        wp_enqueue_style('bootstarp-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css');
+        wp_enqueue_script('popper-script', plugin_dir_url(__FILE__) . 'assets/extras/popper.min.js', array('jquery'), '1.0.0', true);                
         wp_localize_script('generate-po-script', 'generate_po_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
         ]);
@@ -1193,14 +1198,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
         </div>
         <!-- stylesheet -->
-        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+<!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
+<!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
 
         <!-- script -->
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+<!--        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
+        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
+        <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+<!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
 
         <!--  -->
 
