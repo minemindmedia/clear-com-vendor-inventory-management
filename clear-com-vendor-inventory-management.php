@@ -186,7 +186,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_title` varchar(100) NOT NULL,
         `product_sku` varchar(20) NOT NULL,
         `product_price` decimal(10,2) NOT NULL,
-        `product_quantity` INT(11) NULL,
+        `product_ordered_quantity` INT(11) NULL,
         `product_category` VARCHAR(100) NULL,
         `product_expected_date` INT(11) NULL,
         `product_rare` TINYINT(1) NULL,
@@ -203,11 +203,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         `product_quantity_back_order` INT(11) NULL,
         `product_quantity_canceled` INT(11) NULL,
         `product_quantity_returned` INT(11) NULL,
-        `wp_vendor_purchase_order`  INT(11) NULL,
         `product_expected_date_back_order` INT(11) NULL,
         `post_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
         `post_old_status` VARCHAR(20) NOT NULL,
-        `on_order` int(11) NOT NULL,
+        `on_order_quantity` int(11) NOT NULL,
         `sale_30_days` int(11) NOT NULL,
         `product_stock` int(11) NOT NULL,
         `order_date` datetime NULL,
@@ -405,7 +404,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     $update_data['product_title'] = get_post_field('post_title', $productId);
                     $update_data['product_sku'] = get_post_meta($productId, '_sku', true);
                     $update_data['product_price'] = get_post_meta($productId, '_price', true);
-                    $update_data['product_quantity'] = $_POST['__order_qty'][$productId];
+                    $update_data['product_ordered_quantity'] = $_POST['__order_qty'][$productId];
                     $update_data['product_expected_date'] = $stamp;
                     $update_data['product_rare'] = get_post_meta($productId, 'wcvm_rare', true);
                     //                    $update_data['product_threshold_low'] = get_post_meta($productId, 'wcvm_threshold_low', true);
@@ -587,14 +586,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         $insert_data['product_title'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_title'];
                         $insert_data['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
                         $insert_data['product_price'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_price'];
-                        $insert_data['product_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
+                        $insert_data['product_ordered_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
 //                                                $insert_data['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
                         //                        $insert_data['product_threshold_low'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_low'];
                         //                        $insert_data['product_threshold_reorder'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_threshold_reorder'];
                         //                        $insert_data['product_reorder_qty'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_reorder_qty'];
 //                        $insert_data['product_stock'] = get_post_meta($productIDs, '_stock', true);
                         $insert_data['product_stock'] = $orderDetails[0]->stock;
-                        $insert_data['on_order'] = $orderDetails[0]->on_order;
+                        $insert_data['on_order_quantity'] = $orderDetails[0]->on_order_quantity;
                         $insert_data['vendor_name'] = $orderDetails[0]->primary_vendor_name;
                         $insert_data['sale_30_days'] = $orderDetails[0]->sale_30_days;
                         $insert_data['product_category'] = $orderDetails[0]->category;
@@ -614,7 +613,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             $ajaxResponse['purchase_order'] = true;
                         }
 //                        else{
-//                            print_r($wpdb);
+////                            print_r($wpdb);
 //                            $ajaxResponse['insert'] = $insert_data;
 //                            print_r($insert_data);
 //                            echo '<br>';

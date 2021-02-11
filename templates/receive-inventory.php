@@ -136,7 +136,7 @@
 //                $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
 //                if ($data['product_quantity'] != (int)$_POST['product_quantity_received'][$productId] + (int)$_POST['product_quantity_back_order'][$productId] + (int)$_POST['product_quantity_canceled'][$productId] + (int)$_POST['product_quantity_returned'][$productId]) {
                 
-                if ($single_order->product_quantity != (int)$_POST['product_quantity_received'][$single_order->product_id] + (int)$_POST['product_quantity_back_order'][$single_order->product_id] + (int)$_POST['product_quantity_canceled'][$single_order->product_id] + (int)$_POST['product_quantity_returned'][$single_order->product_id]) {
+                if ($single_order->product_ordered_quantity != (int)$_POST['product_quantity_received'][$single_order->product_id] + (int)$_POST['product_quantity_back_order'][$single_order->product_id] + (int)$_POST['product_quantity_canceled'][$single_order->product_id] + (int)$_POST['product_quantity_returned'][$single_order->product_id]) {
                     $isValid = false;
                     break;
                 }
@@ -170,7 +170,7 @@
                         if ($redirect == "") {
                             $redirect = "publish";
                         }
-                        $data['product_quantity'] = $data['product_quantity_received'];
+                        $data['product_ordered_quantity'] = $data['product_quantity_received'];
                         update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_received', $data['product_quantity_received']);
                         $qtyToUpdate = get_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_received');
 
@@ -242,7 +242,7 @@
                         $status .= 'trash';
                         }
                 $update_data['post_status'] = $status;
-                    $update_data['product_quantity'] = $data['product_quantity'];
+                    $update_data['product_ordered_quantity'] = $data['product_quantity'];
                     $update_data['product_quantity_received'] = $data['product_quantity_received'];
 //                    $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                     $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
@@ -330,7 +330,7 @@
             $product_expected_date_back_order = isset($wcvmgo[0]['product_expected_date_back_order']) ? date('Y-m-d', (int) $wcvmgo[0]['product_expected_date_back_order']) : '';
             // print_r($wcvmgo[0]['product_expected_date_back_order']);
         }
-            $product_quantity = $order->product_quantity;
+            $product_quantity = $order->product_ordered_quantity;
             $product_quantity_received = $order->product_quantity_received;
             $product_quantity_returned = $order->product_quantity_returned;
             $product_quantity_back_order = $order->product_quantity_back_order;
