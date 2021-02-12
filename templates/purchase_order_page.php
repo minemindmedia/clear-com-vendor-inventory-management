@@ -44,6 +44,7 @@
             . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
 
     $orders = $wpdb->get_results($purchase_order_table_sql);
+    
     ?>
     <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
     <?php
@@ -175,7 +176,7 @@
                     <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
                 </div>
                 <div style="float: left;width: 250px; padding: 2px;">
-                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($order->vendor_name)) ?><br>
+                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html(get_the_title($order->vendor_id))) ?><br>
                     <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                 </div>
                 <?php

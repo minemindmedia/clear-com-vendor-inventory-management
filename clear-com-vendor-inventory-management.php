@@ -377,7 +377,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             $wpdb->delete($vendor_purchase_order_table, array('post_status' => 'trash'));
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
             print_r($_POST);
-
+            die;
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
            
@@ -387,55 +387,18 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
                 if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
                     $orderId = $_POST['ID'];
-                } else {
-                    $orderId = wp_insert_post(array(
-                        'post_type' => 'wcvm-order',
-                        'post_status' => 'draft',
-                        'post_parent' => $vendorId,
-                    ));
-                    update_post_meta($orderId, 'wcvmgo', get_post_meta($_POST['ID'], 'wcvmgo', true));
                 }
                 if (!empty($_POST['expected_date'])) {
                     $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
-                    $vpo_UpdateData['post_status'] = 'draft';
+                    $vpo_UpdateData['post_status'] = 'on-order';
                 }
-                $vpo_UpdateData['post_status'] = 'draft';
-                $vpo_UpdateData['order_date'] = date('Y/m/d H:i:s a');
                 $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
                 $vpo_UpdateData['updated_by'] = get_current_user_id();
                 $where_vpo['order_id'] = $orderId;
                 $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);
                 foreach ($_POST['__order_qty'] as $productId => $_) {
 
-                    update_post_meta($orderId, 'wcvmgo_' . $productId . '_qty', $_POST['__order_qty'][$productId]);
-                    $stamp = strtotime($_POST['__expected_date']);
-                    if (!$stamp && !empty($_POST['expected_date'])) {
-                        $stamp = strtotime($_POST['expected_date']);
-                    }
-                    if ($stamp) {
-                        update_post_meta($orderId, 'wcvmgo_' . $productId . '_date', $stamp);
-                    }
-
-                    update_post_meta($orderId, 'wcvmgo_' . $productId, array(
-                        'product_id' => $productId,
-                        'product_title' => get_post_field('post_title', $productId),
-                        'product_sku' => get_post_meta($productId, '_sku', true),
-                        'product_price' => get_post_meta($productId, '_price', true),
-                        'product_quantity' => $_POST['__order_qty'][$productId],
-                        'product_expected_date' => $stamp,
-                        'product_rare' => get_post_meta($productId, 'wcvm_rare', true),
-                        //                        'product_threshold_low' => get_post_meta($productId, 'wcvm_threshold_low', true),
-//                        'product_threshold_reorder' => get_post_meta($productId, 'wcvm_threshold_reorder', true),
-//                        'product_reorder_qty' => get_post_meta($productId, 'wcvm_reorder_qty', true),
-                        'vendor_sku' => get_post_meta($productId, 'wcvm_' . $vendorId . '_sku', true),
-                        'vendor_link' => get_post_meta($productId, 'wcvm_' . $vendorId . '_link', true),
-                        'vendor_price_last' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_last', true),
-                        'vendor_price_bulk' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_bulk', true),
-                        'vendor_price_notes' => get_post_meta($productId, 'wcvm_' . $vendorId . '_price_notes', true),
-                    ));
                     $poStatus = $_POST['status'];
-
-
                     $getPOLineItemDetails = $wpdb->get_results(""
                             . "SELECT * FROM " . $vendor_purchase_order_table . " po "
                             . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
@@ -461,8 +424,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 }
                 if (!empty($_POST['expected_date'])) {
                     $order = get_post($_POST['ID']);
-                    $order->post_status = 'draft';
-                    update_post_meta($orderId, 'po_expected_date', strtotime($_POST['expected_date']));
+                    $order->post_status = 'on-order';
                     wp_update_post($order);
                     wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $order->post_status) . '#order' . $order->ID);
                 }
@@ -532,7 +494,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     if (!array_key_exists($purchase_orders_post_data_single['selected_vendor'], $created_purchase_orders_ids)) {
                         $data = array(
                             'post_type' => 'wcvm-order',
-                            'post_status' => 'auto-draft',
+                            'post_status' => 'new-order',
                             'post_parent' => $purchase_orders_post_data_single['selected_vendor']
                         );
                         $created_purchase_orders_ids[$purchase_orders_post_data_single['selected_vendor']] = wp_insert_post($data);
@@ -597,14 +559,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     $vpo_insertData['created_by'] = get_current_user_id();
                     $insertedPOId = $wpdb->insert($vendor_purchase_order_table, $vpo_insertData);
                     
-                    if ($insertedPOId) {
-                        
+                    if ($wpdb->insert_id) {
+                        $createdOrderId = $wpdb->insert_id;
                         foreach ($vendor_product_ids_data[$uniquer_vendor_id] as $vendor_single_product) {
                             $productIDs = '';
                             $productIDs = $vendor_single_product;
                             $sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = " . $productIDs;
                             $orderDetails = $wpdb->get_results($sql);
-                            $insertPOProductData['vendor_order_idFk'] = $insertedPOId;
+                            $insertPOProductData['vendor_order_idFk'] = $createdOrderId;
                             $insertPOProductData['product_id'] = $productIDs;
                             $insertPOProductData['product_title'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_title'];
                             $insertPOProductData['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
