@@ -148,7 +148,7 @@
                 
 //                foreach ($order->wcvmgo as $productId) {
                   foreach ($order_details as $single_order) {                
-//                    $order->post_status = "";
+                    $order->post_status = "";
 //                    $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
                     $data = get_post_meta($single_order->order_id, 'wcvmgo_' . $single_order->product_id, true);
                     
