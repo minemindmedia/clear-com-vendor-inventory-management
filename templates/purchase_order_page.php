@@ -51,7 +51,7 @@
 //    }
     $table = new Vendor_Management_Columns();
     ?>
-    <?php $table_headers = $table->get_columns_vendors_list(); ?>
+    <?php $table_headers = $table->get_new_orders_columns_list(); ?>
 
 
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>

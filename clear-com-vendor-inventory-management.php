@@ -213,7 +213,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
     public function create_vendor_purchase_order() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'vendor_purchase_order';
+        $table_name = $wpdb->prefix . 'vendor_purchase_orders';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -385,16 +385,12 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
             $order = get_post($_POST['ID']);
-            print_r($_POST);
-            echo "2";
-            die;
-//            print_r($_POST);die;
+            
             $update_data['post_status'] = 'trash';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
             $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
-            update_post_meta($order->ID, 'old_status', $order->post_status);
             $order->post_status = 'trash';
             wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
@@ -654,7 +650,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $link = admin_url('admin-ajax.php?action=generatePO&post_id=');
         global $wpdb;
         $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
-        $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_order";
+        $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_orders";
 // $order_details_table_sql = "SELECT *,
 // 			CASE
 // 				WHEN stock IS NULL THEN 'OUT'

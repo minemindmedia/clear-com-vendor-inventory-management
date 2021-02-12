@@ -47,7 +47,22 @@ class Vendor_Management_Columns {
             'back_orders' => __('Cust BOs', 'wcvm'),
         );
     }
+    public function get_new_orders_columns_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+//        if ($status == "" || $status == 'draft' || $status == 'auto-draft') {
+        $columns_array['__order_qty'] = __('Order QTY', 'wcvm');
+        $columns_array['__delete'] = __('Delete', 'wcvm');
 
+        return $columns_array;
+    }
     public function get_columns_vendors_list() {
         $status = "";
         if (array_key_exists('status', $_REQUEST)) {
