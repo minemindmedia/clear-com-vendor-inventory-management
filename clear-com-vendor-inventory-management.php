@@ -123,14 +123,21 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_product_mapping';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-                    `product_mapping_id` int(11) NOT NULL AUTO_INCREMENT,
-                    `post_id` int(11) NOT NULL,
-                    `vendor_id` int(11) NOT NULL,
-                    `vendor_sku` varchar(11) DEFAULT NULL,
-                    `vendor_price` decimal(11,2) DEFAULT NULL,
-                    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-                    PRIMARY KEY id (product_mapping_id)
-    ) $charset_collate;";
+            `vpm_id` int(11) NOT NULL,
+            `post_id` int(11) NOT NULL,
+            `vendor_id` int(11) DEFAULT NULL,
+            `vendor_sku` varchar(15) DEFAULT NULL,
+            `vendor_price` decimal(10,2) DEFAULT NULL
+            ) $charset_collate;";
+//        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+//                    `product_mapping_id` int(11) NOT NULL AUTO_INCREMENT,
+//                    `post_id` int(11) NOT NULL,
+//                    `vendor_id` int(11) NOT NULL,
+//                    `vendor_sku` varchar(11) DEFAULT NULL,
+//                    `vendor_price` decimal(11,2) DEFAULT NULL,
+//                    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+//                    PRIMARY KEY id (product_mapping_id)
+//    ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -141,34 +148,62 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_po_lookup';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-                    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `product_title` varchar(100) NOT NULL,
-  `sku` varchar(50) NOT NULL,
-  `regular_price` int(11) NOT NULL,
-  `stock_status` varchar(50) NOT NULL,
+  `product_title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sku` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `regular_price` decimal(10,2) NOT NULL,
+  `stock_status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock` int(11) NOT NULL,
   `threshold_low` double NOT NULL,
   `threshold_reorder` int(11) NOT NULL,
   `reorder_qty` int(11) NOT NULL,
   `rare` int(11) NOT NULL,
-  `category` varchar(100) NOT NULL,
-  `vendor_id` varchar(100) NOT NULL,
-  `vendor_name` varchar(100) NOT NULL,
-  `vendor_sku` varchar(50) NOT NULL,
-  `vendor_link` varchar(100) NOT NULL,
+  `category` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_sku` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_link` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `vendor_price_bulk` int(11) NOT NULL,
-  `vendor_price_notes` varchar(50) NOT NULL,
-  `vendor_price` varchar(100) NOT NULL,
+  `vendor_price_notes` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_price` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `primary_vendor_id` int(11) NOT NULL,
-  `primary_vendor_name` varchar(100) NOT NULL,
-    `on_order` int(11) NOT NULL,
+  `primary_vendor_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `on_order` int(11) NOT NULL,
   `sale_30_days` int(11) NOT NULL,
   `order_qty` int(11) NOT NULL,
   `on_vendor_bo` int(11) NOT NULL,
-  `new` INT(11) NULL,
-  PRIMARY KEY id (id)
+  `new` int(11) DEFAULT NULL
     ) $charset_collate;";
+//        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+//                    `id` int(11) NOT NULL AUTO_INCREMENT,
+//  `product_id` int(11) NOT NULL,
+//  `product_title` varchar(100) NOT NULL,
+//  `sku` varchar(50) NOT NULL,
+//  `regular_price` int(11) NOT NULL,
+//  `stock_status` varchar(50) NOT NULL,
+//  `stock` int(11) NOT NULL,
+//  `threshold_low` double NOT NULL,
+//  `threshold_reorder` int(11) NOT NULL,
+//  `reorder_qty` int(11) NOT NULL,
+//  `rare` int(11) NOT NULL,
+//  `category` varchar(100) NOT NULL,
+//  `vendor_id` varchar(100) NOT NULL,
+//  `vendor_name` varchar(100) NOT NULL,
+//  `vendor_sku` varchar(50) NOT NULL,
+//  `vendor_link` varchar(100) NOT NULL,
+//  `vendor_price_bulk` int(11) NOT NULL,
+//  `vendor_price_notes` varchar(50) NOT NULL,
+//  `vendor_price` varchar(100) NOT NULL,
+//  `primary_vendor_id` int(11) NOT NULL,
+//  `primary_vendor_name` varchar(100) NOT NULL,
+//    `on_order` int(11) NOT NULL,
+//  `sale_30_days` int(11) NOT NULL,
+//  `order_qty` int(11) NOT NULL,
+//  `on_vendor_bo` int(11) NOT NULL,
+//  `new` INT(11) NULL,
+//  PRIMARY KEY id (id)
+//    ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -179,45 +214,19 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_purchase_order';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `product_id` int(11) NOT NULL,
-        `vendor_id` int(11) NOT NULL,
-        `order_id` int(11) NOT NULL,
-        `product_title` varchar(100) NOT NULL,
-        `product_sku` varchar(20) NOT NULL,
-        `product_price` decimal(10,2) NOT NULL,
-        `product_ordered_quantity` INT(11) NULL,
-        `product_category` VARCHAR(100) NULL,
-        `product_expected_date` INT(11) NULL,
-        `product_rare` TINYINT(1) NULL,
-        `product_threshold_low` INT(11) NULL,
-        `product_threshold_reorder` INT(11) NULL,
-        `product_reorder_qty` INT(11) NULL,
-        `vendor_sku` varchar(20) NULL,
-        `vendor_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,        
-        `vendor_link` varchar(100) NULL,
-        `vendor_price_last` decimal(10,2) NULL,
-        `vendor_price_bulk` decimal(10,2) NULL,
-        `vendor_price_notes` varchar(100) NULL,
-        `product_quantity_received` INT(11) NULL,
-        `product_quantity_back_order` INT(11) NULL,
-        `product_quantity_canceled` INT(11) NULL,
-        `product_quantity_returned` INT(11) NULL,
-        `product_expected_date_back_order` INT(11) NULL,
-        `post_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-        `post_old_status` VARCHAR(20) NOT NULL,
-        `on_order_quantity` int(11) NOT NULL,
-        `sale_30_days` int(11) NOT NULL,
-        `product_stock` int(11) NOT NULL,
-        `order_date` datetime NULL,
-        `po_expected_date` INT(11) NULL,
-        `expected_date` INT(11) NULL,
-        `set_date` INT(11) NULL,
-        `created_date` datetime NULL,
-        `created_by` INT(11) NULL,
-        `updated_date` datetime NULL,
-        `updated_by` INT(11) NULL,
-        PRIMARY KEY id (id)
+            `id` int(11) NOT NULL,
+            `vendor_id` int(11) DEFAULT NULL,
+            `order_id` int(11) DEFAULT NULL,
+            `post_status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `post_old_status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+            `order_date` datetime DEFAULT NULL,
+            `po_expected_date` int(11) DEFAULT NULL,
+            `expected_date` int(11) DEFAULT NULL,
+            `set_date` int(11) DEFAULT NULL,
+            `created_date` datetime DEFAULT NULL,
+            `created_by` int(11) DEFAULT NULL,
+            `updated_date` datetime DEFAULT NULL,
+            `updated_by` int(11) DEFAULT NULL
             ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -261,11 +270,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('generate-po-script', plugin_dir_url(__FILE__) . 'assets/vendors.js', array('jquery'), '1.0.0', true);
-        wp_enqueue_script('multiselect-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js', array('jquery'), '1.0.0', true);
-        wp_enqueue_style('multiselect-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css');
-        wp_enqueue_script('bootstarp-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js', array('jquery'), '1.0.0', true);
-        wp_enqueue_style('bootstarp-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css');
-        wp_enqueue_script('popper-script', plugin_dir_url(__FILE__) . 'assets/extras/popper.min.js', array('jquery'), '1.0.0', true);
+
         wp_localize_script('generate-po-script', 'generate_po_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
         ]);
@@ -324,7 +329,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             die;
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
-            $update_data['post_status'] = 'draft';
+            $update_data['post_status'] = 'auto-draft';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
@@ -375,15 +380,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
-            /* foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
-              }
-              foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
-              }
-              foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
-              } */
+           
             if (!empty($_POST['__order_qty'])) {
 
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
@@ -592,7 +589,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             
             if ($uniquer_vendor_ids) {
                 foreach ($uniquer_vendor_ids as $uniquer_vendor_id) {
-                   
                     $vpo_insertData['vendor_id'] = $uniquer_vendor_id;
                     $vpo_insertData['order_id'] = $created_purchase_orders_ids[$uniquer_vendor_id];
                     $vpo_insertData['post_status'] = 'new-order';
@@ -636,6 +632,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                                 $productIDs .= ',' . $vendor_single_product;
                             }
                             add_post_meta($created_purchase_orders_ids[$uniquer_vendor_id], 'wcvmgo_product_id', $productIDs);
+
                         }
                     }
                 }
@@ -1201,14 +1198,28 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
         </div>
         <!-- stylesheet -->
+<<<<<<< HEAD
         <!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
         <!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
+=======
+<!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
+        <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css';?>">
+<!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
+        <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css';?>">
+>>>>>>> acbedae0135ffe02319029130c13c00d377fa994
 
         <!-- script -->
         <!--        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
         <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
+        <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/popper.min.js';?>"></script>
         <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+<<<<<<< HEAD
         <!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
+=======
+        <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js'; ?>"></script>
+<!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
+        <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js';?>"></script>
+>>>>>>> acbedae0135ffe02319029130c13c00d377fa994
 
         <!--  -->
 

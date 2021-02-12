@@ -21,9 +21,9 @@
     global $wpdb;
     $records = false;
 
-    $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
-    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'auto-draft';
-    if ($show_status == "draft" || $show_status == "auto-draft") {
+    $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
+    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
+    if ($show_status == "draft" || $show_status == "new-order") {
         $query_status = "='" . $show_status . "'";
     } else {
         $query_status = "LIKE '%" . $show_status . "%'";
@@ -40,11 +40,10 @@
     WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
 
     $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
-            . " LEFT JOIN ".$vendor_purchase_order_items_table." poi ON po.id = poi.vendor_order_idFk"
+            . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
             . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
 
     $orders = $wpdb->get_results($purchase_order_table_sql);
-
     ?>
     <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
     <?php
@@ -92,7 +91,7 @@
             <form action="" method="get" id="wcvm-search-form">
                 <input type="hidden" name="page" value="<?php echo $_GET['page'] ?>"/>
                 <input type="hidden" name="status" value="<?php echo $get_status ?>"/>
-                <input type="text" name="search_po" id="search_po" value="<?php // echo $get_status           ?>" placeholder="Search Through PO #">
+                <input type="text" name="search_po" id="search_po" value="<?php // echo $get_status                ?>" placeholder="Search Through PO #">
             </form>
         </div>
         <div style="float: right;margin-bottom: 20px;">
@@ -102,7 +101,7 @@
             </form>
         </div>
 
-        <?php // add_thickbox();      ?>
+        <?php // add_thickbox();       ?>
         <!--    <div id="my-content-id" style="display:none;">
                 <img id="loading_image" src="../wp-content/plugins/woocommerce-vendor-management/templates/loading2.gif"/>
                 <div id="vendor_details">
@@ -114,7 +113,6 @@
         $last_order_id = 0;
         $last_expected_date = '';
         foreach ($orders as $order) {
-
             ?>
             <div style="clear: both;"></div>
 
@@ -127,12 +125,8 @@
                 <tr bgcolor="#e8e8e8" style="font-size:11px;">
                     <?php
                     foreach ($table_headers as $header) {
-                        if (($header == 'Delete') && $_GET['status'] == 'publish') {
-                            
-                        } else {
-                            ?>
-                            <th><?php echo $header; ?></th><?php
-                        }
+                        ?>
+                        <th><?php echo $header; ?></th><?php
                     }
                     ?>
                 </tr>
@@ -140,22 +134,22 @@
 
             </table>
 
-            <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'): ?>
+            <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
                 <div style="padding-top: 5px;width: 300px;float: left">
                     <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                     <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
-                    <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
+                    <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
             <?php endif ?>
             <div style="padding-top: 5px;float: left">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
-            <?php // if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'):       ?>
+            <?php // if ($order->post_status == 'new-order' || $order->post_status == 'draft'):        ?>
             <!-- <div style="padding-top: 5px;float: right">
                 <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
                 <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
             </div> -->
-            <?php // endif        ?>
+            <?php // endif         ?>
             </div>
             <div style="clear: both;"></div>
             <br><br>
@@ -167,7 +161,7 @@
         }
 //        }
         if (!in_array($order->order_id, $printed_po_numbers)) {
-            
+
             $records = true;
             ?>
             <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
@@ -214,7 +208,7 @@
                                 ?></button>
                 </div>
 
-                <?php if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'auto-draft'): ?>
+                <?php if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'new-order'): ?>
                     <div style="float: right;padding: 2px;">
                         <?php if ($order->post_status == 'trash'): ?>
                             <button type="submit" name="unarchive" value="unarchive" class="button"><?= esc_html__('Restore', 'wcvm') ?></button>
@@ -239,12 +233,9 @@
                             <tr bgcolor="#e8e8e8" style="font-size:11px;">
                                 <?php
                                 foreach ($table_headers as $header) {
-                                    if (($header == 'Delete') && $_GET['status'] == 'publish') {
-                                        
-                                    } else {
-                                        ?>
-                                        <th><?php echo $header; ?></th><?php
-                                    }
+                                    ?>
+                                    <th><?php echo $header; ?></th>
+                                    <?php
                                 }
                                 ?>
                             </tr>
@@ -286,9 +277,9 @@
                             <td><?php echo wc_price($order->vendor_price_last); ?></td>
                             <td><?php echo $order->product_stock; ?></td>
                             <td><?php echo $order->sale_30_days; ?></td>
-        <!--                                <td><input readonly type="text" value="<?php // echo $order->threshold_low;         ?>" style="width:60px;"></td>
-                            <td><input readonly type="text" value="<?php // echo $order->threshold_reorder;         ?>" style="width:60px;"></td>
-                            <td><input readonly type="text" value="<?php // echo $order->reorder_qty;         ?>" style="width:60px;"></td>-->
+        <!--                                <td><input readonly type="text" value="<?php // echo $order->threshold_low;              ?>" style="width:60px;"></td>
+                            <td><input readonly type="text" value="<?php // echo $order->threshold_reorder;              ?>" style="width:60px;"></td>
+                            <td><input readonly type="text" value="<?php // echo $order->reorder_qty;              ?>" style="width:60px;"></td>-->
 
                             <td><?php echo $order->on_order_quantity; ?></td>
                             <!--<td>On Vendor Bo</td>-->
@@ -316,22 +307,14 @@
                                 if ($_GET['status'] == 'publish') {
                                     $inputType = 'readonly';
                                 }
+                                
+                            }
                                 ?>
 
                                 <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
-                                <?php
-                                if ($_GET['status'] == 'publish') {
-                                    
-                                } else {
-                                    ?>
-                                    <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
-                                    <?php
-                                }
-                            }
-                            ?>
 
-
-
+                                <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
+                                
                         </tr>
 
                         <?php
@@ -344,12 +327,7 @@
                         <tr bgcolor="#e8e8e8" style="font-size:11px;">
                             <?php
                             foreach ($table_headers as $header) {
-                                if (($header == 'Delete') && $_GET['status'] == 'publish') {
-                                    
-                                } else {
-                                    ?>
-                                    <th><?php echo $header; ?></th><?php
-                                }
+                                ?><th><?php echo $header; ?></th><?php
                             }
                             ?>
                         </tr>
@@ -357,18 +335,18 @@
 
                 </table>
 
-                <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'): ?>
+                <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
                     <div style="padding-top: 5px;width: 300px;float: left">
                         <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                         <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
-                        <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'auto-draft' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
+                        <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                     </div>
                 <?php endif ?>
                 <div style="padding-top: 5px;float: left">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
-                <?php if ($order->post_status == 'auto-draft' || $order->post_status == 'draft'): ?>
-                    <!-- <div style="padding-top: 5px;float: right">
+                <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
+<!--                     <div style="padding-top: 5px;float: right">
                         <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
                         <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
                     </div> -->
