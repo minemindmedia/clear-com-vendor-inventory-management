@@ -123,11 +123,12 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_product_mapping';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            `vpm_id` int(11) NOT NULL,
+            `vpm_id` int(11) NOT NULL AUTO_INCREMENT,
             `post_id` int(11) NOT NULL,
             `vendor_id` int(11) DEFAULT NULL,
             `vendor_sku` varchar(15) DEFAULT NULL,
-            `vendor_price` decimal(10,2) DEFAULT NULL
+            `vendor_price` decimal(10,2) DEFAULT NULL,
+            PRIMARY KEY (`vpm_id`)
             ) $charset_collate;";
 //        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
 //                    `product_mapping_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -148,7 +149,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_po_lookup';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `product_id` int(11) NOT NULL,
   `product_title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `sku` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -173,7 +174,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
   `sale_30_days` int(11) NOT NULL,
   `order_qty` int(11) NOT NULL,
   `on_vendor_bo` int(11) NOT NULL,
-  `new` int(11) DEFAULT NULL
+  `new` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
     ) $charset_collate;";
 //        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
 //                    `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -214,7 +216,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $table_name = $wpdb->prefix . 'vendor_purchase_order';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `vendor_id` int(11) DEFAULT NULL,
             `order_id` int(11) DEFAULT NULL,
             `post_status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -226,7 +228,50 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             `created_date` datetime DEFAULT NULL,
             `created_by` int(11) DEFAULT NULL,
             `updated_date` datetime DEFAULT NULL,
-            `updated_by` int(11) DEFAULT NULL
+            `updated_by` int(11) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+            ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+    public function create_vendor_purchase_order_items() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'vendor_purchase_orders_items';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            `id`  int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) NOT NULL,
+  `vendor_order_idFk` int(11) NOT NULL,
+  `product_title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_sku` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_price` decimal(10,2) NOT NULL,
+  `product_ordered_quantity` int(11) NOT NULL,
+  `product_category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `product_expected_date` int(11) DEFAULT NULL,
+  `product_rare` tinyint(1) DEFAULT NULL,
+  `product_threshold_low` int(11) DEFAULT NULL,
+  `product_threshold_reorder` int(11) DEFAULT NULL,
+  `product_reorder_qty` int(11) DEFAULT NULL,
+  `vendor_sku` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vendor_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vendor_link` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vendor_price_last` decimal(10,2) DEFAULT NULL,
+  `vendor_price_bulk` decimal(10,2) DEFAULT NULL,
+  `vendor_price_notes` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `product_quantity_received` int(11) DEFAULT NULL,
+  `product_quantity_back_order` int(11) DEFAULT NULL,
+  `product_quantity_canceled` int(11) DEFAULT NULL,
+  `product_quantity_returned` int(11) DEFAULT NULL,
+  `product_expected_date_back_order` int(11) DEFAULT NULL,
+  `on_order_quantity` int(11) NOT NULL,
+  `sale_30_days` int(11) NOT NULL,
+  `product_stock` int(11) NOT NULL,
+  `created_date` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_date` datetime DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  PRIMARY KEY id (`id`)
             ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -238,6 +283,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $this->create_vendor_product_mapping();
         $this->create_vendor_po_lookup();
         $this->create_vendor_purchase_order();
+        $this->create_vendor_purchase_order_items();
     }
 
     public function enqueueScript() {
