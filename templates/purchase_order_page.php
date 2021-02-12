@@ -43,20 +43,8 @@
             . " LEFT JOIN ".$vendor_purchase_order_items_table." poi ON po.id = poi.vendor_order_idFk"
             . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
 
-    // $posts_table_sql = "SELECT *, sum(po.product_quantity) as total_quantity FROM `" . $posts_table . "` p
-    //                     LEFT JOIN " . $postmeta_table . " pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
-    //                     LEFT JOIN " . $vendor_po_lookup_table . " wvpl ON wvpl.product_id = pm.meta_value
-    //                     LEFT JOIN " . $vendor_purchase_order_table . " po on po.product_id = wvpl.product_id
-    //                     WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.post_modified DESC";
     $orders = $wpdb->get_results($purchase_order_table_sql);
-    
-//    $orders = $wpdb->get_results($posts_table_sql);
-    // echo $wpdb->last_query;
-//    if (isset($_GET['search_po'])) {
-    ?>
-        <!--<h1><? "Details for PO # " . $_GET['search_po']; ?></h1>-->
-    <?php
-//    } else {
+
     ?>
     <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
     <?php
@@ -66,7 +54,7 @@
     <?php $table_headers = $table->get_columns_vendors_list(); ?>
 
 
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=auto-draft') ?>"<?php if (!$status || $status == 'auto-draft'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>
+    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>
     |
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=draft') ?>"<?php if ($status == 'draft'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('On order', 'wcvm') ?></a>
     |
@@ -126,32 +114,7 @@
         $last_order_id = 0;
         $last_expected_date = '';
         foreach ($orders as $order) {
-//            $postmeta_table = $wpdb->prefix . "postmeta";
-//            $postmeta_table_sql = "SELECT * FROM `" . $postmeta_table . "` pm
-//            where pm.meta_key = 'wcvmgo' and pm.post_id = '" . $order->order_id . "'";
-//            $postmeta_result = $wpdb->get_results($postmeta_table_sql);
-////            if($postmeta_result) {
-//                $ordersIDArr = $postmeta_result[0]->meta_value;
-//                $ordersIDs = unserialize($ordersIDArr);
-////            if (in_array($order->meta_value, $ordersIDs)) {
-//                $records = true;
-//                $post_id = get_post($order->order_id);
-//                $post_parent_id = $post_id->post_parent;
-//                $parent_post_title = get_post($post_parent_id);
-//                $vendor_price = 0;
-//                $vendor_sku = '';
-//                $vendors = explode(',', $order->vendor_name);
-//                $vendor_Prices = explode(',', $order->vendor_price);
-//                $vendor_Skus = explode(',', $order->vendor_sku);
-//                $i = 0;
-//                while ($i < count($vendors)) {
-//
-//                    if ($vendors[$i] == $order->primary_vendor_name) {
-//                        $vendor_price = $vendor_Prices[$i];
-//                        $vendor_sku = $vendor_Skus[$i];
-//                        break;
-//                    }$i++;
-//                }
+
             ?>
             <div style="clear: both;"></div>
 
@@ -204,6 +167,7 @@
         }
 //        }
         if (!in_array($order->order_id, $printed_po_numbers)) {
+            
             $records = true;
             ?>
             <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
@@ -422,7 +386,7 @@
 <?php
 
 function get_print_status($order = FALSE) {
-    if ($order->post_status == 'auto-draft') {
+    if ($order->post_status == 'new-order') {
         echo 'Status: New<br>';
     } else if ($order->post_status == 'draft') {
         echo 'Status: On order<br>';
