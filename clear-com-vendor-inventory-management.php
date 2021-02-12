@@ -316,11 +316,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('generate-po-script', plugin_dir_url(__FILE__) . 'assets/vendors.js', array('jquery'), '1.0.0', true);
-//        wp_enqueue_script('multiselect-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js', array('jquery'), '1.0.0', true);
-//        wp_enqueue_style('multiselect-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css');
-//        wp_enqueue_script('bootstarp-script', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js', array('jquery'), '1.0.0', true);        
-//        wp_enqueue_style('bootstarp-stylesheet', plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css');
-//        wp_enqueue_script('popper-script', plugin_dir_url(__FILE__) . 'assets/extras/popper.min.js', array('jquery'), '1.0.0', true);                
+
         wp_localize_script('generate-po-script', 'generate_po_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
         ]);
@@ -430,15 +426,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'draft';
-            /* foreach ($_POST['wcvm_threshold_low'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_threshold_low', $value ? $value : '');
-              }
-              foreach ($_POST['wcvm_threshold_reorder'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_threshold_reorder', $value ? $value : '');
-              }
-              foreach ($_POST['wcvm_reorder_qty'] as $productId => $value) {
-              update_post_meta($productId, 'wcvm_reorder_qty', $value ? $value : '');
-              } */
+           
             if (!empty($_POST['__order_qty'])) {
 
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
@@ -453,16 +441,16 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                     ));
                     update_post_meta($orderId, 'wcvmgo', get_post_meta($_POST['ID'], 'wcvmgo', true));
                 }
-                 if (!empty($_POST['expected_date'])) {
-                            $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
-                            $vpo_UpdateData['post_status'] = 'draft';
-                        }
-                        $vpo_UpdateData['post_status'] = 'draft';
-                        $vpo_UpdateData['order_date'] = date('Y/m/d H:i:s a');
-                        $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
-                        $vpo_UpdateData['updated_by'] = get_current_user_id();
-                        $where_vpo['order_id'] = $orderId;
-                        $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData,$where_vpo);
+                if (!empty($_POST['expected_date'])) {
+                    $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
+                    $vpo_UpdateData['post_status'] = 'draft';
+                }
+                $vpo_UpdateData['post_status'] = 'draft';
+                $vpo_UpdateData['order_date'] = date('Y/m/d H:i:s a');
+                $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
+                $vpo_UpdateData['updated_by'] = get_current_user_id();
+                $where_vpo['order_id'] = $orderId;
+                $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);
                 foreach ($_POST['__order_qty'] as $productId => $_) {
 
                     update_post_meta($orderId, 'wcvmgo_' . $productId . '_qty', $_POST['__order_qty'][$productId]);
@@ -581,7 +569,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $vendor_purchase_order_item_table = $wpdb->prefix . 'vendor_purchase_orders_items';
         $ajaxResponse['message'] = 'no post data';
         $ajaxResponse['purchase_order'] = false;
-//        print_r($_POST);die;
         $product_IDs = [];
         if (isset($_POST)) {
             $purchase_orders_post_data = $_POST['purchase_order_data'];
@@ -624,10 +611,6 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         'product_sku' => $productVendorLookupData['sku'],
                         'product_price' => $productVendorLookupData['regular_price'],
                         'product_quantity' => $productQty,
-                        //                        'product_rare' => $productVendorLookupData['rare'],
-//                        'product_threshold_low' => $productVendorLookupData['threshold_low'],
-//                        'product_threshold_reorder' => $productVendorLookupData['threshold_reorder'],
-//                        'product_reorder_qty' => $productVendorLookupData['reorder_qty'],
                         'vendor_sku' => $producyVendorMapping[$purchase_orders_post_data_single['selected_vendor']]['sku'],
                         'vendor_price_last' => $producyVendorMapping[$purchase_orders_post_data_single['selected_vendor']]['prices'],
                         'vendor_link' => $productVendorLookupData['vendor_link'],
@@ -644,58 +627,30 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
 
                     $vendor_product_quantities[$purchase_orders_post_data_single['selected_vendor']][$productID] = $productQty;
-//                    print_r($vendor_product_orders_data);
-//                    print_r($vendor_product_on_orders_data);
-//                    print_r($vendor_product_quantities);
                 }
             }
-
+            
+            
             $uniquer_vendor_ids = array_keys($created_purchase_orders_ids);
-
+            
             if ($uniquer_vendor_ids) {
-
                 foreach ($uniquer_vendor_ids as $uniquer_vendor_id) {
-
-                    update_post_meta($created_purchase_orders_ids[$uniquer_vendor_id], 'wcvmgo', $vendor_product_ids_data[$uniquer_vendor_id]);
                     $vpo_insertData['vendor_id'] = $uniquer_vendor_id;
                     $vpo_insertData['order_id'] = $created_purchase_orders_ids[$uniquer_vendor_id];
-                    $vpo_insertData['post_status'] = 'auto-draft';
+                    $vpo_insertData['post_status'] = 'new-order';
                     $vpo_insertData['order_date'] = date('Y/m/d H:i:s a');
                     $vpo_insertData['created_date'] = date('Y/m/d H:i:s a');
                     $vpo_insertData['created_by'] = get_current_user_id();
                     $insertedPOId = $wpdb->insert($vendor_purchase_order_table, $vpo_insertData);
+                    
                     if ($insertedPOId) {
+                        
                         foreach ($vendor_product_ids_data[$uniquer_vendor_id] as $vendor_single_product) {
                             $productIDs = '';
-                            update_post_meta($created_purchase_orders_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_qty', $vendor_product_quantities[$uniquer_vendor_id][$vendor_single_product]);
-                            update_post_meta($created_purchase_orders_ids[$uniquer_vendor_id], 'wcvmgo_' . $vendor_single_product . '_onorder', serialize($vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]));
                             $productIDs = $vendor_single_product;
-                            update_post_meta($created_purchase_orders_ids[$uniquer_vendor_id], 'wcvmgo_' . $productIDs, array(
-                                'product_id' => $productIDs,
-                                'product_title' => get_post_field('post_title', $productIDs),
-                                'product_sku' => get_post_meta($productIDs, '_sku', true),
-                                'product_price' => $_POST['__order_qty'][$productIDs],
-                                'product_quantity' => $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'],
-                                'product_rare' => get_post_meta($productIDs, 'wcvm_rare', true),
-                                //                        'product_threshold_low' => get_post_meta($productIDs, 'wcvm_threshold_low', true),
-//                        'product_threshold_reorder' => get_post_meta($productIDs, 'wcvm_threshold_reorder', true),
-//                        'product_reorder_qty' => get_post_meta($productIDs, 'wcvm_reorder_qty', true),
-                                'vendor_sku' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_sku', true),
-                                'vendor_link' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_link', true),
-                                'vendor_price_last' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_last', true),
-                                'vendor_price_bulk' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_bulk', true),
-                                'vendor_price_notes' => get_post_meta($productIDs, 'wcvm_' . $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor'] . '_price_notes', true),
-                            ));
                             $sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup vpol WHERE vpol.product_id = " . $productIDs;
                             $orderDetails = $wpdb->get_results($sql);
-//print_r($orderDetails);
-// insert generate po details into wp_vendor_purchase_order
-
-
-
-
                             $insertPOProductData['vendor_order_idFk'] = $insertedPOId;
-                            $insertPOProductData['order_id'] = $vpo_insertData['order_id'];
                             $insertPOProductData['product_id'] = $productIDs;
                             $insertPOProductData['product_title'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_title'];
                             $insertPOProductData['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
@@ -713,10 +668,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             $insertPOProductData['created_date'] = date('Y/m/d H:i:s a');
                             $insertPOProductData['created_by'] = get_current_user_id();
                             $insertedPOLineItem = $wpdb->insert($vendor_purchase_order_item_table, $insertPOProductData);
+                          
                             if ($insertedPOLineItem) {
                                 $ajaxResponse['purchase_order'] = true;
-                                $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_order = on_order + " . $insertPOProductData['product_ordered_quantity'] . " WHERE product_id = " . $productIDs;
-                                $wpdb->query($updateOnOrderQuery);
                             }
                             if ($productIDs == '') {
                                 $productIDs .= $vendor_single_product;
@@ -728,7 +682,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         }
                     }
                 }
-                $ajaxResponse['redirect_url'] = admin_url() . 'admin.php?page=wcvm-epo&status=auto-draft';
+                $ajaxResponse['redirect_url'] = admin_url() . 'admin.php?page=wcvm-epo&status=new-order';
             }
         }
         exit(json_encode($ajaxResponse));
@@ -1086,28 +1040,28 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
             <div style="float: left;vertical-align: top">
 
-                                                                        <!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
-                                                                                            <option <?php
+                                                                                <!--                <select name="stock_status_filter" class="vendor_details" id="stock_status_filter" multiple="multiple">
+                                                                                                    <option <?php
                 // if (in_array('out', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="out"><?= esc_html__('OUT', 'wcvm') ?></option>
-                                                                                            <option <?php
+                                                                                                    <option <?php
                 // if (in_array('low', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="low"><?= esc_html__('LOW', 'wcvm') ?></option>
-                                                                                            <option <?php
+                                                                                                    <option <?php
                 // if (in_array('reorder', $selected_status)) {
 //                    echo 'selected';
 //                } 
                 ?> value="reorder"><?= esc_html__('REORDER', 'wcvm') ?></option>
-                                                                                            <option <?php
+                                                                                                    <option <?php
                 // if (in_array('ok', $selected_status)) {
 //                echo 'selected';
 //            } 
                 ?> value="ok"><?= esc_html__('OK', 'wcvm') ?></option>
-                                                                                        </select>-->
+                                                                                                </select>-->
                 <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
                     <?php
                     global $wpdb;
@@ -1131,7 +1085,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>"/>
-                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;           ?>"/>-->
+                <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;            ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
 
@@ -1290,19 +1244,28 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
         </div>
         <!-- stylesheet -->
+<<<<<<< HEAD
+        <!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
+        <!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
+=======
 <!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
         <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css';?>">
 <!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
         <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css';?>">
+>>>>>>> acbedae0135ffe02319029130c13c00d377fa994
 
         <!-- script -->
-<!--        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
+        <!--        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
         <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/popper.min.js';?>"></script>
         <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+<<<<<<< HEAD
+        <!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
+=======
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js'; ?>"></script>
 <!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js';?>"></script>
+>>>>>>> acbedae0135ffe02319029130c13c00d377fa994
 
         <!--  -->
 
