@@ -427,8 +427,41 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
 
-                if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
+                if ($_POST['action'] == 'update') {
                     $orderId = $_POST['ID'];
+                }
+//                if (!empty($_POST['expected_date'])) {
+//                    $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
+//                    $vpo_UpdateData['post_status'] = 'on-order';
+//                }
+//                $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
+//                $vpo_UpdateData['updated_by'] = get_current_user_id();
+//                $where_vpo['order_id'] = $orderId;
+//                $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);
+                foreach ($_POST['__order_qty'] as $productId => $_) {
+
+                    $poStatus = $_POST['status'];
+                    $getPOLineItemDetails = $wpdb->get_results(""
+                            . "SELECT * FROM " . $vendor_purchase_order_table . " po "
+                            . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
+                            . "WHERE order_id = " . $orderId . " AND product_id = " . $productId . " AND post_status = '" . $poStatus . "'");
+                    if (!$getPOLineItemDetails) {
+                        
+                    } else {
+                        if ($getPOLineItemDetails[0]->product_ordered_quantity != $_POST['__order_qty'][$productId]) {
+                            $difference = $_POST['__order_qty'][$productId] - $getPOLineItemDetails[0]->product_ordered_quantity;
+//                            $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_order = on_order + " . $difference . " WHERE product_id = " . $productId . "";
+                            $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_order = " . $_POST['__order_qty'][$productId] . " WHERE product_id = " . $productId . "";
+                            $wpdb->query($updateOnOrderQuery);
+                        }
+                        $updatePOProductData['product_ordered_quantity'] = $_POST['__order_qty'][$productId];
+                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
+                        $updatePOProductData['updated_by'] = get_current_user_id();
+                        $wherePOProductData['product_id'] = $productId;
+                        $wherePOProductData['vendor_order_idFk'] = $getPOLineItemDetails[0]->vendor_order_idFk;
+//                        $wherePOProductData['order_id'] = $orderId;
+                        $updated = $wpdb->update($vendor_purchase_order_items_table, $updatePOProductData, $wherePOProductData);
+                    }
                 }
                 if (!empty($_POST['expected_date'])) {
                     $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
@@ -437,33 +470,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
                 $vpo_UpdateData['updated_by'] = get_current_user_id();
                 $where_vpo['order_id'] = $orderId;
-                $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);
-                foreach ($_POST['__order_qty'] as $productId => $_) {
-
-                    $poStatus = $_POST['status'];
-                    $getPOLineItemDetails = $wpdb->get_results(""
-                            . "SELECT * FROM " . $vendor_purchase_order_table . " po "
-                            . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
-                            . "WHERE order_id = " . $orderId . " AND product_id = " . $productId . " AND post_status = '" . $poStatus . "'");
-
-                    if (!$getPOLineItemDetails) {
-                        
-                    } else {
-
-                        if ($getPOLineItemDetails[0]->product_ordered_quantity != $_POST['__order_qty'][$productId]) {
-                            $difference = $_POST['__order_qty'][$productId] - $getPOLineItemDetails[0]->product_ordered_quantity;
-                            $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_order = on_order + " . $difference . " WHERE product_id = " . $productId . "";
-                            $wpdb->query($updateOnOrderQuery);
-                        }
-
-                        $updatePOProductData['product_ordered_quantity'] = $_POST['__order_qty'][$productId];
-                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
-                        $updatePOProductData['updated_by'] = get_current_user_id();
-                        $wherePOProductData['product_id'] = $productId;
-                        $wherePOProductData['order_id'] = $orderId;
-                        $updated = $wpdb->update($vendor_purchase_order_item_table, $updatePOProductData, $wherePOProductData);
-                    }
-                }
+                $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);                
                 if (!empty($_POST['expected_date'])) {
                     $order = get_post($_POST['ID']);
                     $order->post_status = 'on-order';
@@ -611,7 +618,9 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         'product_sku' => $productVendorLookupData['sku'],
                         'product_price' => $productVendorLookupData['regular_price'],
                         'product_quantity' => $productQty,
+                        'product_rare' => $productVendorLookupData['rare'],
                         'vendor_sku' => $producyVendorMapping[$purchase_orders_post_data_single['selected_vendor']]['sku'],
+                        'vendor_name' => $producyVendorMapping[$purchase_orders_post_data_single['selected_vendor']]['name'],
                         'vendor_price_last' => $producyVendorMapping[$purchase_orders_post_data_single['selected_vendor']]['prices'],
                         'vendor_link' => $productVendorLookupData['vendor_link'],
                         'vendor_price_bulk' => $productVendorLookupData['vendor_price_bulk'],
@@ -655,9 +664,11 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                             $insertPOProductData['product_title'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_title'];
                             $insertPOProductData['product_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_sku'];
                             $insertPOProductData['product_price'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_price'];
+                            $insertPOProductData['product_rare'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['product_rare'];
                             $insertPOProductData['product_ordered_quantity'] = $vendor_product_on_orders_data[$uniquer_vendor_id][$vendor_single_product]['qty'];
                             $insertPOProductData['product_category'] = $orderDetails[0]->category;
                             $insertPOProductData['vendor_sku'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_sku'];
+                            $insertPOProductData['vendor_name'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_name'];
                             $insertPOProductData['vendor_price_last'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_last'];
                             $insertPOProductData['vendor_link'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_link'];
                             $insertPOProductData['vendor_price_bulk'] = $vendor_product_orders_data[$uniquer_vendor_id][$vendor_single_product]['vendor_price_bulk'];
