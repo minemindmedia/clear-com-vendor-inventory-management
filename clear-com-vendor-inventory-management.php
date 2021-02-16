@@ -418,10 +418,10 @@ class WC_Clear_Com_Vendor_Inventory_Management {
             }
             $wpdb->delete($vendor_purchase_order_table, array('post_status' => 'trash'));
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
-            print_r($_POST);
-            die;
+//            print_r($_POST);
+//            die;
             $order = get_post($_POST['ID']);
-            $order->post_status = $order->old_status ? $order->old_status : 'draft';
+            $order->post_status = $order->old_status ? $order->old_status : 'on-order';
            
             if (!empty($_POST['__order_qty'])) {
 
@@ -472,7 +472,49 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                 }
             }
         }
-        require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
+            $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
+    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
+    if ($show_status == "on-order" || $show_status == "new-order") {
+        $query_status = "='" . $show_status . "'";
+    } else {
+        $query_status = "LIKE '%" . $show_status . "%'";
+    }
+    $status = $show_status;
+    $posts_table = $wpdb->prefix . "posts";
+    $postmeta_table = $wpdb->prefix . "postmeta";
+    $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
+    $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_orders";
+    $vendor_purchase_order_items_table = $wpdb->prefix . "vendor_purchase_orders_items";
+    
+//    $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
+//    JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+//    LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
+//    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
+
+    $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
+            . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
+            . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
+
+    $orders = $wpdb->get_results($purchase_order_table_sql);
+            
+            if($status == 'new-order'){
+                require_once plugin_dir_path(__FILE__) . 'templates/new-order-template.php';
+            }elseif($status == 'on-order'){
+                require_once plugin_dir_path(__FILE__) . 'templates/on-order-template.php';
+            }elseif($status == 'pending'){
+                require_once plugin_dir_path(__FILE__) . 'templates/back-order-template.php';
+            }elseif($status == 'publish'){
+                require_once plugin_dir_path(__FILE__) . 'templates/completed-orders-template.php';
+            }elseif($status == 'private'){
+                require_once plugin_dir_path(__FILE__) . 'templates/cancelled-orders-template.php';
+            }elseif($status == 'returned'){
+                require_once plugin_dir_path(__FILE__) . 'templates/returned-order-template.php';
+            }elseif($status == 'return_closed'){
+                require_once plugin_dir_path(__FILE__) . 'templates/return-closed-order-template.php';
+            }elseif($status == 'trash'){
+                require_once plugin_dir_path(__FILE__) . 'templates/trash-template.php';
+            }
+//        require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
     }
 
     public function wcvimReceiveInventoryPage() {

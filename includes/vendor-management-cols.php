@@ -63,6 +63,77 @@ class Vendor_Management_Columns {
 
         return $columns_array;
     }
+        public function get_on_order_columns_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+        $columns_array['__order_qty'] = __('Order QTY', 'wcvm');
+
+        return $columns_array;
+    }
+        public function get_back_order_columns_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+        $columns_array['__order_qty'] = __('BO QTY', 'wcvm');
+
+        return $columns_array;
+    }
+        public function get_completed_orders_column_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+        $columns_array['__order_qty'] = __('Received QTY', 'wcvm');
+
+        return $columns_array;
+    }
+        public function get_cancelled_orders_column_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+        $columns_array['__order_qty'] = __('Cancelled QTY', 'wcvm');
+
+        return $columns_array;
+    }
+        public function get_returned_orders_column_list() {
+        $columns_array = [];
+        $columns_array['_sku'] = __('CC SKU', 'wcvm');
+        $columns_array['wcvm_status'] = __('Stock Status', 'wcvm');
+        $columns_array['_price'] = __('Our Price', 'wcvm');
+        $columns_array['__wcvm_vendor_sku'] = __('Vendor SKU', 'wcvm');
+        $columns_array['__wcvm_vendor_price_last'] = __('Vendor Price', 'wcvm');
+        $columns_array['_stock'] = __('QTY On Hand', 'wcvm');
+        $columns_array['_qty_history_30'] = __('30 Days', 'wcvm');
+        $columns_array['_wcvm_on_order'] = __('On Order', 'wcvm');
+        $columns_array['__order_qty'] = __('Returned QTY', 'wcvm');
+        $columns_array['__delete'] = __('Mark Close', 'wcvm');        
+
+        return $columns_array;
+    }
     public function get_columns_vendors_list() {
         $status = "";
         if (array_key_exists('status', $_REQUEST)) {

@@ -22,28 +22,28 @@
     $records = false;
 
     $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
-    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
-    if ($show_status == "draft" || $show_status == "new-order") {
-        $query_status = "='" . $show_status . "'";
-    } else {
-        $query_status = "LIKE '%" . $show_status . "%'";
-    }
-    $status = $show_status;
-    $posts_table = $wpdb->prefix . "posts";
-    $postmeta_table = $wpdb->prefix . "postmeta";
-    $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
-    $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_orders";
-    $vendor_purchase_order_items_table = $wpdb->prefix . "vendor_purchase_orders_items";
-    $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
-    JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
-    LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
-    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
-
-    $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
-            . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
-            . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
-
-    $orders = $wpdb->get_results($purchase_order_table_sql);
+//    $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
+//    if ($show_status == "on-order" || $show_status == "new-order") {
+//        $query_status = "='" . $show_status . "'";
+//    } else {
+//        $query_status = "LIKE '%" . $show_status . "%'";
+//    }
+//    $status = $show_status;
+//    $posts_table = $wpdb->prefix . "posts";
+//    $postmeta_table = $wpdb->prefix . "postmeta";
+//    $vendor_po_lookup_table = $wpdb->prefix . "vendor_po_lookup";
+//    $vendor_purchase_order_table = $wpdb->prefix . "vendor_purchase_orders";
+//    $vendor_purchase_order_items_table = $wpdb->prefix . "vendor_purchase_orders_items";
+//    $posts_table_sql = "SELECT * FROM `" . $posts_table . "` p
+//    JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND meta_key = 'wcvmgo_product_id' 
+//    LEFT JOIN " . $wpdb->prefix . "vendor_po_lookup wvpl ON wvpl.product_id = pm.meta_value
+//    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
+//
+//    $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
+//            . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
+//            . " WHERE po.post_status " . $query_status . " ORDER BY po.id DESC";
+//
+//    $orders = $wpdb->get_results($purchase_order_table_sql);
     
     ?>
     <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
@@ -51,12 +51,12 @@
 //    }
     $table = new Vendor_Management_Columns();
     ?>
-    <?php $table_headers = $table->get_new_orders_columns_list(); ?>
+    <?php $table_headers = $table->get_on_order_columns_list(); ?>
 
 
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=draft') ?>"<?php if ($status == 'draft'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('On order', 'wcvm') ?></a>
+    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=on-order') ?>"<?php if ($status == 'on-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('On order', 'wcvm') ?></a>
     |
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=pending') ?>"<?php if ($status == 'pending'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Back order', 'wcvm') ?></a>
     |
@@ -73,13 +73,13 @@
       |
      */ ?>
     <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php if ($status == 'trash'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Trash', 'wcvm') ?></a>    
-    <?php if ($status == 'trash'): ?>
-        |
+    <?php // if ($status == 'trash'): ?>
+<!--        |
         <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
         <form action="" method="post" id="wcvm-delete-all-form">
             <input type="hidden" name="delete-all" value="all">
-        </form>
-    <?php endif ?>
+        </form>-->
+    <?php // endif ?>
     <br><br>
     <?php
     if ($orders) {
@@ -135,22 +135,16 @@
 
             </table>
 
-            <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
+            <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
                 <div style="padding-top: 5px;width: 300px;float: left">
                     <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                     <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
-            <?php endif ?>
+            <?php // endif ?>
             <div style="padding-top: 5px;float: left">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
-            <?php // if ($order->post_status == 'new-order' || $order->post_status == 'draft'):        ?>
-            <!-- <div style="padding-top: 5px;float: right">
-                <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
-                <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
-            </div> -->
-            <?php // endif         ?>
             </div>
             <div style="clear: both;"></div>
             <br><br>
@@ -180,48 +174,35 @@
                     <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                 </div>
                 <?php
-                if ($status == "returned") {
+//                if ($status == "returned") {
                     ?>
-                    <div style="float: right;padding: 2px;">
+<!--                    <div style="float: right;padding: 2px;">
                         <button type="button" class="button" onclick="mark_closed('<?php echo $order->order_id ?>')">Mark Selected Closed</button>
-                    </div>
+                    </div>-->
                     <?php
-                }
+//                }
                 ?>
 
                 <div style="float: right;padding: 2px;">
                     <button type="button" class="button" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php
-                    if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-                        echo 'Close';
-                    } else if ($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) {
-                        echo 'Close';
-                    } else {
+//                    if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
+//                        echo 'Close';
+//                    } else if ($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) {
+//                        echo 'Close';
+//                    } else {
                         echo 'Open';
-                    }
+//                    }
                     ?>"><?php
-                                if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-                                    echo 'Open';
-                                } else if ($order->post_status == $show_status || strpos($order->post_status, $show_status) !== false) {
+//                                if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
+//                                    echo 'Open';
+//                                } else if ($order->post_status == $show_status || strpos($order->post_status, $show_status) !== false) {
                                     echo 'Close';
-                                } else {
-                                    'Open';
-                                }
+//                                } else {
+//                                    'Open';
+//                                }
                                 ?></button>
                 </div>
 
-                <?php if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'new-order'): ?>
-                    <div style="float: right;padding: 2px;">
-                        <?php if ($order->post_status == 'trash'): ?>
-                            <button type="submit" name="unarchive" value="unarchive" class="button"><?= esc_html__('Restore', 'wcvm') ?></button>
-                            <button type="submit" name="delete" value="delete" class="button"><?= esc_html__('Delete', 'wcvm') ?></button>
-                        <?php else: ?>
-                            <input type="hidden" name="archive" value="archive" />
-                    <!--                            <button style="display: none;" type="submit" name="archive" id="order_<?= esc_attr($order->order_id) ?>" value="archive" class="button"><?= esc_html__('Delete Entire PO', 'wcvm') ?></button>-->
-                            <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_entire">Delete Entire PO</a>
-                            <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_selected">Delete Selected Lines</a>
-                        <?php endif ?>
-                    </div>
-                <?php endif ?>
                 <div<?php
                 $display = "";
                 if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'publish' || $status == 'private' || $status == 'trash') {
@@ -286,35 +267,35 @@
                             <!--<td>On Vendor Bo</td>-->
                             <?php
                             $order_product_Qty = 0;
-                            if ($status == 'return_closed') {
-                                $order_product_Qty = $order->product_quantity_return_closed;
-//                                    $order_Qty = get_post_meta($order->order_id, "wcvmgo_".$order->product_id."_return_closed");
-//                                     if ($order_Qty) {
-//                                         $order_product_Qty = $order_Qty[0];
-//                                     }
-                            } else {
+//                            if ($status == 'return_closed') {
+//                                $order_product_Qty = $order->product_quantity_return_closed;
+////                                    $order_Qty = get_post_meta($order->order_id, "wcvmgo_".$order->product_id."_return_closed");
+////                                     if ($order_Qty) {
+////                                         $order_product_Qty = $order_Qty[0];
+////                                     }
+//                            } else {
 //                                    $order_Qty = get_post_meta($order->order_id, "wcvmgo_" . $order->product_id);
 //                                    if ($order_Qty) {
 //                                        $order_product_Qty = $order_Qty[0]['product_quantity'];
 //                                    }
                                 $order_product_Qty = $order->product_ordered_quantity;
-                            }
-                            if ($status != 'trash') {
-                                $inputType = '';
-
-                                if ($status == 'pending') {
-                                    $inputType = 'readonly';
-                                }
-                                if ($_GET['status'] == 'publish') {
-                                    $inputType = 'readonly';
-                                }
-                                
-                            }
+//                            }
+//                            if ($status != 'trash') {
+//                                $inputType = '';
+//
+//                                if ($status == 'pending') {
+//                                    $inputType = 'readonly';
+//                                }
+//                                if ($_GET['status'] == 'publish') {
+//                                    $inputType = 'readonly';
+//                                }
+//                                
+//                            }
                                 ?>
 
-                                <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
+                                <td><input type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
 
-                                <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
+<!--                                <td><input class="deleting" id = "<?php // echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>-->
                                 
                         </tr>
 
@@ -336,22 +317,17 @@
 
                 </table>
 
-                <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
+                <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
                     <div style="padding-top: 5px;width: 300px;float: left">
                         <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                         <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
                         <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                     </div>
-                <?php endif ?>
+                <?php // endif ?>
                 <div style="padding-top: 5px;float: left">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
-                <?php if ($order->post_status == 'new-order' || $order->post_status == 'draft'): ?>
-<!--                     <div style="padding-top: 5px;float: right">
-                        <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
-                        <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
-                    </div> -->
-                <?php endif ?>
+
         </form>
         <br><br>
         <br><br>
@@ -367,7 +343,7 @@
 function get_print_status($order = FALSE) {
     if ($order->post_status == 'new-order') {
         echo 'Status: New<br>';
-    } else if ($order->post_status == 'draft') {
+    } else if ($order->post_status == 'on-order') {
         echo 'Status: On order<br>';
     } else if ($order->post_status == 'pending') {
         echo 'Status: Backordered<br>';
