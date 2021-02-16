@@ -285,13 +285,13 @@
 //                                    $inputType = 'readonly';
 //                                }
 //                                if ($_GET['status'] == 'publish') {
-                                    $inputType = 'readonly';
+//                                    $inputType = 'readonly';
 //                                }
 //                                
 //                            }
                                 ?>
 
-                                <td><input <?php echo $inputType . ' '; ?>type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
+                                <td><input type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
 
                                 <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
                                 
