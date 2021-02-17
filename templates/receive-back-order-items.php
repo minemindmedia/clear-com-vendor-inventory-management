@@ -97,6 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $updated = $wpdb->update($vendor_purchase_order_items_table, $update_data, $where_data);
                 // echo $wpdb->last_query;
             }
+            if ($_POST['action'] == 'archive') {
+//                update_post_meta($order->ID, 'old_status', $order->post_status);
+                $order->post_status = 'trash';
+            }      
+            
             $updatePOProductData['post_status'] = $order->post_status;
 //            $updatePOProductData['set_date'] = time();
             $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
@@ -108,10 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //            } else {
 //                delete_post_meta($order->ID, 'expected_date');
 //            }
-            if ($_POST['action'] == 'archive') {
-//                update_post_meta($order->ID, 'old_status', $order->post_status);
-                $order->post_status = 'trash';
-            }
+
             wp_update_post(array(
                 'ID' => $order->ID,
                 'post_status' => $order->post_status,
