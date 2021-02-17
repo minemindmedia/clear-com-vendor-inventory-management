@@ -7,12 +7,18 @@
 //require('wp-load.php');
 require('../../../../wp-load.php');
 $total = 0;
+$vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
+$vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';
 if (array_key_exists('po', $_REQUEST)) {
     $orderID = $_REQUEST['po'];
     $order = get_post($orderID);
-    $wcvmgo_manual = get_post_meta($orderID, "wcvmgo");
-    $purchaseOrderDetails = $wpdb->get_results('SELECT * FROM wp_vendor_purchase_order WHERE order_id = ' . $orderID);
-    $order->wcvmgo = $wcvmgo_manual[0];
+//    $wcvmgo_manual = get_post_meta($orderID, "wcvmgo");
+//    $purchaseOrderDetails = $wpdb->get_results('SELECT * FROM wp_vendor_purchase_order WHERE order_id = ' . $orderID);
+    $order_details_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po "
+            . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
+            . " WHERE po.order_id = " . $orderID;
+    $order_details = $wpdb->get_results($order_details_sql);
+//    $order->wcvmgo = $wcvmgo_manual[0];
     $vendor = get_post($order->post_parent);
 }
 ?>
@@ -99,7 +105,8 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <?php
-                                                                                        foreach ($purchaseOrderDetails as $singleLineItem):
+//                                                                                        foreach ($purchaseOrderDetails as $singleLineItem):
+                                                                                        foreach ($order_details as $singleLineItem):
                                                                                             ?>
                                                                                             <td style="text-align: right"><?php echo $singleLineItem->product_ordered_quantity; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->vendor_sku; ?>   </td>

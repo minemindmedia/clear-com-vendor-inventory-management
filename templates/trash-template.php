@@ -28,24 +28,25 @@
     <?php
     $table = new Vendor_Management_Columns();
     ?>
-    <?php $table_headers = $table->get_on_order_columns_list(); ?>
+    <?php $table_headers = $table->get_on_order_columns_list(); 
+                require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
+                ?>
 
-
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>
+<!--    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php // if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('New', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=on-order') ?>"<?php if ($status == 'on-order'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('On order', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=on-order') ?>"<?php // if ($status == 'on-order'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('On order', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=pending') ?>"<?php if ($status == 'pending'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Back order', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=back-order') ?>"<?php // if ($status == 'back-order'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Back order', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=publish') ?>"<?php if ($status == 'publish'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Completed', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=completed') ?>"<?php // if ($status == 'completed'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Completed', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=private') ?>"<?php if ($status == 'private'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Canceled', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=canceled') ?>"<?php // if ($status == 'canceled'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Canceled', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=returned') ?>"<?php if ($status == 'returned'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Returns Open', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=returned') ?>"<?php // if ($status == 'returned'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Returns Open', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=return_closed') ?>"<?php if ($status == 'return_closed'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Returns Closed', 'wcvm') ?></a>
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=return_closed') ?>"<?php // if ($status == 'return_closed'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Returns Closed', 'wcvm') ?></a>
     |
-    <a href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php if ($status == 'trash'): ?> style="font-weight: bold"<?php endif ?>><?= esc_html__('Trash', 'wcvm') ?></a>    
+    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php // if ($status == 'trash'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Trash', 'wcvm') ?></a>    -->
         <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
         <form action="" method="post" id="wcvm-delete-all-form">
             <input type="hidden" name="delete-all" value="all">
@@ -151,16 +152,16 @@
 
                 <?php // if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'new-order'): ?>
                     <div style="float: right;padding: 2px;">
-                        <?php // if ($order->post_status == 'trash'): ?>
+                        <?php if ($order->post_status == 'trash'): ?>
                             <button type="submit" name="unarchive" value="unarchive" class="button"><?= esc_html__('Restore', 'wcvm') ?></button>
                             <button type="submit" name="delete" value="delete" class="button"><?= esc_html__('Delete', 'wcvm') ?></button>
                     </div>
-                <?php // endif ?>
+                <?php endif ?>
                 <div<?php
-                $display = "";
-                if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'publish' || $status == 'private' || $status == 'trash') {
+//                $display = "";
+//                if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'completed' || $status == 'canceled' || $status == 'trash') {
                     $display = "none";
-                }
+//                }
                 ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
                     <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
 
@@ -290,11 +291,11 @@ function get_print_status($order = FALSE) {
         echo 'Status: New<br>';
     } else if ($order->post_status == 'on-order') {
         echo 'Status: On order<br>';
-    } else if ($order->post_status == 'pending') {
+    } else if ($order->post_status == 'back-order') {
         echo 'Status: Backordered<br>';
-    } else if ($order->post_status == 'publish') {
+    } else if ($order->post_status == 'completed') {
         echo 'Status: Completed<br>';
-    } else if ($order->post_status == 'private') {
+    } else if ($order->post_status == 'canceled') {
         echo 'Status: Canceled<br>';
     } else if ($order->post_status == 'returned') {
         echo 'Status: Returned<br>';
@@ -306,11 +307,11 @@ function get_print_status($order = FALSE) {
         echo 'Status: Trash<br>';
     } else if (strpos($order->post_status, $_REQUEST['status']) !== FALSE) {
         $status_string = "Status : ";
-        if ($_REQUEST['status'] == 'pending') {
+        if ($_REQUEST['status'] == 'back-order') {
             $status_string .= "Backordered";
-        } elseif ($_REQUEST['status'] == 'publish') {
+        } elseif ($_REQUEST['status'] == 'completed') {
             $status_string .= "Completed";
-        } elseif ($_REQUEST['status'] == 'private') {
+        } elseif ($_REQUEST['status'] == 'canceled') {
             $status_string .= "Canceled";
         } elseif ($_REQUEST['status'] == 'returned') {
             $status_string .= "Returned";

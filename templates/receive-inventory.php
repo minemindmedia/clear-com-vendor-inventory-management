@@ -111,7 +111,6 @@
     $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
     $vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-//        print_r($_POST);die;
 
         $wcvmgo_product_quantity = 0;
 
@@ -121,20 +120,13 @@
         $order_details = $wpdb->get_results($order_details_sql);
 
         $order = get_post($_POST['ID']);
-//        if ($order && $order->post_type == 'wcvm-order') {
-
         if ($order_details) {
 
             $isValid = true;
-//            foreach ($order->wcvmgo as $productId) {
             foreach ($order_details as $single_order) {
-
-//                if (get_post_status($productId) == 'trash') {
                 if ($single_order->post_status == 'trash') {
                     continue;
                 }
-//                $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
-//                if ($data['product_quantity'] != (int)$_POST['product_quantity_received'][$productId] + (int)$_POST['product_quantity_back_order'][$productId] + (int)$_POST['product_quantity_canceled'][$productId] + (int)$_POST['product_quantity_returned'][$productId]) {
 
                 if ($single_order->product_ordered_quantity != (int) $_POST['product_quantity_received'][$single_order->product_id] + (int) $_POST['product_quantity_back_order'][$single_order->product_id] + (int) $_POST['product_quantity_canceled'][$single_order->product_id] + (int) $_POST['product_quantity_returned'][$single_order->product_id]) {
                     $isValid = false;
@@ -143,86 +135,64 @@
             }
             if ($isValid) {
 
-//                $order->post_status = get_post_status($order->ID);
                 $expectedDate = '';
                 $redirect = '';
                 $last_order_id = 0;
-//                foreach ($order->wcvmgo as $productId) {
+                $order->post_status = "";
+                
                 foreach ($order_details as $single_order) {
-                    if ($last_order_id && $last_order_id != $single_order->order_id) {
-                        $updatePOProductData['post_status'] = $order->post_status;
-                        $updatePOProductData['set_date'] = time();
-                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
-                        $updatePOProductData['updated_by'] = get_current_user_id();
-                        $wherePOProductData['order_id'] = $last_order_id;
+                    if($last_order_id != $single_order->order_id) {
                         $order->post_status = "";
                         $last_order_id = $single_order->order_id;
                     }
-//                    $data = get_post_meta($order->ID, 'wcvmgo_' . $productId, true);
-//                    $data = get_post_meta($single_order->order_id, 'wcvmgo_' . $single_order->product_id, true);
 
                         $data['product_quantity_received'] = (int) $_POST['product_quantity_received'][$single_order->product_id];
                         $data['product_quantity_back_order'] = (int) $_POST['product_quantity_back_order'][$single_order->product_id];
                         $data['product_quantity_canceled'] = (int) $_POST['product_quantity_canceled'][$single_order->product_id];
                         $data['product_quantity_returned'] = (int) $_POST['product_quantity_returned'][$single_order->product_id];
                         $data['product_expected_date_back_order'] = $_POST['product_expected_date_back_order'][$single_order->product_id];
-//                    print_r($data);die;
+                        
                         if ($data['product_quantity_back_order'] && $data['product_expected_date_back_order']) {
                             $data['product_expected_date_back_order'] = strtotime($data['product_expected_date_back_order']);
                         } else {
                             $data['product_expected_date_back_order'] = '';
                         }
                         if ($data['product_quantity_received'] > 0) {
-//                        echo 's';die;
+
                             if ($order->post_status != "") {
                                 $order->post_status .= "|";
                             }
-                            $order->post_status = 'publish';
+                            $order->post_status = 'completed';
                             if ($redirect == "") {
-                                $redirect = "publish";
+                                $redirect = "completed";
                             }
 
-//                        $data['product_ordered_qty'] = $single_order->product_ordered_quantity - $data['product_quantity_received'];
-//                        //$data['product_ordered_quantity'] = $data['product_quantity_received'];
-//                        update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_received', $data['product_quantity_received']);
-//                        $qtyToUpdate = get_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_received');
-//print_r($single_order);die;
-//                        update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_qty', $qtyToUpdate[0] - $data['product_quantity_received']);
-//                        update_post_meta($single_order->product_id, '_stock_status', 'instock');
-//                        $wcvmgo_product_quantity = $qtyToUpdate[0] - $data['product_quantity_received'];
                         }
                         if ($data['product_quantity_back_order'] > 0) {
-                            $wcvmgo_product_quantity = $data['product_quantity_back_order'];
-                            $update_data['product_quantity_back_order'] = $wcvmgo_product_quantity;
                             if ($order->post_status != "") {
                                 $order->post_status .= "|";
                             }
-                            $order->post_status .= 'pending';
-//                        update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_qty', $data['product_quantity_back_order']);
+                            $order->post_status .= 'back-order';
                             if ($data['product_expected_date_back_order']) {
                                 if (!$expectedDate || $expectedDate > $data['product_expected_date_back_order']) {
                                     $expectedDate = $data['product_expected_date_back_order'];
                                 }
-//                            update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_date', $data['product_expected_date_back_order']);
                             } else {
                                 $update_data['product_expected_date_back_order'] = '';
-//                            delete_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_date');
                             }
                             if ($redirect == "") {
-                                $redirect = "pending";
+                                $redirect = "back-order";
                             }
                         } else {
                             $update_data['product_quantity_back_order'] = 0;
-//                        delete_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_qty');
                         }
                         if ($data['product_quantity_canceled'] > 0) {
                             if ($order->post_status != "") {
                                 $order->post_status .= "|";
                             }
-                            $order->post_status .= 'private';
-//                        update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_cancelled', $data['product_quantity_canceled']);
+                            $order->post_status .= 'canceled';
                             if ($redirect == "") {
-                                $redirect = "private";
+                                $redirect = "canceled";
                             }
                         }
                         if ($data['product_quantity_returned'] > 0) {
@@ -233,54 +203,45 @@
                             if ($redirect == "") {
                                 $redirect = "returned";
                             }
-//                        update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id . '_returned', $data['product_quantity_returned']);
                         }
 
-//                    update_post_meta($order->ID, 'wcvmgo_' . $single_order->product_id, $data);
-
-                        if (!empty($origin['product_quantity_received'])) {
-//                        $stock = $data['product_quantity_received'] + get_post_meta($single_order->product_id, '_stock', true) - $origin['product_quantity_received'];
-                            $stock = $data['product_quantity_received'] + $single_order->product_stock - $origin['product_quantity_received'];
-                        } else {
-//                        $stock = $data['product_quantity_received'] + get_post_meta($single_order->product_id, '_stock', true);
-                            $stock = $data['product_quantity_received'] + $single_order->product_stock;
-                        }
-//                    update_post_meta($single_order->product_id, '_stock', $stock);
-
-                        if ($_POST['action'] == 'archive') {
-                            $status = $order->post_status;
-                            if ($status != "") {
-                                $status .= "|";
-                            }
-                            $status .= 'trash';
-                        }
-//                        $update_data['post_status'] = $order->post_status;
-                        $update_data['product_ordered_quantity'] = $data['product_quantity'];
+//                        if (!empty($origin['product_quantity_received'])) {
+//                            $stock = $data['product_quantity_received'] + $single_order->product_stock - $origin['product_quantity_received'];
+//                        } else {
+//                            $stock = $data['product_quantity_received'] + $single_order->product_stock;
+//                        }
+                        $update_data['product_expected_date_back_order'] = $expectedDate;
                         $update_data['product_quantity_received'] = $data['product_quantity_received'];
-//                    $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
+                        $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                         $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
                         $update_data['product_quantity_returned'] = $data['product_quantity_returned'];
-//                    $update_data['product_expected_date_back_order'] = $data['product_expected_date_back_order'];
                         if (!empty($expectedDate)) {
-                            $update_data['expected_date'] = $expectedDate;
+                            $update_data['product_expected_date'] = $expectedDate;
                         }
 
                         $update_data['updated_date'] = date('Y/m/d H:i:s a');
                         $where_data['product_id'] = $single_order->product_id;
-                        $where_data['vendor_order_idFk'] = $order->id;
+                        $where_data['vendor_order_idFk'] = $single_order->vendor_order_idFk;
                         $updated = $wpdb->update($vendor_purchase_order_items_table, $update_data, $where_data);
-//print_r($wpdb);die;
+                        
+                        
                         $quantity_to_deduct_from_on_order = $data['product_quantity_received'] + $data['product_quantity_canceled'] + $data['product_quantity_returned'];
                         $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET stock = stock + " . $data['product_quantity_received'] . ",on_order = on_order - " . $quantity_to_deduct_from_on_order . " WHERE product_id = " . $single_order->product_id . "";
                         $wpdb->query($updateOnOrderQuery);
                     }
-
-//                    if ($expectedDate) {
-//                        update_post_meta($order->ID, 'expected_date', $expectedDate);
-//                    } else {
-//                        delete_post_meta($order->ID, 'expected_date');
-//                    }
-//                    update_post_meta($order->ID, 'set_date', time());
+                        if ($_POST['action'] == 'archive') {
+                            if ($order->post_status != "") {
+                                $order->post_status .= "|";
+                            }
+                            $order->post_status .= 'trash';
+                        }
+                        $status = implode('|',array_unique(explode('|', $order->post_status)));                        
+                        $updatePOProductData['post_status'] = $status;
+                        $updatePOProductData['set_date'] = time();
+                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
+                        $updatePOProductData['updated_by'] = get_current_user_id();
+                        $wherePOProductData['order_id'] = $last_order_id;
+                        $updated = $wpdb->update($vendor_purchase_order_table, $updatePOProductData, $wherePOProductData);
                     if ($_POST['action'] == 'archive') {
                         update_post_meta($order->ID, 'old_status', $order->post_status);
                         if ($order->post_status != "") {
@@ -333,7 +294,6 @@
             $product_quantity_canceled = '';
             $product_expected_date_back_order = '';
             foreach ($orders as $order) {
-//        print_r($order);die;
                 $vendors = explode(',', $order->vendor_name);
                 $vendor_ids = explode(',', $order->vendor_id);
                 $vendor_prices = explode(',', $order->vendor_price);
@@ -354,7 +314,6 @@
                 $product_quantity_back_order = $order->product_quantity_back_order;
                 $product_quantity_canceled = $order->product_quantity_canceled;
                 $product_expected_date_back_order = isset($order->product_expected_date_back_order) ? date('Y-m-d', (int) $order->product_expected_date_back_order) : '';
-                // print_r($wcvmgo[0]['product_expected_date_back_order']);
 
                 $vendor_price = 0;
                 $vendor_sku = '';
@@ -379,8 +338,8 @@
                 </tfoot>
                 </table>                
                 <div style="padding-top: 5px;">
-                    <!--<button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><? esc_html__('Set Inventory', 'wcvm') ?></button>-->
-                    <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                    <button type="submit" name="action" value="update" data-role="receive-inventory" class="button button-primary"><?= esc_html__('Set Inventory', 'wcvm') ?></button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <button type="submit" name="action" value="archive" data-role="receive-inventory" class="button"><?= esc_html__('Set Inventory & Archive', 'wcvm') ?></button>
                 </div>
                 <br><br>
@@ -427,7 +386,7 @@
                             <td><input type="text" name="product_quantity_canceled[<?php echo $order->product_id; ?>]" data-role="product_quantity_canceled" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
                             <td><input type="text" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>                    
             <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
-                            <td></td>
+                            <!--<td></td>-->
                         </tr>
                     <?php } ?>
                 </tbody>

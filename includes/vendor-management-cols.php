@@ -27,7 +27,7 @@ class Vendor_Management_Columns {
             'product_quantity_back_order' => __('Vnd BO', 'wcvm'),
             'product_quantity_canceled' => __('Cancel', 'wcvm'),
             'product_expected_date_back_order' => __('BO Expected Date', 'wcvm'),
-            'back_orders' => __('Cust BOs', 'wcvm'),
+//            'back_orders' => __('Cust BOs', 'wcvm'),
         );
     }
 
@@ -157,7 +157,7 @@ class Vendor_Management_Columns {
             $columns_array['__order_qty'] = __('Order QTY', 'wcvm');
         } else if ($status == 'publish') {
             $columns_array['__order_qty'] = __('Received QTY', 'wcvm');
-        } else if ($status == 'pending') {
+        } else if ($status == 'back-order') {
             $columns_array['__order_qty'] = __('BO QTY', 'wcvm');
         } else if ($status == 'private') {
             $columns_array['__order_qty'] = __('Cancelled QTY', 'wcvm');

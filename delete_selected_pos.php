@@ -26,6 +26,7 @@ for ($i = 0; $i < count($ids_to_delete); $i++) {
                       
          if(!$remainigProductItems){
              $wpdb->delete($vendor_purchase_order_table, array('id' => $productItemDetails[0]->id , 'order_id' => $orderId));                          
+                wp_delete_post($orderId);             
          }
 //        delete_post_meta($orderId, 'wcvmgo_' . $productId . '_qty');
 //        delete_post_meta($orderId, 'wcvmgo_' . $productId . '_date');
