@@ -47,13 +47,16 @@
     <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=return_closed') ?>"<?php // if ($status == 'return_closed'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Returns Closed', 'wcvm') ?></a>
     |
     <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=trash') ?>"<?php // if ($status == 'trash'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('Trash', 'wcvm') ?></a>    -->
+    <br><br>
+    <?php
+    if ($orders) {
+        ?>
         <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
         <form action="" method="post" id="wcvm-delete-all-form">
             <input type="hidden" name="delete-all" value="all">
         </form>
-     <br><br>
-    <?php
-    if ($orders) {
+
+        <?php
         $get_status = "";
         if (array_key_exists('status', $_GET)) {
             $get_status = $_GET['status'];

@@ -307,7 +307,7 @@
 
                 <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
                     <div style="padding-top: 5px;width: 300px;float: left">
-                        <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
+                        <input type="date" autocomplete="off" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
                         <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
                         <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                     </div>

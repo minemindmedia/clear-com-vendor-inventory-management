@@ -267,7 +267,7 @@ $status = $show_status;
                     <td><input type="text" data-role="__product_quantity_back_order" name="__product_quantity_back_order[<?php echo $order->product_id; ?>]" value="<?php echo $product_quantity_received; ?>" style="width:60px;"></td>                    
                     <td><input type="text" data-role="__product_quantity_canceled" name="__product_quantity_canceled[<?php echo $order->product_id; ?>]" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
                     <!--<td><input type="text" data-role="datetime" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]"  value="<?php echo $product_expected_date_back_order; ?>" style="text-align: center;width: 70px;font-size: 10px;"></td>-->
-                    <td><input type="text" data-role="datetime" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]"  value="<?php // echo $product_expected_date_back_order; ?>" style="text-align: center;width: 70px;font-size: 10px;"></td>
+                    <td><input type="text" autocomplete="off" data-role="datetime" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]"  value="<?php // echo $product_expected_date_back_order; ?>" style="text-align: center;width: 70px;font-size: 10px;"></td>
                     <td></td>
                 </tr>
                 <?php } ?>

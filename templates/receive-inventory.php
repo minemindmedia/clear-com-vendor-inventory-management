@@ -137,15 +137,9 @@
 
                 $expectedDate = '';
                 $redirect = '';
-                $last_order_id = 0;
                 $order->post_status = "";
                 
                 foreach ($order_details as $single_order) {
-                    if($last_order_id != $single_order->order_id) {
-                        $order->post_status = "";
-                        $last_order_id = $single_order->order_id;
-                    }
-
                         $data['product_quantity_received'] = (int) $_POST['product_quantity_received'][$single_order->product_id];
                         $data['product_quantity_back_order'] = (int) $_POST['product_quantity_back_order'][$single_order->product_id];
                         $data['product_quantity_canceled'] = (int) $_POST['product_quantity_canceled'][$single_order->product_id];
@@ -162,7 +156,7 @@
                             if ($order->post_status != "") {
                                 $order->post_status .= "|";
                             }
-                            $order->post_status = 'completed';
+                            $order->post_status .= 'completed';
                             if ($redirect == "") {
                                 $redirect = "completed";
                             }
@@ -235,13 +229,6 @@
                             }
                             $order->post_status .= 'trash';
                         }
-                        $status = implode('|',array_unique(explode('|', $order->post_status)));                        
-                        $updatePOProductData['post_status'] = $status;
-                        $updatePOProductData['set_date'] = time();
-                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
-                        $updatePOProductData['updated_by'] = get_current_user_id();
-                        $wherePOProductData['order_id'] = $last_order_id;
-                        $updated = $wpdb->update($vendor_purchase_order_table, $updatePOProductData, $wherePOProductData);
                     if ($_POST['action'] == 'archive') {
                         update_post_meta($order->ID, 'old_status', $order->post_status);
                         if ($order->post_status != "") {
@@ -252,7 +239,13 @@
                             $redirect = "trash";
                         }
                     }
-
+                        $status = implode('|',array_unique(explode('|', $order->post_status)));                        
+                        $updatePOProductData['post_status'] = $status;
+                        $updatePOProductData['set_date'] = time();
+                        $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
+                        $updatePOProductData['updated_by'] = get_current_user_id();
+                        $wherePOProductData['order_id'] = $single_order->order_id;
+                        $updated = $wpdb->update($vendor_purchase_order_table, $updatePOProductData, $wherePOProductData);
                     $query = "UPDATE wp_posts SET post_status = '" . $order->post_status . "' WHERE ID = " . $order->ID;
 
                     $wpdb->query($query);
@@ -384,7 +377,7 @@
                             <td><input type="text" name="product_quantity_returned[<?php echo $order->product_id; ?>]" data-role="product_quantity_returned" value="<?php echo $product_quantity_returned; ?>" style="width:60px;"></td>
                             <td><input type="text" name="product_quantity_back_order[<?php echo $order->product_id; ?>]" data-role="product_quantity_back_order" value="<?php echo $product_quantity_back_order; ?>" style="width:60px;"></td>
                             <td><input type="text" name="product_quantity_canceled[<?php echo $order->product_id; ?>]" data-role="product_quantity_canceled" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
-                            <td><input type="text" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>                    
+                            <td><input type="text" autocomplete="off" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>                    
             <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
                             <!--<td></td>-->
                         </tr>
