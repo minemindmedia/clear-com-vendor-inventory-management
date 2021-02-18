@@ -760,6 +760,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $order_by[] = "v.stock " . $qty_on_hand_filter;
             }
         }
+        $where = '';
         //$where = " WHERE v.stock_status IN ('outofstock','instock')";
         if (array_key_exists('selected_vendors', $_GET)) {
             if ($_GET['selected_vendors'] != "") {
