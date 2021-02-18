@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $last_order_id = 0;
 //            foreach ($order->wcvmgo as $productId) {
             foreach ($order_details as $productDetail) {
+
                 if($last_order_id != $productDetail->order_id) {
 //                    $order->post_status = "";
                     $last_order_id = $productDetail->order_id;
@@ -82,6 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //                update_post_meta($productId, '_stock', $stock);
 
 //                $update_data['product_quantity'] = $wcvmgo_product_quantity;
+                $update_back_order_qty = 0;
+                $update_back_order_qty = $data['product_quantity_received'] + $data['product_quantity_canceled'];
+                
+                if($update_back_order_qty <= $productDetail->product_quantity_back_order ){
+                    $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_vendor_bo = on_vendor_bo - " . $update_back_order_qty . ",stock = stock + " . $data['product_quantity_received'] . " WHERE product_id = " . $productDetail->product_id . "";
+                    $wpdb->query($updateOnOrderQuery);               
+                }
                 $update_data['product_quantity_received'] = $data['product_quantity_received'];
                 $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                 $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
@@ -183,7 +191,7 @@ $status = $show_status;
 //                // print_r($wcvmgo[0]['product_expected_date_back_order']);
 //            }
 
-            $product_quantity = $order->product_quantity ? $order->product_quantity : '';
+//            $product_quantity = $order->product_quantity ? $order->product_quantity : '';
                 $product_quantity_received = isset($order->product_quantity_received) ? $order->product_quantity_received : '';
                 $product_quantity_returned = isset($order->product_quantity_returned) ? $order->product_quantity_returned : '';
                 $product_quantity_back_order = isset($order->product_quantity_back_order) ? $order->product_quantity_back_order : '';

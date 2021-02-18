@@ -225,8 +225,8 @@
                         $updated = $wpdb->update($vendor_purchase_order_items_table, $update_data, $where_data);
                         
                         
-                        $quantity_to_deduct_from_on_order = $data['product_quantity_received'] + $data['product_quantity_canceled'] + $data['product_quantity_returned'];
-                        $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET stock = stock + " . $data['product_quantity_received'] . ",on_order = on_order - " . $quantity_to_deduct_from_on_order . " WHERE product_id = " . $single_order->product_id . "";
+                        $quantity_to_deduct_from_on_order = $data['product_quantity_received'] + $data['product_quantity_canceled'] + $data['product_quantity_returned'] + $data['product_quantity_back_order'];
+                        $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_vendor_bo = on_vendor_bo + ".$data['product_quantity_back_order']." ,stock = stock + " . $data['product_quantity_received'] . ",on_order = on_order - " . $quantity_to_deduct_from_on_order . " WHERE product_id = " . $single_order->product_id . "";
                         $wpdb->query($updateOnOrderQuery);
                     }
                         if ($_POST['action'] == 'archive') {
@@ -294,10 +294,10 @@
             $product_quantity_canceled = '';
             $product_expected_date_back_order = '';
             foreach ($orders as $order) {
-                $vendors = explode(',', $order->vendor_name);
-                $vendor_ids = explode(',', $order->vendor_id);
-                $vendor_prices = explode(',', $order->vendor_price);
-                $vendor_skus = explode(',', $order->vendor_sku);
+//                $vendors = explode(',', $order->vendor_name);
+//                $vendor_ids = explode(',', $order->vendor_id);
+//                $vendor_prices = explode(',', $order->vendor_price);
+//                $vendor_skus = explode(',', $order->vendor_sku);
 //            $wcvmgo = get_post_meta($order->order_id, 'wcvmgo_' . $order->product_id);
 //            if ($wcvmgo) {
 //                $product_quantity = $wcvmgo[0]['product_quantity'] ? $wcvmgo[0]['product_quantity'] : '';
@@ -315,16 +315,16 @@
                 $product_quantity_canceled = $order->product_quantity_canceled;
                 $product_expected_date_back_order = isset($order->product_expected_date_back_order) ? date('Y-m-d', (int) $order->product_expected_date_back_order) : '';
 
-                $vendor_price = 0;
-                $vendor_sku = '';
-                $i = 0;
-                while ($i < count($vendor_ids)) {
-                    if ($vendor_ids[$i] == $order->vendor_id) {
-                        $vendor_price = $vendor_prices[$i];
-                        $vendor_sku = $vendor_skus[$i];
-                        break;
-                    }$i++;
-                }
+//                $vendor_price = 0;
+//                $vendor_sku = '';
+//                $i = 0;
+//                while ($i < count($vendor_ids)) {
+//                    if ($vendor_ids[$i] == $order->vendor_id) {
+//                        $vendor_price = $vendor_prices[$i];
+//                        $vendor_sku = $vendor_skus[$i];
+//                        break;
+//                    }$i++;
+//                }
                 if ($last_order_id > 0 && $last_order_id != $order->order_id) {
                     $records = true;
                     ?>
@@ -373,7 +373,7 @@
                         <?php } ?>
                         <tr>
                             <td><a href=""><?php echo $order->product_sku; ?></a></td>
-                            <td><?php echo $order->category; ?></td>
+                            <td><?php echo $order->product_category; ?></td>
                             <td></td>
                             <td><?php echo $order->vendor_name; ?></td>
                             <td></td>

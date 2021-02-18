@@ -264,6 +264,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
   `product_quantity_back_order` int(11) DEFAULT NULL,
   `product_quantity_canceled` int(11) DEFAULT NULL,
   `product_quantity_returned` int(11) DEFAULT NULL,
+  `product_quantity_return_closed` int(11) DEFAULT NULL,
   `product_expected_date_back_order` int(11) DEFAULT NULL,
   `on_order_quantity` int(11) NOT NULL,
   `sale_30_days` int(11) NOT NULL,
@@ -382,8 +383,8 @@ class WC_Clear_Com_Vendor_Inventory_Management {
 //            wp_update_post($order);
 //            delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
-            print_r($_POST);
-            die;
+//            print_r($_POST);
+//            die;
             $order = get_post($_POST['ID']);
 
             $update_data['post_status'] = 'trash';
@@ -443,10 +444,14 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         
                     } else {
                         $quantityToUpdateinLookup = $_POST['__order_qty'][$productId];
-                        if ($getPOLineItemDetails[0]->product_ordered_quantity != $_POST['__order_qty'][$productId]) {
-                            $quantityToUpdateinLookup = $_POST['__order_qty'][$productId] - $getPOLineItemDetails[0]->product_ordered_quantity;
+                        if($getPOLineItemDetails[0]->post_status == 'on-order'){
+                            if ($getPOLineItemDetails[0]->product_ordered_quantity != $_POST['__order_qty'][$productId]) {
+                                $quantityToUpdateinLookup = $_POST['__order_qty'][$productId] - $getPOLineItemDetails[0]->product_ordered_quantity;
+                            }
                         }
+                        
                         $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_order = on_order + " . $quantityToUpdateinLookup . " WHERE product_id = " . $productId . "";
+
                         $wpdb->query($updateOnOrderQuery);
                         $updatePOProductData['product_ordered_quantity'] = $_POST['__order_qty'][$productId];
                         $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
@@ -750,7 +755,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
         v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, 
         v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
-        v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty, v.stock_status, 
+        v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty,v.on_vendor_bo, v.stock_status, 
         CASE WHEN v.stock IS NULL THEN 'OUT' 
         WHEN CAST(v.stock as signed) <= 0 THEN 'OUT' 
         ELSE 'IN' END product_stock_status
@@ -759,7 +764,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
         group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
         v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
-        v.sale_30_days, v.order_qty, v.stock_status ";
+        v.sale_30_days, v.order_qty,v.on_vendor_bo, v.stock_status ";
 
 
         $sql = $order_details_table_sql;
@@ -1234,7 +1239,7 @@ class WC_Clear_Com_Vendor_Inventory_Management {
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty 
                                 ?></td>-->
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order ? $orderDetail->on_order : 0 ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->total_quantity; ?></td>
+                        <td class="center seventh-cell"><?php echo $orderDetail->on_vendor_bo; ?></td>
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
