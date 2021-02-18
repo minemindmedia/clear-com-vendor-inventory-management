@@ -1676,31 +1676,31 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
             }
         }
-        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
-                FROM
-                    wp_posts orders
-                JOIN
-                    wp_postmeta quantity
-                ON
-                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
-                WHERE
-                    orders.post_type = "wcvm-order" AND orders.post_status IN ("on-order", "back-order")
-                GROUP BY
-                    quantity.meta_key, orders.post_status';
-        $data = $wpdb->get_results($sql);
-        if ($data) {
-            foreach ($data as $single_row) {
-                $updateOnOrderData = [];
-                if ($single_row->post_status == 'on-order') {
-                    $updateOnOrderData['on_order'] = $single_row->quantity;
-                } else if ($single_row->post_status == 'back-order') {
-                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
-                }
-
-                $where['product_id'] = $single_row->product_id;
-                $wpdb->update('wp_vendor_po_lookup', $updateOnOrderData, $where);
-            }
-        }
+//        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
+//                FROM
+//                    wp_posts orders
+//                JOIN
+//                    wp_postmeta quantity
+//                ON
+//                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
+//                WHERE
+//                    orders.post_type = "wcvm-order" AND orders.post_status IN ("on-order", "back-order")
+//                GROUP BY
+//                    quantity.meta_key, orders.post_status';
+//        $data = $wpdb->get_results($sql);
+//        if ($data) {
+//            foreach ($data as $single_row) {
+//                $updateOnOrderData = [];
+//                if ($single_row->post_status == 'on-order') {
+//                    $updateOnOrderData['on_order'] = $single_row->quantity;
+//                } else if ($single_row->post_status == 'back-order') {
+//                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
+//                }
+//
+//                $where['product_id'] = $single_row->product_id;
+//                $wpdb->update('wp_vendor_po_lookup', $updateOnOrderData, $where);
+//            }
+//        }
         $sql = "select p.id as product_id
                 from wp_posts p 
                 join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
