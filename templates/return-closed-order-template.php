@@ -338,7 +338,7 @@ function get_print_status($order = FALSE) {
     }
 }
 ?>
-<script>
+<!--<script>
     function mark_closed(id)
     {
         var ids_to_delete = "";
@@ -423,4 +423,4 @@ function get_print_status($order = FALSE) {
             jQuery("#" + this.id).submit();
         }
     });
-</script>
+</script>-->

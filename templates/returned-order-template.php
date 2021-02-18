@@ -361,53 +361,53 @@ function get_print_status($order = FALSE) {
             }
         });
     }
-    jQuery(".delete_selected").bind("click", function () {
-        console.log('s');
-        var ids_to_delete = "";
-        var order_to_process = this.id;
-        console.log(this.id);
-        jQuery(".deleting").each(function (index) {
-            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
-            if (jQuery(this).is(':checked'))
-            {
-                console.log(jQuery(this).is(':checked'));
-                if (ids_to_delete != "")
-                {
-                    ids_to_delete += ",";
-                }
-                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
-            }
-        });
-        if (ids_to_delete != "")
-        {
-            console.log(ids_to_delete);
-            console.log(order_to_process);
-            jQuery.ajax({
-                type: "POST",
-                data: {
-                    ids_to_delete: ids_to_delete,
-                    order_to_process: order_to_process
-                },
-                url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/delete_selected_pos.php",
-                beforeSend: function () {
-                    // setting a timeout
-                    //$(placeholder).addClass('loading');
-                },
-                success: function (data)
-                {
-                    if (data == 1)
-                    {
-                        location.reload();
-                    }
-                }
-            });
-        }
-    });
-    jQuery(".delete_entire").bind("click", function () {
-        var txt;
-        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
-        if (r == true) {
-            jQuery("#" + this.id).submit();
-        }
-    });
+//    jQuery(".delete_selected").bind("click", function () {
+//        console.log('s');
+//        var ids_to_delete = "";
+//        var order_to_process = this.id;
+//        console.log(this.id);
+//        jQuery(".deleting").each(function (index) {
+//            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
+//            if (jQuery(this).is(':checked'))
+//            {
+//                console.log(jQuery(this).is(':checked'));
+//                if (ids_to_delete != "")
+//                {
+//                    ids_to_delete += ",";
+//                }
+//                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
+//            }
+//        });
+//        if (ids_to_delete != "")
+//        {
+//            console.log(ids_to_delete);
+//            console.log(order_to_process);
+//            jQuery.ajax({
+//                type: "POST",
+//                data: {
+//                    ids_to_delete: ids_to_delete,
+//                    order_to_process: order_to_process
+//                },
+//                url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/delete_selected_pos.php",
+//                beforeSend: function () {
+//                    // setting a timeout
+//                    //$(placeholder).addClass('loading');
+//                },
+//                success: function (data)
+//                {
+//                    if (data == 1)
+//                    {
+//                        location.reload();
+//                    }
+//                }
+//            });
+//        }
+//    });
+//    jQuery(".delete_entire").bind("click", function () {
+//        var txt;
+//        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
+//        if (r == true) {
+//            jQuery("#" + this.id).submit();
+//        }
+//    });
 </script>

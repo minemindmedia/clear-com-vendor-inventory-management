@@ -369,41 +369,41 @@ function get_print_status($order = FALSE) {
 }
 ?>
 <script>
-    function mark_closed(id)
-    {
-        var ids_to_delete = "";
-        var order_to_process = id;
-        jQuery(".deleting").each(function (index) {
-            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
-            if (jQuery(this).is(':checked'))
-            {
-                if (ids_to_delete != "")
-                {
-                    ids_to_delete += ",";
-                }
-                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
-            }
-        });
-        jQuery.ajax({
-            type: "POST",
-            data: {
-                ids_to_delete: ids_to_delete,
-                order_to_process: order_to_process
-            },
-            url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/extras/close_selected_returns.php",
-            beforeSend: function () {
-                // setting a timeout
-                //$(placeholder).addClass('loading');
-            },
-            success: function (data)
-            {
-                if (data == 1)
-                {
-                    location.reload();
-                }
-            }
-        });
-    }
+//    function mark_closed(id)
+//    {
+//        var ids_to_delete = "";
+//        var order_to_process = id;
+//        jQuery(".deleting").each(function (index) {
+//            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
+//            if (jQuery(this).is(':checked'))
+//            {
+//                if (ids_to_delete != "")
+//                {
+//                    ids_to_delete += ",";
+//                }
+//                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
+//            }
+//        });
+//        jQuery.ajax({
+//            type: "POST",
+//            data: {
+//                ids_to_delete: ids_to_delete,
+//                order_to_process: order_to_process
+//            },
+//            url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/extras/close_selected_returns.php",
+//            beforeSend: function () {
+//                // setting a timeout
+//                //$(placeholder).addClass('loading');
+//            },
+//            success: function (data)
+//            {
+//                if (data == 1)
+//                {
+//                    location.reload();
+//                }
+//            }
+//        });
+//    }
     jQuery(".delete_selected").bind("click", function () {
         console.log('s');
         var ids_to_delete = "";

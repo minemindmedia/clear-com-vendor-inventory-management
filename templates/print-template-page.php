@@ -108,19 +108,19 @@ if (array_key_exists('po', $_REQUEST)) {
 //                                                                                        foreach ($purchaseOrderDetails as $singleLineItem):
                                                                                         foreach ($order_details as $singleLineItem):
                                                                                             ?>
-                                                                                            <td style="text-align: right"><?php echo $singleLineItem->product_ordered_quantity; ?></td>
+                                                                                            <td style="text-align: center"><?php echo $singleLineItem->product_ordered_quantity; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->vendor_sku; ?>   </td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_sku; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_title; ?></td>
                                                                                             <td style="text-align: right"><?php echo $singleLineItem->vendor_price_last; ?></td>
-                                                                                            <td style="text-align: right"><?php echo (float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity; ?></td>
+                                                                                            <td style="text-align: right"><?php echo number_format((float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity,2); ?></td>
                                                                                         </tr>
                                                                                         <?php $total += (float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity ?>  
                                                                                                                                                                             
                                                                                     <?php endforeach ?>                                                                                    
                                                                                     <tr>
                                                                                         <td colspan="5" style="text-align: right">Total</td>
-                                                                                        <td style="text-align: right"><?php echo $total; ?></td>
+                                                                                        <td style="text-align: right"><?php echo wc_price(number_format($total,2)); ?></td>
                                                                                     </tr>
                                                                                 </tbody></table>
                                                                             <br><br>
