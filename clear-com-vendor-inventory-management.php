@@ -307,7 +307,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 font-size: 10px !important;
                 padding: 14px !important;
             }
-
+            .wp-list-table.wcvm-orders th{
+                background-color: white !important;
+                font-size: 10px !important;
+                padding: 14px !important;
+            }
             .wp-list-table.wcvm-orders .manage-column {
                 font-size: 10px !important;
             }
@@ -1829,11 +1833,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
             if ($data) {
             ?>
                 <style>
-                    .wp-list-table.wcvm-vendors td {
+                    .wp-list-table.wcvm-vendors .table-view-list td {
                         vertical-align: middle;
                     }
 
-                    .wp-list-table.wcvm-vendors .manage-column {
+                    .wp-list-table.wcvm-vendors .table-view-list.manage-column {
                         font-size: 10px;
                     }
                 </style>
@@ -1885,14 +1889,12 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         ?>
                     </tbody>
                 </table>
-                <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />-->
+                <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
 <!--                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
-        <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/dataTables.min.css'; ?>">                
-        <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/dataTables.min.js'; ?>"></script>                
-                <!--<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>-->
+                <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
                 <script>
-                    $(document).ready(function() {
-                        $('#vendors-list').DataTable({
+                    jQuery(document).ready(function() {
+                        jQuery('#vendors-list').DataTable({
                             "pageLength": 25
                         });
                     });

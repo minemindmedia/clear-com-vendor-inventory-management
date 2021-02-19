@@ -92,7 +92,7 @@
                 ?>
             </tbody>
             <tfoot>
-                <tr bgcolor="#e8e8e8" style="font-size:11px;">
+                <tr>
                     <?php
                     foreach ($table_headers as $header) {
                         ?>
@@ -196,11 +196,11 @@
 //                if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'completed' || $status == 'canceled' || $status == 'trash') {
 //                    $display = "none";
 //                }
-                ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
-                    <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
+                ?> style="display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
+                    <table class="wp-list-table fixed widefat striped wcvm-orders">
 
                         <thead>
-                            <tr bgcolor="#e8e8e8" style="font-size:11px;">
+                            <tr>
                                 <?php
                                 foreach ($table_headers as $header) {
                                     ?>
@@ -294,7 +294,7 @@
                         ?>
                     </tbody>
                     <tfoot>
-                        <tr bgcolor="#e8e8e8" style="font-size:11px;">
+                        <tr>
                             <?php
                             foreach ($table_headers as $header) {
                                 ?><th><?php echo $header; ?></th><?php
