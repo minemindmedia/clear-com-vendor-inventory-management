@@ -1410,7 +1410,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                         $("#30_days").val("");
                     }
-                    var vendors_selected = $("#primary_vendor_filter").val().join('|');
+
+                    var vendors_selected;
+                    if($("#primary_vendor_filter").val()){
+                        vendors_selected = $("#primary_vendor_filter").val().join('|');
+                    }
                     $("#selected_vendors").val(vendors_selected);
                     //                    var status_selected = $("#stock_status_filter").val().join('|');
                     //                    $("#selected_status").val(status_selected);
