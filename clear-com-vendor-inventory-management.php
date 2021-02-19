@@ -1198,16 +1198,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <?php
                         $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
             //          $product_url = get_permalink($orderDetail->product_id);
-                        $product_admin_url = get_edit_post_link($orderDetail->product_id);
-                        $product_image_src = '';
-                        if ($thumnailID) {
-                            $image = wp_get_attachment_image_src($thumnailID,'thumbnail'); // returns product image source
-                            //$image = woocommerce_get_product_thumbnail(); // returns product image
-                            //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
-                            $product_image_src = $image[0];
-                        } ?>
+            $product_admin_url = get_edit_post_link($orderDetail->product_id);
+            $product_image_src = '';
+            if ($thumnailID) {
+                $image = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
+                //$image = woocommerce_get_product_thumbnail(); // returns product image
+                //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
+                $product_image_src = $image[0];
+            } ?>
                         <td class="center third-cell">
-                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
+                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url;?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
                                                                                                                                                                                             ?></a>-->
                             <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>"><?php echo $orderDetail->sku ?></a>
 
@@ -1737,30 +1737,83 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $insert_data['order_qty'] = 0;
                 $insert_data['on_vendor_bo'] = 0;
                 $insert_data['new'] = 0;
-                //print_r($insert_data['vendor_name']);
                 $insert = $wpdb->insert($table, $insert_data);
-                //echo $wpdb->last_query;
-                echo $wpdb->last_error;
-            
-                echo "<br>".$insert_data['product_title']." inserted with id ".$wpdb->insert_id;
-            
-                
             }
         }
         wp_reset_postdata();
-        $productOrderData = $wpdb->get_results("SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
+        $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
+        from
+        (
+        SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
         FROM `wp_vendor_purchase_orders_items` p
         join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
-        where o.post_status in ('on-order','back-order')
-        group by product_id,o.post_status");
-        if($productOrderData){
-            foreach($productOrderData as $singleRow){
-                $updateData['order_status']
+        where o.post_status = 'on-order' OR o.post_status LIKE '%back-order%'
+        group by product_id,o.post_status
+        )p
+        group by product_id");
+        
+        if ($productOrderData) {
+            foreach ($productOrderData as $singleRow) {
+                $backOrders = 0;
+                $onOrders = 0;
+                $explodedStatusData = explode(",", $singleRow->order_status);
+                $explodedCountData = explode(",", $singleRow->order_quantity);
+                for ($i=0;$i<count($explodedStatusData);$i++) {
+                    if (strpos($explodedStatusData[$i], "back-order") !== false) {
+                        $backOrders = (int)$backOrders + (int)$explodedCountData[$i];
+                    }
+                    if (strpos($explodedStatusData[$i], "on-order") !== false) {
+                        $onOrders = (int)$onOrders + (int)$explodedCountData[$i];
+                    }
+                }
+                $updateData['on_order'] = $onOrders;
+                $updateData['on_vendor_bo'] = $backOrders;
+                $where['product_id'] = $singleRow->product_id;
+                $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
             }
         }
-        print_r($productOrderData);
-        // echo $wpdb->last_query;
-        die;
+        $sql = "SELECT
+                    items.meta_value product_id,
+                    SUM(quantity.meta_value) quantity
+                FROM
+                    wp_posts orders
+                JOIN
+                    wp_woocommerce_order_items carts
+                ON
+                    carts.order_id = orders.id AND carts.order_item_type = 'line_item'
+                JOIN
+                    wp_woocommerce_order_itemmeta items
+                ON
+                    items.order_item_id = carts.order_item_id AND items.meta_key = '_product_id'
+                JOIN
+                    wp_woocommerce_order_itemmeta quantity
+                ON
+                    quantity.order_item_id = items.order_item_id AND quantity.meta_key = '_qty'
+                WHERE
+                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
+                GROUP BY product_id";
+        $data = $wpdb->get_results($sql);
+        if ($data) {
+            foreach ($data as $single_row) {
+                $updateData['sale_30_days'] = $single_row->quantity;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
+            }
+        }
+        $sql = "select p.id as product_id
+        from wp_posts p 
+        join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
+        where p.post_type = 'product' and m.meta_value = 1";
+        $data = $wpdb->get_results($sql);
+        if ($data) {
+            foreach ($data as $single_row) {
+                $updateNewData['new'] = 1;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup', $updateNewData, $where);
+            }
+            update_option('_vendor_management_last_date', date('m-d-Y H:i:s'));
+            $ajaxResponse['success'] = true;
+        }
 
         if ($insert) {
             $total_rows = $wpdb->get_results("SELECT count(*) AS total_rows FROM " . $table);
@@ -1804,6 +1857,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
             }
         }
+       
 //        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
 //                FROM
 //                    wp_posts orders
