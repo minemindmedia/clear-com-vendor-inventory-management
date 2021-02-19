@@ -155,7 +155,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $table_name = $wpdb->prefix . 'vendor_po_lookup';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE `wp_vendor_po_lookup` (
-            `id` int(11) NOT NULL,
+            `id` int(11) NOT NULL AUTO_INCREMENT,
             `product_id` int(11) DEFAULT NULL,
             `product_title` text,
             `sku` text,
