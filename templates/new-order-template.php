@@ -111,7 +111,7 @@
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
             <?php endif ?>
-            <div style="padding-top: 5px;float: left">
+            <div style="padding-top: 5px;float: left;display:none;">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
             <?php // if ($order->post_status == 'new-order' || $order->post_status == 'draft'):        ?>
@@ -312,7 +312,7 @@
                         <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                     </div>
                 <?php // endif ?>
-                <div style="padding-top: 5px;float: left">
+                <div style="padding-top: 5px;float: left;display:none;">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
         </form>
