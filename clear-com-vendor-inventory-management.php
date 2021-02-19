@@ -1815,6 +1815,23 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $ajaxResponse['success'] = true;
         }
 
+        $deleteQuery = "DELETE FROM wp_vendor_po_lookup WHERE id  NOT IN (
+            SELECT id 
+            FROM `wp_vendor_po_lookup` 
+            WHERE (stock =1 and sale_30_days=1) or (stock =2 and sale_30_days=2) or (stock =2 and sale_30_days=3)
+            or (stock =3 and sale_30_days=4) or (stock =3 and sale_30_days=5) or (stock =4 and sale_30_days=6)
+            or (stock =4 and sale_30_days=7) or (stock =5 and sale_30_days=8) or (stock =5 and sale_30_days=9)
+            or (stock =6 and sale_30_days=11) 
+            
+            UNION
+            
+            SELECT id 
+            FROM `wp_vendor_po_lookup` 
+            WHERE (`stock` <= (`sale_30_days`/2))
+                )
+                                                      ";
+        $wpdb->query($deleteQuery);
+
         if ($insert) {
             $total_rows = $wpdb->get_results("SELECT count(*) AS total_rows FROM " . $table);
             $ajaxResponse['success'] = true;
