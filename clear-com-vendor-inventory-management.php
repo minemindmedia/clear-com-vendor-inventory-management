@@ -180,8 +180,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
             `sale_30_days` int(11) DEFAULT NULL,
             `order_qty` int(11) DEFAULT NULL,
             `on_vendor_bo` int(11) DEFAULT NULL,
-            `new` int(11) DEFAULT NULL
-          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            `new` int(11) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+            ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
