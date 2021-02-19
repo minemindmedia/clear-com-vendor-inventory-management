@@ -302,7 +302,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
     {
 ?>
         <style>
-            th {
+            .product-items-table th {
                 background-color: white !important;
                 font-size: 10px !important;
                 padding: 14px !important;
@@ -321,7 +321,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 word-wrap: break-word !important;
             }
 
-            table.fixed {
+            .wp-list-table.widefat.fixed {
                 table-layout: fixed !important;
             }
         </style>
@@ -1154,7 +1154,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <div id="ajax-response"></div>
             <br class="clear">
         </div>
-        <table id="po-items-table" class="" style="margin-top: 25px;">
+        <table id="po-items-table" class="product-items-table" style="margin-top: 25px;">
             <thead>
                 <tr>
                     <!--                    <th class="center first-cell">New</th>
@@ -1881,9 +1881,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         ?>
                     </tbody>
                 </table>
-                <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
-                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-                <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+                <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />-->
+<!--                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
+        <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/dataTables.min.css'; ?>">                
+        <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/dataTables.min.js'; ?>"></script>                
+                <!--<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>-->
                 <script>
                     $(document).ready(function() {
                         $('#vendors-list').DataTable({
