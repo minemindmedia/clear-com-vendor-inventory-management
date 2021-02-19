@@ -967,6 +967,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
 
             body {
+                background-color: #f1f1f1 !important;
                 color: #333;
                 font-size: 1em;
             }
