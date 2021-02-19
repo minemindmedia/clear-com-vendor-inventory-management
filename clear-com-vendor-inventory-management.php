@@ -1486,18 +1486,18 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             }
                         }
                         else{
-                            if (pre_selected_vendors.length && pre_selected_vendors[0] != '') {
-                                    if (jQuery.inArray(selected_vendors[vendor_counter], pre_selected_vendors) != -1) {} else {
-                                        form_submit = true;
-                                    }
+                            console.log(pre_selected_vendors);
+                            if (pre_selected_vendors.length && pre_selected_vendors[0] != '' && show_all) {
+                                form_submit = true;
                                 }
                             show_row = true;
                         }
                         if (form_submit == true) {
-                            var vendors_selected = $("#primary_vendor_filter").val().join('|');
-                            $("#selected_vendors").val(vendors_selected);
-                            var status_selected = $("#primary_vendor_filter").val().join('|');
-                            $("#selected_status").val(status_selected);
+                            var vendors_selected = $("#primary_vendor_filter").val();
+                            $("#selected_vendors").val("");
+                            if(vendors_selected){
+                                $("#selected_vendors").val(vendors_selected.join('|'));
+                            }
                             $("#page-loader").show();
                             $("#sort-form").submit();
                         } else {
