@@ -1593,7 +1593,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         //				group by post_id
         //				) v on v.post_id = p.id
         //				where p.post_type = 'product'";
-        $sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `product_title`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`, `primary_vendor_id`, `primary_vendor_name`)
+        /*$sql = "INSERT INTO `{$wpdb->prefix}vendor_po_lookup`(`product_id`, `product_title`, `sku`, `regular_price`, `stock_status`, `stock`, `threshold_low`, `threshold_reorder`, `reorder_qty`, `rare`, `category`, `vendor_id`, `vendor_name`, `vendor_sku`, `vendor_price`, `primary_vendor_id`, `primary_vendor_name`)
         SELECT distinct p.id productid, p.post_title as product_title,pm.meta_value as sku, r.meta_value as regular_price,
         ss.meta_value as stock_status,s.meta_value as stock,tl.meta_value as threshold_low,tr.meta_value as threshhold_reorder,tq.meta_value as reorder_qty
         ,rr.meta_value as rare,n.name as Cat,
@@ -1631,7 +1631,160 @@ class WC_Clear_Com_Vendor_Inventory_Management
         where p.post_type = 'product'
         ) z on z.postid = p.ID
         where p.post_type = 'product'";
-        $insert = $wpdb->query($sql);
+        $insert = $wpdb->query($sql);*/
+        global $wpdb;
+        $table = $wpdb->prefix . 'vendor_po_lookup';
+        $args = array(
+            'post_status' => 'publish',
+            'post_type' => 'product',
+            'posts_per_page' => -1
+        );
+        $loop = new WP_Query($args);
+       
+        $counter = 0;
+        $truncate = "TRUNCATE TABLE " . $table;
+        $wpdb->query($truncate);
+        
+        foreach ($loop->posts as $singleItem) {
+            $counter++;
+            $product = wc_get_product($singleItem->ID);
+            // Get Product ID
+            $id = $product->get_id();
+            // Get Product General Info
+            $type = $product->get_type();
+            $name = $product->get_name();
+            $slug = $product->get_slug();
+            $date_created = $product->get_date_created();
+            $date_modified = $product->get_date_modified();
+            $status = $product->get_status();
+            $featured = $product->get_featured();
+            $catalog_visibility = $product->get_catalog_visibility();
+            $description = $product->get_description();
+            $short_description = $product->get_short_description();
+            $sku = $product->get_sku();
+            $menu_order = $product->get_menu_order();
+            $virtual = $product->get_virtual();
+            $link = get_permalink($product->get_id());
+            // Get Product Prices
+            $price = $product->get_price();
+            $regular_price = $product->get_regular_price();
+            $sale_price = $product->get_sale_price();
+            $date_on_sale_from = $product->get_date_on_sale_from();
+            $date_on_sale_to = $product->get_date_on_sale_to();
+            $total_sales = $product->get_total_sales();
+            // Get Product Tax, Shipping & Stock
+            $product->get_tax_status();
+            $product->get_tax_class();
+            $product->get_manage_stock();
+            $stock = $product->get_stock_quantity();
+            $stock_status = $product->get_stock_status();
+            $product->get_backorders();
+            $product->get_sold_individually();
+            $product->get_purchase_note();
+            $product->get_shipping_class_id();
+            // Get Product Dimensions
+            $product->get_weight();
+            $product->get_length();
+            $product->get_width();
+            $product->get_height();
+            // $product->get_dimensions();
+            // Get Linked Products
+            $product->get_upsell_ids();
+            $product->get_cross_sell_ids();
+            $product->get_parent_id();
+            // Get Product Variations and Attributes
+            $product->get_children(); // get variations
+            $product->get_attributes();
+            $product->get_default_attributes();
+            $product->get_attribute('attributeid'); //get specific attribute value
+            // Get Product Taxonomies
+            // $product->get_categories();
+            $product->get_category_ids();
+            $product->get_tag_ids();
+            // $price = $product->get_price_html();
+            if (empty($stock)) {
+                $stock = 0;
+            }
+            $cat_names = wp_get_post_terms($id, 'product_cat', ['fields' => 'names']);
+            $tagsCats = implode(', ', $cat_names);
+
+            $tag_names = wp_get_post_terms($product->get_id(), 'product_tag', ['fields' => 'names']);
+            if ($tag_names) {
+                if ($tagsCats) {
+                    $tagsCats .= ",";
+                }
+                $tagsCats .= implode(', ', $tag_names);
+            }
+            $vendor_ids = (get_post_meta($id, 'wcvm', true));
+            if ($vendor_ids) {
+                $vendor_id_array = [];
+                $vendor_names = [];
+                $vendor_skus = [];
+                $vendor_price = [];
+                $vendor_price_bulk = [];
+                $vendor_price_notes = [];
+                $vendor_price_link = [];
+                if ($vendor_ids) {
+                    foreach ($vendor_ids as  $vendor_id) {
+                        $vendor_id_array[] = $vendor_id;
+                        $vendor_names[] = get_the_title($vendor_id);
+                        $vendor_skus[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_sku', true);
+                        $vendor_price[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_last', true);
+                        $vendor_price_bulk[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_bulk', true);
+                        $vendor_price_notes[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_notes', true);
+                        $vendor_price_link[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_link', true);
+                    }
+                }
+            
+                $insert_data['product_id'] = $id;
+                $insert_data['product_title'] = $name;
+                $insert_data['sku'] =  $sku;
+                $insert_data['regular_price'] = $regular_price;
+                $insert_data['stock_status'] = $stock_status;
+                $insert_data['stock'] = $stock;
+                $insert_data['threshold_low'] = 0;
+                $insert_data['threshold_reorder'] = 0;
+                $insert_data['reorder_qty'] = 0;
+                $insert_data['rare'] = 0;
+                $insert_data['category'] = $tagsCats;
+                $insert_data['vendor_id'] = implode(',', $vendor_id_array);
+                $insert_data['vendor_name'] = implode(',', $vendor_names);
+                $insert_data['vendor_sku'] =  implode(',', $vendor_skus);
+                $insert_data['vendor_link'] = implode(',', $vendor_price_link);
+                $insert_data['vendor_price_bulk'] = implode(',', $vendor_price_bulk);
+                $insert_data['vendor_price_notes'] =implode(', ', $vendor_price_notes);
+                $insert_data['vendor_price'] = implode(', ', $vendor_price);
+                $insert_data['primary_vendor_id'] = get_post_meta($id, 'wcvm_primary', true);
+                $insert_data['primary_vendor_name'] = get_the_title($insert_data['primary_vendor_id']);
+                $insert_data['on_order'] = 0;
+                $insert_data['sale_30_days'] = 0;
+                $insert_data['order_qty'] = 0;
+                $insert_data['on_vendor_bo'] = 0;
+                $insert_data['new'] = 0;
+                //print_r($insert_data['vendor_name']);
+                $insert = $wpdb->insert($table, $insert_data);
+                //echo $wpdb->last_query;
+                echo $wpdb->last_error;
+            
+                echo "<br>".$insert_data['product_title']." inserted with id ".$wpdb->insert_id;
+            
+                
+            }
+        }
+        wp_reset_postdata();
+        $productOrderData = $wpdb->get_results("SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
+        FROM `wp_vendor_purchase_orders_items` p
+        join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
+        where o.post_status in ('on-order','back-order')
+        group by product_id,o.post_status");
+        if($productOrderData){
+            foreach($productOrderData as $singleRow){
+                $updateData['order_status']
+            }
+        }
+        print_r($productOrderData);
+        // echo $wpdb->last_query;
+        die;
 
         if ($insert) {
             $total_rows = $wpdb->get_results("SELECT count(*) AS total_rows FROM " . $table);
