@@ -154,64 +154,34 @@ class WC_Clear_Com_Vendor_Inventory_Management
         global $wpdb;
         $table_name = $wpdb->prefix . 'vendor_po_lookup';
         $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `product_id` int(11) NOT NULL,
-  `product_title` varchar(100) NOT NULL,
-  `sku` varchar(50) NOT NULL,
-  `regular_price` decimal(10,2) NOT NULL,
-  `stock_status` varchar(50) NOT NULL,
-  `stock` int(11) NOT NULL,
-  `threshold_low` double NOT NULL,
-  `threshold_reorder` int(11) NOT NULL,
-  `reorder_qty` int(11) NOT NULL,
-  `rare` int(11) NOT NULL,
-  `category` varchar(100) NOT NULL,
-  `vendor_id` varchar(100) NOT NULL,
-  `vendor_name` varchar(100) NOT NULL,
-  `vendor_sku` varchar(50) NOT NULL,
-  `vendor_link` varchar(100) NOT NULL,
-  `vendor_price_bulk` int(11) NOT NULL,
-  `vendor_price_notes` varchar(50) NOT NULL,
-  `vendor_price` varchar(100) NOT NULL,
-  `primary_vendor_id` int(11) NOT NULL,
-  `primary_vendor_name` varchar(100) NOT NULL,
-  `on_order` int(11) NOT NULL,
-  `sale_30_days` int(11) NOT NULL,
-  `order_qty` int(11) NOT NULL,
-  `on_vendor_bo` int(11) NOT NULL,
-  `new` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-    ) $charset_collate;";
-        //        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        //                    `id` int(11) NOT NULL AUTO_INCREMENT,
-        //  `product_id` int(11) NOT NULL,
-        //  `product_title` varchar(100) NOT NULL,
-        //  `sku` varchar(50) NOT NULL,
-        //  `regular_price` int(11) NOT NULL,
-        //  `stock_status` varchar(50) NOT NULL,
-        //  `stock` int(11) NOT NULL,
-        //  `threshold_low` double NOT NULL,
-        //  `threshold_reorder` int(11) NOT NULL,
-        //  `reorder_qty` int(11) NOT NULL,
-        //  `rare` int(11) NOT NULL,
-        //  `category` varchar(100) NOT NULL,
-        //  `vendor_id` varchar(100) NOT NULL,
-        //  `vendor_name` varchar(100) NOT NULL,
-        //  `vendor_sku` varchar(50) NOT NULL,
-        //  `vendor_link` varchar(100) NOT NULL,
-        //  `vendor_price_bulk` int(11) NOT NULL,
-        //  `vendor_price_notes` varchar(50) NOT NULL,
-        //  `vendor_price` varchar(100) NOT NULL,
-        //  `primary_vendor_id` int(11) NOT NULL,
-        //  `primary_vendor_name` varchar(100) NOT NULL,
-        //    `on_order` int(11) NOT NULL,
-        //  `sale_30_days` int(11) NOT NULL,
-        //  `order_qty` int(11) NOT NULL,
-        //  `on_vendor_bo` int(11) NOT NULL,
-        //  `new` INT(11) NULL,
-        //  PRIMARY KEY id (id)
-        //    ) $charset_collate;";
+        $sql = "CREATE TABLE `wp_vendor_po_lookup` (
+            `id` int(11) NOT NULL,
+            `product_id` int(11) DEFAULT NULL,
+            `product_title` text,
+            `sku` text,
+            `regular_price` decimal(10,2) DEFAULT NULL,
+            `stock_status` text,
+            `stock` int(11) DEFAULT NULL,
+            `threshold_low` double DEFAULT NULL,
+            `threshold_reorder` int(11) DEFAULT NULL,
+            `reorder_qty` int(11) DEFAULT NULL,
+            `rare` int(11) DEFAULT NULL,
+            `category` text,
+            `vendor_id` text,
+            `vendor_name` text,
+            `vendor_sku` text,
+            `vendor_link` text,
+            `vendor_price_bulk` int(11) DEFAULT NULL,
+            `vendor_price_notes` text,
+            `vendor_price` text,
+            `primary_vendor_id` int(11) DEFAULT NULL,
+            `primary_vendor_name` text,
+            `on_order` int(11) DEFAULT NULL,
+            `sale_30_days` int(11) DEFAULT NULL,
+            `order_qty` int(11) DEFAULT NULL,
+            `on_vendor_bo` int(11) DEFAULT NULL,
+            `new` int(11) DEFAULT NULL
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -574,7 +544,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
             if ($product_update_last_date >= $vendor_management_last_date || 1) {
                 ?>
-                    <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>
+                    <!-- <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a> -->
                     <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
                     <a style="" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>
                     <div style="margin-top:10px;display:none;" class="text-danger">
@@ -1004,7 +974,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
             a:visited,
             a:hover,
             a:active {
-                color: #000;
+                /*color: #000;*/
+                color: #0073aa;
                 text-decoration: none;
             }
 
@@ -1036,6 +1007,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
             th a,
             td a {
+                color: #007bff;
                 display: block;
                 width: 100%;
             }
@@ -1225,15 +1197,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                             ?></td>-->
                         <?php
                         $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
-            $product_url = get_permalink($orderDetail->product_id);
-            if ($thumnailID) {
-                $image = woocommerce_get_product_thumbnail();
-                //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
-            } ?>
+            //          $product_url = get_permalink($orderDetail->product_id);
+                        $product_admin_url = get_edit_post_link($orderDetail->product_id);
+                        $product_image_src = '';
+                        if ($thumnailID) {
+                            $image = wp_get_attachment_image_src($thumnailID,'thumbnail'); // returns product image source
+                            //$image = woocommerce_get_product_thumbnail(); // returns product image
+                            //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
+                            $product_image_src = $image[0];
+                        } ?>
                         <td class="center third-cell">
-                            <!--<a class="sku-thumbnail" href="<?php echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
+                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
                                                                                                                                                                                             ?></a>-->
-                            <a class="sku-thumbnail" href="#" data-image="<?php echo $image; ?>"><?php echo $orderDetail->sku ?></a>
+                            <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>"><?php echo $orderDetail->sku ?></a>
 
                         </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
