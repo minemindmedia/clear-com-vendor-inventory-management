@@ -1004,7 +1004,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
             a:visited,
             a:hover,
             a:active {
-                color: #000;
+                /*color: #000;*/
+                color: #0073aa;
                 text-decoration: none;
             }
 
@@ -1036,6 +1037,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
             th a,
             td a {
+                color: #007bff;
                 display: block;
                 width: 100%;
             }
@@ -1225,15 +1227,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                             ?></td>-->
                         <?php
                         $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
-            $product_url = get_permalink($orderDetail->product_id);
-            if ($thumnailID) {
-                $image = woocommerce_get_product_thumbnail();
-                //                                $image = wp_get_attachment_image($thumnailID,'thumbnail');
-            } ?>
+            //          $product_url = get_permalink($orderDetail->product_id);
+                        $product_admin_url = get_edit_post_link($orderDetail->product_id);
+                        $product_image_src = '';
+                        if ($thumnailID) {
+                            $image = wp_get_attachment_image_src($thumnailID,'thumbnail'); // returns product image source
+                            //$image = woocommerce_get_product_thumbnail(); // returns product image
+                            //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
+                            $product_image_src = $image[0];
+                        } ?>
                         <td class="center third-cell">
-                            <!--<a class="sku-thumbnail" href="<?php echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
+                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url; ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
                                                                                                                                                                                             ?></a>-->
-                            <a class="sku-thumbnail" href="#" data-image="<?php echo $image; ?>"><?php echo $orderDetail->sku ?></a>
+                            <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>"><?php echo $orderDetail->sku ?></a>
 
                         </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
