@@ -383,7 +383,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $order->post_status = 'trash';
             wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
-            header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
+//            header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
+            header('Location:' . plugin_dir_url(__FILE__).'/templates/print-template-page.php?po=' . $_POST['ID']);            
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
             $wpdb->delete($vendor_purchase_order_table, array('order_id' => $_POST['ID']));

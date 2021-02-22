@@ -431,7 +431,8 @@ function get_print_status($order = FALSE) {
                     ids_to_delete: ids_to_delete,
                     order_to_process: order_to_process
                 },
-                url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/delete_selected_pos.php",
+//                url: "<?php // echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/delete_selected_pos.php",                
+                url: "<?php echo plugins_url(); ?>/clear-com-vendor-inventory-management/delete_selected_pos.php",
                 beforeSend: function () {
                     // setting a timeout
                     //$(placeholder).addClass('loading');
