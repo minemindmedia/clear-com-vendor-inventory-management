@@ -546,9 +546,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
             if ($product_update_last_date >= $vendor_management_last_date) {
                 ?>
-                    <!-- <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a> -->
+                     <!--<a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>--> 
                     <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
-                    <!-- <a style="" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a> -->
+                     <!--<a style="" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>--> 
                     <div style="margin-top:10px;" class="text-danger">
                         <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
                     </div>
@@ -1744,10 +1744,21 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
         }
         wp_reset_postdata();
+//        $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
+//        from
+//        (
+//        SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
+//        FROM `wp_vendor_purchase_orders_items` p
+//        join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
+//        where o.post_status = 'on-order' OR o.post_status LIKE '%back-order%'
+//        group by product_id,o.post_status
+//        )p
+//        group by product_id");
         $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
         from
         (
-        SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
+        SELECT product_id,o.post_status as order_status , case when o.post_status = 'on-order'
+        then sum(product_ordered_quantity) when o.post_status like '%back-order%' then sum(product_quantity_back_order) end as order_quantity
         FROM `wp_vendor_purchase_orders_items` p
         join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
         where o.post_status = 'on-order' OR o.post_status LIKE '%back-order%'
@@ -1798,9 +1809,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $data = $wpdb->get_results($sql);
         if ($data) {
             foreach ($data as $single_row) {
-                $updateData['sale_30_days'] = $single_row->quantity;
+                $updateSaleData['sale_30_days'] = $single_row->quantity;
                 $where['product_id'] = $single_row->product_id;
-                $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
+                $wpdb->update('wp_vendor_po_lookup', $updateSaleData, $where);
             }
         }
         $sql = "select p.id as product_id
