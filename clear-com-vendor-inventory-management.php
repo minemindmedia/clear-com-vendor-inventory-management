@@ -1212,7 +1212,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <td class="center third-cell">
                             <!--<a class="sku-thumbnail" href="<?php // echo $product_url;?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
                                                                                                                                                                                             ?></a>-->
-                            <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>"><?php echo $orderDetail->sku ?></a>
+                            <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>" target="_blank"><?php echo $orderDetail->sku ?></a>
 
                         </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
