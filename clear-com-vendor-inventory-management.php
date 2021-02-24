@@ -1238,7 +1238,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                     if ($selected == 'selected') {
                                         $purchase_orders_post_data_single_price = $vendor_prices[$i];
                                     } ?>
-                                    <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . $vendor_prices[$i]; ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
+                                    <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . trim(number_format($vendor_prices[$i], 2)); ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
                                 <?php
                                 } ?>
                             </select>
