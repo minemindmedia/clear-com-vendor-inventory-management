@@ -1,7 +1,14 @@
 <?php
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+    define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp/');
+
+require(ABSPATH . 'wp-load.php');
+
 //echo getcwd();die;
 define('WP_USE_THEMES', false);
-require('../../../../wp-load.php');
+// require('../../../../wp-load.php');
 
 $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
 $vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';

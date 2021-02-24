@@ -97,7 +97,7 @@
             </table>
 
 
-            <div style="padding-top: 5px;float: left;display:none;">
+            <div style="padding-top: 5px;float: left;">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
             </div>
@@ -128,7 +128,7 @@
                     <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                 </div>
 
-                    <div style="float: right;padding: 2px;;display:none;">
+                    <div style="float: right;padding: 2px;">
                         <button type="button" class="button" onclick="mark_closed('<?php echo $order->order_id ?>')">Mark Selected Closed</button>
                     </div>
 
@@ -269,7 +269,7 @@
 
                 </table>
 
-                <div style="padding-top: 5px;float: left;display:none;">
+                <div style="padding-top: 5px;float: left;">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
         </form>

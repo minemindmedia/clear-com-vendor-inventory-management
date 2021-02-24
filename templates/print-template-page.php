@@ -4,8 +4,13 @@
  * @var WP_Post $vendor
  * @var WP_Post[] $products
  */
-//require('wp-load.php');
-require('../../../../wp-load.php');
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+    define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp/');
+
+require(ABSPATH . 'wp-load.php');
+// require('../../../../wp-load.php');
 $total = 0;
 $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
 $vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';

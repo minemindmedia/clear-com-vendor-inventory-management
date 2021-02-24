@@ -94,7 +94,7 @@
 
             </table>
 
-            <div style="padding-top: 5px;float: left;display:none;">
+            <div style="padding-top: 5px;float: left;">
                 <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
             </div>
             </div>
@@ -265,7 +265,7 @@
                 </table>
 
 
-                <div style="padding-top: 5px;float: left;display:none;">
+                <div style="padding-top: 5px;float: left;">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
         </form>
