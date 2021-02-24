@@ -1237,7 +1237,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                     }
                                     if ($selected == 'selected') {
                                         $purchase_orders_post_data_single_price = $vendor_prices[$i];
-                                    }else if($selected == '') {
+                                    }
+                                    if(count($vendors) == 1 && $selected == '') {
                                         $purchase_orders_post_data_single_price = $vendor_prices[$i];
                                     }
                                      ?>
