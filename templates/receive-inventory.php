@@ -365,7 +365,8 @@
                         <tbody>
                         <?php } ?>
                         <tr>
-                            <td><a href=""><?php echo $order->product_sku; ?></a></td>
+                            <!--<td><a href=""><?php // echo $order->product_sku; ?></a></td>-->
+                            <td><?php echo $order->product_sku; ?></a>
                             <td><?php echo $order->product_category; ?></td>
                             <td></td>
                             <td><?php echo $order->vendor_name; ?></td>

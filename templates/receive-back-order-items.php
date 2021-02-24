@@ -256,8 +256,8 @@ $status = $show_status;
             <tbody>
             <?php } ?>
                 <tr>
-                    <td><a href=""><?php echo $order->product_sku; ?></a></td>
-                    <td><a href=""><?php echo $order->product_category; ?></a></td>
+                    <td><?php echo $order->product_sku; ?></td>
+                    <td><?php echo $order->product_category; ?></td>
                     <td><?php echo $order->vendor_name; ?></td>                    
                     <td></td>
                     <td><?php echo $order->vendor_sku; ?></td>
