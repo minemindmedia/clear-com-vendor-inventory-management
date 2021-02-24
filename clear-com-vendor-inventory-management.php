@@ -484,7 +484,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
         $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
                 . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
-                . " WHERE po.post_status " . $query_status . " ORDER BY po.updated_date DESC";
+                . " WHERE po.post_status " . $query_status . " ORDER BY po.order_id DESC";
         //echo $purchase_order_table_sql;die;
         $orders = $wpdb->get_results($purchase_order_table_sql);
 
