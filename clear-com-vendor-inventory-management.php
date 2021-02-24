@@ -223,22 +223,22 @@ class WC_Clear_Com_Vendor_Inventory_Management
             `id`  int(11) NOT NULL AUTO_INCREMENT,
   `product_id` int(11) NOT NULL,
   `vendor_order_idFk` int(11) NOT NULL,
-  `product_title` varchar(100) NOT NULL,
-  `product_sku` varchar(20) NOT NULL,
+  `product_title` text NOT NULL,
+  `product_sku` text NOT NULL,
   `product_price` decimal(10,2) NOT NULL,
   `product_ordered_quantity` int(11) NOT NULL,
-  `product_category` varchar(100) DEFAULT NULL,
+  `product_category` text DEFAULT NULL,
   `product_expected_date` int(11) DEFAULT NULL,
   `product_rare` tinyint(1) DEFAULT NULL,
   `product_threshold_low` int(11) DEFAULT NULL,
   `product_threshold_reorder` int(11) DEFAULT NULL,
   `product_reorder_qty` int(11) DEFAULT NULL,
-  `vendor_sku` varchar(20) DEFAULT NULL,
-  `vendor_name` varchar(100) DEFAULT NULL,
-  `vendor_link` varchar(100) DEFAULT NULL,
+  `vendor_sku` text DEFAULT NULL,
+  `vendor_name` text DEFAULT NULL,
+  `vendor_link` text DEFAULT NULL,
   `vendor_price_last` decimal(10,2) DEFAULT NULL,
   `vendor_price_bulk` decimal(10,2) DEFAULT NULL,
-  `vendor_price_notes` varchar(100) DEFAULT NULL,
+  `vendor_price_notes` text DEFAULT NULL,
   `product_quantity_received` int(11) DEFAULT NULL,
   `product_quantity_back_order` int(11) DEFAULT NULL,
   `product_quantity_canceled` int(11) DEFAULT NULL,
@@ -1226,6 +1226,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             } ?>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
+                            <?php $purchase_orders_post_data_single_price = 0;?>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
                                 <?php
