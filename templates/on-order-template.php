@@ -15,6 +15,12 @@
         text-align: center !important;
     }
 
+    
+    .wcvm-orders.po-on-order {
+        border: 1px solid #fe5f55;
+        box-shadow: 0 0 10px #fe5f55;
+    }
+
 </style>
 <div class="wrap">
     <?php
@@ -133,8 +139,8 @@
             </table>
 
             <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
-                <div style="padding-top: 5px;width: 300px;float: left">
-                    <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
+                <div style="padding-top: 5px;width: 261px;float: left">
+                    <input type="date" name="expected_date" style="width: 150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" >
                     <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
                     <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                 </div>
@@ -206,7 +212,7 @@
 //                    $display = "none";
 //                }
                 ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
-                    <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
+                    <table class="wp-list-table fixed widefat striped wcvm-orders po-on-order" style="width:100%; max-width: 1400px; border-collapse: collapse;">
 
                         <thead>
                             <tr bgcolor="#e8e8e8" style="font-size:11px;">
@@ -315,8 +321,8 @@
                 </table>
 
                 <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
-                    <div style="padding-top: 5px;width: 300px;float: left">
-                        <input type="date" name="expected_date" style="width: 100px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('YYYY-mm-dd', 'wcvm') ?>" >
+                    <div style="padding-top: 5px;width: 261px;float: left">
+                        <input type="date" name="expected_date" style="width:150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" >
                         <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
                         <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
                     </div>

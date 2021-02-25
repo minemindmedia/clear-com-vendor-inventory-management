@@ -15,6 +15,11 @@
         text-align: center !important;
     }
 
+    .wcvm-orders.po-canceled {
+        border: 1px solid #38b000;
+        box-shadow: 0 0 10px #38b000;
+    }
+
 </style>
 <div class="wrap">
     <?php
@@ -174,7 +179,7 @@
                     $display = "none";
 //                }
                 ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
-                    <table class="wp-list-table fixed widefat striped wcvm-orders" style="width:100%; max-width: 1400px; border-collapse: collapse;">
+                    <table class="wp-list-table fixed widefat striped wcvm-orders po-canceled" style="width:100%; max-width: 1400px; border-collapse: collapse;">
 
                         <thead>
                             <tr bgcolor="#e8e8e8" style="font-size:11px;">

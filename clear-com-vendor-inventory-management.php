@@ -1258,7 +1258,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                             ?></td>-->
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order ? $orderDetail->on_order : 0 ?></td>
                         <td class="center seventh-cell"><?php echo $orderDetail->on_vendor_bo; ?></td>
-                        <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' type="text" style="width:30px" value="0"></td>
+                        <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' tabindex="<?php echo $even_odd_counter + 1; ?>" type="text" style="width:50px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
                 <?php
