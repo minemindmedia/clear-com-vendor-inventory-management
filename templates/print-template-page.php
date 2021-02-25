@@ -118,14 +118,14 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_sku; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_title; ?></td>
                                                                                             <td style="text-align: right"><?php echo wc_price($singleLineItem->vendor_price_last); ?></td>
-                                                                                            <td style="text-align: right"><?php echo wc_price(number_format((float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity,2)); ?></td>
+                                                                                            <td style="text-align: right"><?php echo wc_price((float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity); ?></td>
                                                                                         </tr>
-                                                                                        <?php $total += (float) $singleLineItem->vendor_price_last * (float) $singleLineItem->product_ordered_quantity ?>  
+                                                                                        <?php $total += (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity ?>  
                                                                                                                                                                             
                                                                                     <?php endforeach ?>                                                                                    
                                                                                     <tr>
                                                                                         <td colspan="5" style="text-align: right">Total</td>
-                                                                                        <td style="text-align: right"><?php echo wc_price(number_format($total,2)); ?></td>
+                                                                                        <td style="text-align: right"><?php echo wc_price($total); ?></td>
                                                                                     </tr>
                                                                                 </tbody></table>
                                                                             <br><br>
