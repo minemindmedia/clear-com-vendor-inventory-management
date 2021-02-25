@@ -1215,7 +1215,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
                 $product_image_src = $image_src[0];
             }
-            $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+            $siteUrl = str_replace('wp', '', get_site_url());
+            $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
+            // $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
             if(!file_exists($imagepath)) {
                 $product_image_src = wc_placeholder_img_src();
             }            
