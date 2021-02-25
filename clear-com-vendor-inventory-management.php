@@ -718,8 +718,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $purchase_orders_post_data = [];
         $selected_status = [];
         // print_r($_GET);
-        $thirty_days_filter = 'desc';
-        $order_by[] = "v.sale_30_days ". $thirty_days_filter;
         if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET)) {
             $thirty_days_filter = $_GET['30_days'];
             $qty_on_hand_filter = $_GET['qty_on_hand'];
@@ -729,6 +727,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
             if (!empty($qty_on_hand_filter)) {
                 $order_by[] = "v.stock " . $qty_on_hand_filter;
             }
+        }else{
+            $thirty_days_filter = 'desc';
+            $order_by[] = "v.sale_30_days ". $thirty_days_filter;
         }
         $where = '';
         //$where = " WHERE v.stock_status IN ('outofstock','instock')";
