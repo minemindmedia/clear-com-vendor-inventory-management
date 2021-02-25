@@ -6,10 +6,13 @@
  */
 
 /** Absolute path to the WordPress directory. */
-if ( !defined('ABSPATH') )
-    define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp/');
-
-require(ABSPATH . 'wp-load.php');
+if ($_SERVER['HTTP_HOST'] == "localhost") {
+    require('../../../../wp-load.php');
+} else {
+    if ( !defined('ABSPATH') )
+        define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp/');
+    require(ABSPATH . 'wp-load.php');
+    }
 // require('../../../../wp-load.php');
 $total = 0;
 $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
