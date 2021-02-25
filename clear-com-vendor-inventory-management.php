@@ -718,6 +718,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $purchase_orders_post_data = [];
         $selected_status = [];
         // print_r($_GET);
+        $thirty_days_filter = 'desc';
+        $order_by[] = "v.sale_30_days ". $thirty_days_filter;
         if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET)) {
             $thirty_days_filter = $_GET['30_days'];
             $qty_on_hand_filter = $_GET['qty_on_hand'];
@@ -1050,6 +1052,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 display: none;
             }
         </style>
+        <div id='page-loader' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'>
+            <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
+        </div>        
         <div class="wrap wm-vm-go">
             <h1><?= esc_html__('Generate Purchase Orders', 'wcvm') ?></h1>
             <form action="" method="post">
@@ -1203,12 +1208,18 @@ class WC_Clear_Com_Vendor_Inventory_Management
             //          $product_url = get_permalink($orderDetail->product_id);
             $product_admin_url = get_edit_post_link($orderDetail->product_id);
             $product_image_src = '';
+            $product_image_src = wc_placeholder_img_src();
             if ($thumnailID) {
-                $image = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
+                $image_src = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
                 //$image = woocommerce_get_product_thumbnail(); // returns product image
                 //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
-                $product_image_src = $image[0];
-            } ?>
+                $product_image_src = $image_src[0];
+            }
+            $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+            if(!file_exists($imagepath)) {
+                $product_image_src = wc_placeholder_img_src();
+            }            
+            ?>
                         <td class="center third-cell">
                             <!--<a class="sku-thumbnail" href="<?php // echo $product_url;?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
                                                                                                                                                                                             ?></a>-->
@@ -1266,9 +1277,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
         } ?>
             </tbody>
         </table>
-        <div id='page-loader' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'>
-            <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
-        </div>
         <!-- stylesheet -->
 
         <!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
