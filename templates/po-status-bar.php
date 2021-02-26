@@ -1,3 +1,4 @@
+<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .po-status {
             font-size: 15px;
@@ -28,7 +29,7 @@
             color: #1b263b;
         }
     </style>
-    <a class="po-status po-new" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>" <?php if (!$status || $status == 'new-order') : ?> style="font-weight: bold" <?php endif ?>><?= esc_html__('New', 'wcvm') ?></a>
+    <a class="p-2 bg-indigo-600 hover:bg-indigo-300 text-white text-base" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>" <?php if (!$status || $status == 'new-order') : ?> style="font-weight: bold" <?php endif ?>><?= esc_html__('New orders', 'wcvm') ?></a>
     |
     <a class="po-status po-on-order" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=on-order') ?>" <?php if ($status == 'on-order') : ?> style="font-weight: bold" <?php endif ?>><?= esc_html__('On order', 'wcvm') ?></a>
     |

@@ -6,6 +6,7 @@
  * @var string $status
  */
 ?>
+
 <style>
     #TB_ajaxContent {
         text-align: center;
@@ -110,15 +111,13 @@
             </table>
 
             <?php if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
-                <div style="padding-top: 5px;width: 336px;float: left">
-                    <input type="date" name="expected_date" style="width: 150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" >
-                    <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >
-                    <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
-                </div>
+                <div class="flex space-x-2">
+                   <div><input class="block py-8" type="date" name="expected_date" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" ></div>
+                   <div><input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" ></div>
+                   <div class="flex-1"><button type="submit" name="action" value="update" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button></div>
             <?php endif ?>
-            <div style="padding-top: 5px;float: left;">
-                <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
-            </div>
+                    <div><button type="submit" name="print" value="print" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0"><?= esc_html__('Print Order', 'wcvm') ?></button></div>
+                </div>
             <?php // if ($order->post_status == 'new-order' || $order->post_status == 'draft'):        ?>
             <!-- <div style="padding-top: 5px;float: right">
                 <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($last_order_id) ?>">
@@ -126,9 +125,6 @@
             </div> -->
             <?php // endif         ?>
             </div>
-            <div style="clear: both;"></div>
-            <br><br>
-            <br><br>
             </form>
 
 
@@ -139,70 +135,56 @@
 
             $records = true;
             ?>
-            <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
+            <form style="clear: both" class="purchase-order border-2 border-indigo-600 p-8 mb-8 bg-gray-50"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
                 <input type="hidden" name="ID" value="<?= esc_attr($order->order_id) ?>">
                 <input type="hidden" name="status" value="<?= esc_attr($status) ?>">
 
 
 
-                <div style="float: left;width: 200px; padding: 2px;">
-                    <?php get_print_status($order); ?>
-                    <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
-                </div>
-                <div style="float: left;width: 250px; padding: 2px;">
-                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html(get_the_title($order->vendor_id))) ?><br>
-                    <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
-                </div>
-                <?php
-//                if ($status == "returned") {
-                    ?>
-<!--                    <div style="float: right;padding: 2px;">
-                        <button type="button" class="button" onclick="mark_closed('<?php echo $order->order_id ?>')">Mark Selected Closed</button>
-                    </div>-->
-                    <?php
-//                }
-                ?>
-
-                <div style="float: right;padding: 2px;">
-                    <button type="button" class="button" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php
-////                    if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-//                        echo 'Close';
-//                    } else if ($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) {
-//                        echo 'Close';
-//                    } else {
-                        echo 'Open';
-//                    }
-                    ?>"><?php
-//                                if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-//                                    echo 'Open';
-//                                } else if ($order->post_status == $show_status || strpos($order->post_status, $show_status) !== false) {
-                                    echo 'Close';
-//                                } else {
-//                                    'Open';
-//                                }
-                                ?></button>
-                </div>
-
-                <?php // if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'new-order'): ?>
-                    <div style="float: right;padding: 2px;">
-                        <?php // if ($order->post_status == 'trash'): ?>
-<!--                            <button type="submit" name="unarchive" value="unarchive" class="button"><? esc_html__('Restore', 'wcvm') ?></button>
-                            <button type="submit" name="delete" value="delete" class="button"><? esc_html__('Delete', 'wcvm') ?></button>-->
-                        <?php // else: ?>
-                            <input type="hidden" name="archive" value="archive" />
-                    <!--                            <button style="display: none;" type="submit" name="archive" id="order_<?= esc_attr($order->order_id) ?>" value="archive" class="button"><?= esc_html__('Delete Entire PO', 'wcvm') ?></button>-->
-                            <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_entire">Delete Entire PO</a>
-                            <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="button delete_selected">Delete Selected Lines</a>
-                        <?php // endif ?>
+                <div class="flex space-x-4">
+                    <div class="flex flex-1 space-x-4 text-gray-700 px-2">
+                        <div class="self-center text-base font-semibold">
+                            <?php get_print_status($order); ?>
+                        </div>
+                        <div class="self-center text-base font-semibold">
+                            <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
+                        </div>
+                        <div class="self-center text-base font-semibold">
+                            <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html(get_the_title($order->vendor_id))) ?>
+                        </div>
+                        <div class="self-center text-base font-semibold">
+                            <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
+                        </div>
                     </div>
-                <?php // endif ?>
+                    <div class="self-center text-base font-semibold">
+                        <div class="flex space-x-4">
+                            <div>
+                                <input type="hidden" name="archive" value="archive" />
+                                <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="block px-2 py-1.5 border-2 border-red-700 bg-red-700 hover:bg-red-500 text-white hover:text-white text-xs rounded delete_entire">Delete Entire PO</a>
+                            </div>
+                            <div>
+                                <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="block px-2 py-1.5 border-2 border-red-700 hover:border-red-500 text-red-700 hover:text-red-500 text-xs rounded delete_selected">Delete Selected Lines</a>
+                            </div>
+                            <div>
+                                <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo 'Expand'; ?>">
+                                    <?php echo 'Collapse'; ?>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+             
+                </div>
+
+
+
                 <div<?php
                 $display = "";
 //                if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'completed' || $status == 'canceled' || $status == 'trash') {
 //                    $display = "none";
 //                }
                 ?> style="display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
-                    <table class="wp-list-table fixed widefat striped wcvm-orders po-new">
+                    <table class="wp-list-table widefat striped wcvm-orders my-6">
 
                         <thead>
                             <tr>
@@ -310,13 +292,6 @@
 
                 </table>
 
-                <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
-                    <div style="padding-top: 5px;width: 336px;float: left">
-                        <input type="date" autocomplete="off" name="expected_date" style="width:150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" >
-                        <input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    
-                        <button type="submit" name="action" value="update" class="button button-primary"><?= esc_html__($order->post_status == 'new-order' ? 'Set Date & Place On Order' : 'Update Order', 'wcvm') ?></button>
-                    </div>
-                <?php // endif ?>
                 <div style="padding-top: 5px;float: left;">
                     <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
                 </div>
