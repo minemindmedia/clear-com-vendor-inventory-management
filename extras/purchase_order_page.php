@@ -29,7 +29,7 @@
     $posts_table_sql = "SELECT * FROM " . $posts_table . " WHERE post_type = 'wcvm-order' AND post_status = 'auto-draft' ORDER BY wp_posts.post_date DESC ";
 //    $orders = $wpdb->get_results($posts_table_sql);
     ?>
-    <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
+    
     <?php
         $table = new Vendor_Management_Columns(); ?>
         <?php $table_headers = $table->get_columns_vendors_list(); ?>

@@ -29,7 +29,7 @@
 //    $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
     $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
     ?>
-    <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
+    
     <?php
     $table = new Vendor_Management_Columns();
     ?>
@@ -286,9 +286,17 @@
         <br><br>
         <?php
     }
-} if (!$records) {
-    echo '<br><br>No Orders Found';
-}
+} if (!$records) { ?>
+
+<?php $table_headers = $table->get_on_order_columns_list(); 
+            require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
+        ?>
+        <div class="flex border-2 border-t-8 border-gray-600 p-8 mb-4 bg-gray-50 text-lg text-semibold">
+            No orders are currently in the trash.
+        </div>
+
+
+<?php }
 ?>
 </div>
 <?php

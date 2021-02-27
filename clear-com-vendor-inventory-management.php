@@ -1289,6 +1289,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css'; ?>">
         <!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
         <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css'; ?>">
+        <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/tailwind.css'; ?>">
 
 
         <!-- script -->
@@ -1300,6 +1301,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js'; ?>"></script>
         <!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js'; ?>"></script>
+        
 
 
         <!--  -->
