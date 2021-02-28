@@ -33,9 +33,7 @@
     <?php
     $table = new Vendor_Management_Columns();
     ?>
-    <?php $table_headers = $table->get_on_order_columns_list(); 
-                require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
-                ?>
+
 
 <!--    <a href="<? site_url('/wp-admin/admin.php?page=wcvm-epo&status=new-order') ?>"<?php // if (!$status || $status == 'new-order'): ?> style="font-weight: bold"<?php // endif ?>><? esc_html__('New', 'wcvm') ?></a>
     |
@@ -55,10 +53,6 @@
     <?php
     if ($orders) {
         ?>
-        <button type="submit" id="wcvm-delete-all-button"><?= esc_html__('Delete All', 'wcvm') ?></button>
-        <form action="" method="post" id="wcvm-delete-all-form">
-            <input type="hidden" name="delete-all" value="all">
-        </form>
 
         <?php
         $get_status = "";
@@ -66,18 +60,27 @@
             $get_status = $_GET['status'];
         }
         ?>
-        <div style="float: right;margin-bottom: 20px;">
-            <form action="" method="get" id="wcvm-search-form">
-                <input type="hidden" name="page" value="<?php echo $_GET['page'] ?>"/>
-                <input type="hidden" name="status" value="<?php echo $get_status ?>"/>
-                <input type="text" name="search_po" id="search_po" value="<?php // echo $get_status                ?>" placeholder="Search Through PO #">
-            </form>
-        </div>
-        <div style="float: right;margin-bottom: 20px;">
-            <form action="<?php echo get_site_url() . '/wp-admin/admin.php?page=wcvm-epo&status=' . $get_status; ?>" method="get" id="wcvm-delete-all-form">
-                <input type="hidden" name="page" value="<?php echo $_GET['page'] ?>"/>
-                <input type="hidden" name="status" value="<?php echo $get_status ?>"/>
-            </form>
+        <div class="flex">
+            <div class="flex-1">
+                <?php $table_headers = $table->get_on_order_columns_list(); 
+                    require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
+                ?>
+            </div>
+            <div class="self-end pb-4">
+                <div>
+                    <form action="" method="get" id="wcvm-search-form">
+                        <input type="hidden" name="page" value="<?php echo $_GET['page'] ?>"/>
+                        <input type="hidden" name="status" value="<?php echo $get_status ?>"/>
+                        <input class="h-9 w-64" type="text" name="search_po" id="search_po" value="<?php // echo $get_status ?>" placeholder="Search Through PO #">
+                    </form>
+                </div>
+                <div>
+                    <form action="<?php echo get_site_url() . '/wp-admin/admin.php?page=wcvm-epo&status=' . $get_status; ?>" method="get" id="wcvm-delete-all-form">
+                        <input type="hidden" name="page" value="<?php echo $_GET['page'] ?>"/>
+                        <input type="hidden" name="status" value="<?php echo $get_status ?>"/>
+                    </form>
+                </div>
+            </div>
         </div>
         <?php
         $printed_po_numbers = [];
@@ -105,13 +108,18 @@
 
             </table>
 
-            <div style="padding-top: 5px;float: left;">
-                <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
-            </div>
+            <div class="flex">
+                    <div class="flex-1"></div>
+                    <div>
+                    <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                    <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="print" class="svg-inline--fa fa-print fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"></path></svg>
+                        <span class="self-center"><?= esc_html__('Print Order', 'wcvm') ?></span>
+                    </button>
+                </div>
+                </div>
             </div>
             <div style="clear: both;"></div>
-            <br><br>
-            <br><br>
+     
             </form>
 
 
@@ -122,55 +130,64 @@
 
             $records = true;
             ?>
-            <form style="clear: both" class="purchase-order"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
+            <form style="clear: both" class="purchase-order border-2 border-t-8 border-gray-600 p-8 mb-4 bg-gray-50"  id="<?= esc_attr($order->order_id) ?>" action="<?= site_url('/wp-admin/admin.php?page=wcvm-epo') ?>" method="post">
                 <input type="hidden" name="ID" value="<?= esc_attr($order->order_id) ?>">
                 <input type="hidden" name="status" value="<?= esc_attr($status) ?>">
 
 
 
-                <div style="float: left;width: 200px; padding: 2px;">
-                    <?php get_print_status($order); ?>
-                    <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
-                </div>
-                <div style="float: left;width: 250px; padding: 2px;">
-                    <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html(get_the_title($order->vendor_id))) ?><br>
-                    <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
+                <div class="flex space-x-4">
+                    <div class="self-center text-base font-semibold">
+                        <?php get_print_status($order); ?>
+                    </div>
+                    <div class="self-center text-base font-semibold">
+                        <?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?>
+                    </div>
+                    <div class="self-center text-base font-semibold">
+                        <?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html(get_the_title($order->vendor_id))) ?>
+                    </div>
+                    <div class="self-center text-base font-semibold">
+                        <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
+                    </div>
+
+                    <div class="flex flex-1">
+
+                    </div>
+
+                    <div class="flex space-x-4 self-center text-base font-semibold">
+
+
+                        
+                        <?php if ($order->post_status == 'trash'): ?>
+                            <button type="submit" name="unarchive" value="unarchive" class="flex block px-2 py-1.5 border-2 border-green-700 bg-green-700 hover:bg-green-500 text-white hover:text-white text-xs rounded">
+                            <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-restore" class="svg-inline--fa fa-trash-restore fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32zm70.11-175.8l89.38-94.26a15.41 15.41 0 0 1 22.62 0l89.38 94.26c10.08 10.62 2.94 28.8-11.32 28.8H256v112a16 16 0 0 1-16 16h-32a16 16 0 0 1-16-16V320h-57.37c-14.26 0-21.4-18.18-11.32-28.8zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>    
+                            <?= esc_html__('Restore', 'wcvm') ?></button>
+                            <button type="submit" name="delete" value="delete" class="flex block px-2 py-1.5 border-2 border-red-700 bg-red-700 hover:bg-red-500 text-white hover:text-white text-xs rounded ">
+                            <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" class="svg-inline--fa fa-trash fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
+                                <span class="self-center">Permanently Delete</span>
+                            </button>
+                    
+                <?php endif ?>
+
+                <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '- Collapse'; ?>">
+                            <?php echo '+ Expand'; ?>
+                        </button>
+                        
+                    </div>
                 </div>
 
-                <div style="float: right;padding: 2px;">
-                    <button type="button" class="button" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php
-//                    if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-                        echo 'Close';
-//                    } else if ($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) {
-//                        echo 'Close';
-//                    } else {
-//                        echo 'Open';
-//                    }
-                    ?>"><?php
-//                                if ($status == 'publish' || $status == 'private' || $status == 'trash' || $status == 'multiple') {
-                                    echo 'Open';
-//                                } else if ($order->post_status == $show_status || strpos($order->post_status, $show_status) !== false) {
-//                                    echo 'Close';
-//                                } else {
-//                                    'Open';
-//                                }
-                                ?></button>
-                </div>
+
+
 
                 <?php // if ($order->post_status == 'trash' || $order->post_status == 'new' || $order->post_status == 'new-order'): ?>
-                    <div style="float: right;padding: 2px;">
-                        <?php if ($order->post_status == 'trash'): ?>
-                            <button type="submit" name="unarchive" value="unarchive" class="button"><?= esc_html__('Restore', 'wcvm') ?></button>
-                            <button type="submit" name="delete" value="delete" class="button"><?= esc_html__('Delete', 'wcvm') ?></button>
-                    </div>
-                <?php endif ?>
+
                 <div<?php
 //                $display = "";
 //                if (($order->post_status != $show_status && strpos($order->post_status, $show_status) === false) || $status == 'completed' || $status == 'canceled' || $status == 'trash') {
                     $display = "none";
 //                }
                 ?> style="width:100%;display: <?php echo $display; ?>" data-role="order-table" data-id="<?= esc_attr($order->order_id) ?>" id="<?= esc_attr($order->order_id) ?>">
-                    <table class="wp-list-table fixed widefat striped wcvm-orders po-trash" style="width:100%; max-width: 1400px; border-collapse: collapse;">
+                <table class="wp-list-table widefat striped wcvm-orders my-6">
 
                         <thead>
                             <tr bgcolor="#e8e8e8" style="font-size:11px;">
@@ -278,12 +295,18 @@
 
                 </table>
 
-                <div style="padding-top: 5px;float: left;">
-                    <button type="submit" name="print" value="print" class="button button-primary"><?= esc_html__('Print Order', 'wcvm') ?></button>
+                <div class="flex">
+                    <div class="flex-1"></div>
+                    <div>
+                    <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                    <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="print" class="svg-inline--fa fa-print fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"></path></svg>
+                        <span class="self-center"><?= esc_html__('Print Order', 'wcvm') ?></span>
+                    </button>
                 </div>
+                </div>
+
         </form>
-        <br><br>
-        <br><br>
+
         <?php
     }
 } if (!$records) { ?>
