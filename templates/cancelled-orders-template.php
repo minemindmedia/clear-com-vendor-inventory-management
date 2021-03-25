@@ -312,7 +312,7 @@
             require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
         ?>
         <div class="flex border-2 border-t-8 border-yellow-600 p-8 mb-4 bg-gray-50 text-lg text-semibold">
-            There no cancelled orders at this time.
+            There are no cancelled orders at this time.
         </div>
 
 <?php }
