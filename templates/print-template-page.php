@@ -7,7 +7,9 @@
 
 /** Absolute path to the WordPress directory. */
 if ($_SERVER['HTTP_HOST'] == "localhost") {
-    require('/var/www/site/wp/wp-load.php');
+        define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/');
+        require(ABSPATH . 'wp-load.php');
+//    require('/var/www/site/wp/wp-load.php');
 } else {
     if ( !defined('ABSPATH') )
         define('ABSPATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp/');

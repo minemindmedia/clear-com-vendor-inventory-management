@@ -24,9 +24,9 @@ class Vendor_Management_Columns {
             // 'product_expected_date' => __('Expected Order Date', 'wcvm'),
             'product_quantity_received' => __('<div class="text-sm font-semibold">QTY Rcv</div>', 'wcvm'),
             'product_quantity_returned' => __('<div class="text-sm font-semibold">QTY Ret</div>', 'wcvm'),
-            'product_quantity_back_order' => __('<div class="text-sm font-semibold">Vnd BO</div>', 'wcvm'),
+//            'product_quantity_back_order' => __('<div class="text-sm font-semibold">Vnd BO</div>', 'wcvm'),
             'product_quantity_canceled' => __('<div class="text-sm font-semibold">Cancel</div>', 'wcvm'),
-            'product_expected_date_back_order' => __('<div class="text-sm font-semibold">BO Expected Date</div>', 'wcvm'),
+//            'product_expected_date_back_order' => __('<div class="text-sm font-semibold">BO Expected Date</div>', 'wcvm'),
 //            'back_orders' => __('Cust BOs', 'wcvm'),
         );
     }
@@ -93,6 +93,9 @@ class Vendor_Management_Columns {
     }
         public function get_completed_orders_column_list() {
         $columns_array = [];
+        if (array_key_exists('status', $_REQUEST)) {
+            $status = $_REQUEST['status'];
+        }
         $columns_array['_sku'] = __('<div class="text-sm font-semibold">CC SKU</div>', 'wcvm');
         $columns_array['wcvm_status'] = __('<div class="text-sm font-semibold">Stock Status</div>', 'wcvm');
         $columns_array['_price'] = __('<div class="text-sm font-semibold">Our Price</div>', 'wcvm');
@@ -102,7 +105,9 @@ class Vendor_Management_Columns {
         $columns_array['_qty_history_30'] = __('<div class="text-sm font-semibold">30 Days</div>', 'wcvm');
         $columns_array['_wcvm_on_order'] = __('<div class="text-sm font-semibold">On Order</div>', 'wcvm');
         $columns_array['__order_qty'] = __('<div class="text-sm font-semibold">Received QTY</div>', 'wcvm');
-
+        if ($status == 'return_closed') {
+            $columns_array['__order_qty'] = __('<div class="text-sm font-semibold">Returned Closed QTY</div>', 'wcvm');
+        }
         return $columns_array;
     }
         public function get_cancelled_orders_column_list() {
@@ -115,7 +120,7 @@ class Vendor_Management_Columns {
         $columns_array['_stock'] = __('<div class="text-sm font-semibold">QTY On Hand</div>', 'wcvm');
         $columns_array['_qty_history_30'] = __('<div class="text-sm font-semibold">30 Days</div>', 'wcvm');
         $columns_array['_wcvm_on_order'] = __('<div class="text-sm font-semibold">On Order</div>', 'wcvm');
-        $columns_array['__order_qty'] = __('<div class="text-sm font-semibold">Cancel</div>led QTY', 'wcvm');
+        $columns_array['__order_qty'] = __('<div class="text-sm font-semibold">Cancelled QTY</div>', 'wcvm');
 
         return $columns_array;
     }

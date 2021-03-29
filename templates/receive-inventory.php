@@ -369,7 +369,8 @@
                     <input type="hidden" name="ID" value="<?= esc_attr($order->order_id) ?>">
                     <div class="flex space-x-8 text-base font-semibold">
                         <div><?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?></div>
-                        <div class="flex-1"><?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?></div>
+                        <div><?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?></div>
+                        <div class="flex-1"><?= sprintf(esc_html__('PO Expected Date: %s'), date('m/d/Y', $order->po_expected_date)) ?></div>
                         <div><?= sprintf(esc_html__('Vendor: %s', 'wcvm'), esc_html($order->vendor_name)) ?></div>
                         
                     </div>
@@ -387,7 +388,26 @@
                         <?php } ?>
                         <tr>
                             <!--<td><a href=""><?php // echo $order->product_sku; ?></a></td>-->
-                            <td><?php echo $order->product_sku; ?></a>
+                        <?php
+                        $thumnailID = get_post_thumbnail_id($order->product_id);
+                        $product_admin_url = get_edit_post_link($order->product_id);
+                        $product_image_src = '';
+                        $product_image_src = wc_placeholder_img_src();
+                        if ($thumnailID) {
+                            $image_src = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
+                            $product_image_src = $image_src[0];
+                        }
+                        $siteUrl = str_replace('wp', '', get_site_url());
+                        if ($_SERVER['HTTP_HOST'] == "localhost") {
+                            $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+                        } else {
+                            $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
+                        }
+                        if(!file_exists($imagepath)) {
+                            $product_image_src = wc_placeholder_img_src();
+                        }
+            ?>                            
+                            <td><a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>" target="_blank"><?php echo $order->product_sku ?></a></td>
                             <td><?php echo $order->product_category; ?></td>
                             <td></td>
                             <td><?php echo $order->vendor_name; ?></td>
@@ -397,9 +417,9 @@
                             <td id="quantity_<?php echo $order->product_id; ?>" data-quantity="<?php echo $product_quantity; ?>"><?php echo $product_quantity; ?></td>
                             <td><input type="text" name="product_quantity_received[<?php echo $order->product_id; ?>]" data-role="product_quantity_received" value="<?php echo $product_quantity_received; ?>" style="width:60px;"></td>
                             <td><input type="text" name="product_quantity_returned[<?php echo $order->product_id; ?>]" data-role="product_quantity_returned" value="<?php echo $product_quantity_returned; ?>" style="width:60px;"></td>
-                            <td><input type="text" name="product_quantity_back_order[<?php echo $order->product_id; ?>]" data-role="product_quantity_back_order" value="<?php echo $product_quantity_back_order; ?>" style="width:60px;"></td>
+                            <!--<td><input type="text" name="product_quantity_back_order[<?php // echo $order->product_id; ?>]" data-role="product_quantity_back_order" value="<?php echo $product_quantity_back_order; ?>" style="width:60px;"></td>-->
                             <td><input type="text" name="product_quantity_canceled[<?php echo $order->product_id; ?>]" data-role="product_quantity_canceled" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
-                            <td><input type="text" autocomplete="off" name="product_expected_date_back_order[<?php echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>                    
+                            <!--<td><input type="text" autocomplete="off" name="product_expected_date_back_order[<?php // echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>-->                    
             <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
                             <!--<td></td>-->
                         </tr>

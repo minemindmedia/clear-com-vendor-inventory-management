@@ -1,6 +1,14 @@
 jQuery(document).ready(function ($) {
     $("#filter-vendor").show();
     $("#filter_action").show();
+    $(".sku-thumbnail").mouseenter(function() {
+        var image_name = $(this).data('image');
+        var imageTag = '<div class="image" style="position:absolute;">' + '<img class="image-class" style="height:5rem !important;border:none !important" src="' + image_name + '" alt="image" height="100" />' + '</div>';
+        $(this).parent('td').append(imageTag);
+    });
+    $(".sku-thumbnail").mouseleave(function() {
+        $(this).parent('td').children('div.image').hide();
+    });
         var container = $('#wcvmcpAdminProduct');
         // adding vendor
     container.on('click', '[data-role="add"]', function() {

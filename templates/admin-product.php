@@ -74,14 +74,14 @@
                     <span class="description"><small>(<?= date(get_option('date_format'), $exptected) ?>)</small></span>
                 <?php endif ?>
             </p>
-            <p class="form-field">
-                <label><?= esc_html__('Amount On Vendor BO', 'wcvm') ?></label>
-                <?= esc_html($product->_wcvm_on_vendor_bo) ?>
-                <?php $exptected = $product->_wcvm_on_vendor_bo_date ?>
-                <?php if ($exptected): ?>
-                    <span class="description"><small>(<?= date(get_option('date_format'), $exptected) ?>)</small></span>
-                <?php endif ?>
-            </p>
+<!--            <p class="form-field">
+                <label><? esc_html__('Amount On Vendor BO', 'wcvm') ?></label>
+                <? esc_html($product->_wcvm_on_vendor_bo) ?>
+                <?php // $exptected = $product->_wcvm_on_vendor_bo_date ?>
+                <?php // if ($exptected): ?>
+                    <span class="description"><small>(<? date(get_option('date_format'), $exptected) ?>)</small></span>
+                <?php // endif ?>
+            </p>-->
         </div>
         <div style="clear: both"></div>
     </div>

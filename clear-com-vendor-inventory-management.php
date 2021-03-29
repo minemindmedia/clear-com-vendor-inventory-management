@@ -17,7 +17,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
         add_action('admin_menu', array($this, 'wcvimSaveAdminMenu'));
         add_action('admin_menu', array($this, 'wcvimPo'));
         add_action('admin_menu', array($this, 'wcvimReceiveInventory'));
-        add_action('admin_menu', array($this, 'wcvimReceiveBackOrderItems'));
+        // hide backorder menu
+//        add_action('admin_menu', array($this, 'wcvimReceiveBackOrderItems'));
         add_action('admin_menu', array($this, 'wcvimgeneratePo'));
 
         add_action("wp_ajax_generate_po", array($this, "generate_po"));
@@ -1217,8 +1218,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $product_image_src = $image_src[0];
             }
             $siteUrl = str_replace('wp', '', get_site_url());
-            $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
-            // $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+            if ($_SERVER['HTTP_HOST'] == "localhost") {
+                $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+            } else {
+                $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
+            }
             if(!file_exists($imagepath)) {
                 $product_image_src = wc_placeholder_img_src();
             }            
@@ -1312,14 +1316,14 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 // $('.wm-vm-go input[name="filter_action"]').on('click', function() {
                 // 	$(this.form).attr('method', 'get');
                 // });
-                $(".sku-thumbnail").mouseenter(function() {
-                    var image_name = $(this).data('image');
-                    var imageTag = '<div class="image" style="position:absolute;">' + '<img src="' + image_name + '" alt="image" height="100" />' + '</div>';
-                    $(this).parent('td').append(imageTag);
-                });
-                $(".sku-thumbnail").mouseleave(function() {
-                    $(this).parent('td').children('div.image').hide();
-                });
+//                $(".sku-thumbnail").mouseenter(function() {
+//                    var image_name = $(this).data('image');
+//                    var imageTag = '<div class="image" style="position:absolute;">' + '<img src="' + image_name + '" alt="image" height="100" />' + '</div>';
+//                    $(this).parent('td').append(imageTag);
+//                });
+//                $(".sku-thumbnail").mouseleave(function() {
+//                    $(this).parent('td').children('div.image').remove();
+//                });
                 var sorted_by_days = false;
                 var sorted_by_qty = false;
                 $(".sort-by").each(function() {

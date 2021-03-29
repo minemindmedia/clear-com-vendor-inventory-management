@@ -213,7 +213,27 @@
 //                                        echo '&#10004;';
 //                                    }
                             ?></td>-->
-                            <td><?php echo $order->product_sku; ?></td>
+                        <?php
+                        $thumnailID = get_post_thumbnail_id($order->product_id);
+                        $product_admin_url = get_edit_post_link($order->product_id);
+                        $product_image_src = '';
+                        $product_image_src = wc_placeholder_img_src();
+                        if ($thumnailID) {
+                            $image_src = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
+                            $product_image_src = $image_src[0];
+                        }
+                        $siteUrl = str_replace('wp', '', get_site_url());
+                        if ($_SERVER['HTTP_HOST'] == "localhost") {
+                            $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
+                        } else {
+                            $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
+                        }
+                        if(!file_exists($imagepath)) {
+                            $product_image_src = wc_placeholder_img_src();
+                        }
+            ?>                            
+                            <td><a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>" target="_blank"><?php echo $order->product_sku ?></a></td>
+
                             <td><?php
                                 $stock = $order->product_stock;
 
