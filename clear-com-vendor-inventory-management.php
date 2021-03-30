@@ -774,7 +774,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $order_by[] = "v.stock_30_days_sale_percent " . $percentage_filter;
             }
         } else {
-            $percentage_filter = 'desc';
+            $percentage_filter = 'asc';
             $order_by[] = "v.stock_30_days_sale_percent " . $percentage_filter;
         }
         $where = '';
@@ -1213,7 +1213,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <a href="#" class="sort-by <?php echo $thirty_days_filter . " " . $extra_class_30_days; ?>" id='30-days'>30<br> Days</a>
                     </th>
                     <th class="center eleventh-cell">
-                        <a href="#" class="sort-by <?php echo $percentage_filter . " " . $extra_class_percentage; ?>" id='percentage'>QTY On Hand / 30 Days</a>
+                        <a href="#" class="sort-by <?php echo $percentage_filter . " " . $extra_class_percentage; ?>" id='percentage'>QTY On Hand %</a>
                     </th>
                     <!--                    <th class="center seventh-cell">Low<br>Thresh</th>
                     <th class="center seventh-cell">Reorder<br>Thresh</th>
