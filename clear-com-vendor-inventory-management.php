@@ -798,7 +798,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
           $where .= " v.stock_status IN (" . implode(",", $selected_status) . ")";
           }
           } */
-        $order_details_table_sql = "SELECT v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
+        $order_details_table_sql = "SELECT v.id,v.stock_30_days_sale_percent, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, 
         v.stock, v.threshold_low, v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, 
         v.vendor_sku, v.vendor_link, v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, 
         v.primary_vendor_name, v.on_order, v.sale_30_days, v.order_qty,v.on_vendor_bo, v.stock_status, 
@@ -807,7 +807,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         ELSE 'IN' END product_stock_status
         FROM " . $vendor_po_lookup_table . " v
          " . $where . "
-        group by v.id, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
+        group by v.id,v.stock_30_days_sale_percent, v.product_id, v.product_title, v.sku, v.regular_price, v.stock_status, v.stock, v.threshold_low, 
         v.threshold_reorder, v.reorder_qty, v.new , v.rare, v.category, v.vendor_id, v.vendor_name, v.vendor_sku, v.vendor_link, 
         v.vendor_price_bulk, v.vendor_price_notes, v.vendor_price, v.primary_vendor_id, v.primary_vendor_name, v.on_order, 
         v.sale_30_days, v.order_qty,v.on_vendor_bo, v.stock_status ";
@@ -1321,7 +1321,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <td class="center seventh-cell"><?php echo wc_price($purchase_orders_post_data_single_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
-                        <td class="center eleventh-cell"><?php echo number_format($orderDetail->stock_30_days_sale_percent, 2) . '%' ?></td>
+                        <td class="center eleventh-cell"><?php echo $orderDetail->stock_30_days_sale_percent. '%' ?></td>
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low
                                                             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder
