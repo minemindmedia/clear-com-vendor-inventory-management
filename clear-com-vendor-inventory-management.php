@@ -381,6 +381,82 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
             $wpdb->delete($vendor_purchase_order_table, array('post_status' => 'trash'));
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
+
+            if ($_POST['action'] == 'new-return') {
+                $orderId = $_POST['ID'];
+                $valid = true;
+                foreach ($_POST['__order_qty'] as $productId => $_) {
+                    $poStatus = $_POST['status'];
+                    $getPOLineItemDetails = $wpdb->get_results(""
+                            . "SELECT * FROM " . $vendor_purchase_order_table . " po "
+                            . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
+                            . "WHERE order_id = " . $orderId . " AND product_id = " . $productId . " AND post_status LIKE '%" . $poStatus . "%'");
+                    if (!$getPOLineItemDetails) {
+                        
+                    } else {
+                        if ($_POST['product_quantity_returned'][$productId] <= $_POST['__order_qty'][$productId]) {
+                            $updatePOProductData['product_quantity_returned'] = $getPOLineItemDetails[0]->product_quantity_returned + $_POST['product_quantity_returned'][$productId];
+                            $updatePOProductData['product_quantity_received'] = $getPOLineItemDetails[0]->product_quantity_received - $_POST['product_quantity_returned'][$productId];
+                        }
+                        else{
+                            $valid = false;
+                        }
+                        if ($valid) {
+                            $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
+                            $updatePOProductData['updated_by'] = get_current_user_id();
+                            $wherePOProductData['product_id'] = $productId;
+                            $wherePOProductData['vendor_order_idFk'] = $getPOLineItemDetails[0]->vendor_order_idFk;
+                            //                        $wherePOProductData['order_id'] = $orderId;
+                            $updated = $wpdb->update($vendor_purchase_order_items_table, $updatePOProductData, $wherePOProductData);
+                            $order_product_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po "
+                                    . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
+                                    . " WHERE po.order_id = " . $orderId;
+
+                            $order_product_details = $wpdb->get_results($order_product_sql);
+                            $status = "";
+                            foreach ($order_product_details as $order) {
+                                if ($order->product_quantity_received) {
+                                    $status .= "completed";
+                                }
+                                if ($order->product_quantity_back_order) {
+                                    if ($status != "") {
+                                        $status .= "|";
+                                    }
+                                    $status .= "back-order";
+                                }
+                                if ($order->product_quantity_canceled) {
+                                    if ($status != "") {
+                                        $status .= "|";
+                                    }
+                                    $status .= "canceled";
+                                }
+                                if ($order->product_quantity_returned) {
+                                    if ($status != "") {
+                                        $status .= "|";
+                                    }
+                                    $status .= "returned";
+                                }
+                                if ($order->product_quantity_return_closed) {
+                                    if ($status != "") {
+                                        $status .= "|";
+                                    }
+                                    $status .= "return_closed";
+                                }
+                            }
+
+                            global $wpdb;
+                            $postStatus = implode('|', array_unique(explode('|', $status)));
+
+                            $update_po_data['post_status'] = $postStatus;
+                            $update_po_data['updated_date'] = date('Y/m/d H:i:s a');
+                            $update_po_data['updated_by'] = get_current_user_id();
+                            $where_po['order_id'] = $orderId;
+                            $updated = $wpdb->update($vendor_purchase_order_table, $update_po_data, $where_po);
+                            wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=returned'));                                                        
+                        }
+                    }
+                }
+            } else {
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'on-order';
 
@@ -432,6 +508,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=' . $order->post_status) . '#order' . $order->ID);
                 }
             }
+        }
         }
         $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
         $show_status = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'new-order';
