@@ -133,15 +133,28 @@ if (array_key_exists('status', $_GET)) {
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <?php
+                                                                                        $itemQty = '';
+                                                                                        $itemExtendedPrice = '';
+                                                                                        $itemTotalPrice = '';
 //                                                                                        foreach ($purchaseOrderDetails as $singleLineItem):
                                                                                         foreach ($order_details as $singleLineItem):
+                                                                                            $itemQty = $singleLineItem->product_ordered_quantity;
+                                                                                            $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
+                                                                                            $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
+                                                                                            if($returned_note) {
+                                                                                                if($singleLineItem->product_quantity_returned > 0) {
+                                                                                                    $itemQty = $singleLineItem->product_quantity_returned;
+                                                                                                    $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
+                                                                                                    $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
+                                                                                                }
+                                                                                            }
                                                                                             ?>
-                                                                                            <td style="text-align: center"><?php echo $singleLineItem->product_ordered_quantity; ?></td>
+                                                                                            <td style="text-align: center"><?php echo $itemQty; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->vendor_sku; ?>   </td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_sku; ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_title; ?></td>
                                                                                             <td style="text-align: right"><?php echo wc_price($singleLineItem->vendor_price_last); ?></td>
-                                                                                            <td style="text-align: right"><?php echo wc_price((float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity); ?></td>
+                                                                                            <td style="text-align: right"><?php echo wc_price($itemExtendedPrice); ?></td>
                                                                                             <?php if ($cancelled_note) { ?>
                                                                                             <td style="text-align: right"><?php echo wc_price($singleLineItem->product_price * $singleLineItem->product_quantity_canceled); ?></td>
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_quantity_canceled_note; ?></td>
@@ -150,7 +163,7 @@ if (array_key_exists('status', $_GET)) {
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_quantity_returned_note; ?></td>
                                                                                             <?php } ?>
                                                                                         </tr>
-                                                                                        <?php $total += (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity ?>  
+                                                                                        <?php $total += $itemTotalPrice; ?>  
                                                                                                                                                                             
                                                                                     <?php endforeach ?>                                                                                    
                                                                                     <tr>
