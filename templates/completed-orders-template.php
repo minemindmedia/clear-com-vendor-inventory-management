@@ -141,8 +141,8 @@
 
                     </div>
                     <div style="display:none;" class="self-center text-base font-semibold order-headers-<?php echo $order->order_id ?>">
-                        <button type="submit" name="action" value="new-return" data-role="new-return" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
-                            <?php echo 'Return'; ?>
+                        <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
+                            <?php echo 'Save Returns'; ?>
                         </button>
                     </div>
                     <div class="self-center text-base font-semibold">
