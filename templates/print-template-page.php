@@ -32,6 +32,16 @@ if (array_key_exists('po', $_REQUEST)) {
 //    $order->wcvmgo = $wcvmgo_manual[0];
     $vendor = get_post($order->post_parent);
 }
+$cancelled_note = false;
+$returned_note = false;
+if (array_key_exists('status', $_GET)) { 
+    if ($_GET['status'] == 'canceled') {
+        $cancelled_note = true;
+    } else if($_GET['status'] == 'returned') {
+        $returned_note = true;
+    }
+}
+
 ?>
 <body class="email" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
     <div id="wrapper" dir="ltr">
@@ -113,6 +123,13 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                         <th style="text-align: left">Product description</th>
                                                                                         <th style="text-align: right">Price</th>
                                                                                         <th style="text-align: right">Extended$</th>
+                                                                                        <?php if ($cancelled_note) { ?>
+                                                                                        <th style="text-align: right">Cancelled Amount</th>
+                                                                                        <th style="text-align: center">Cancelled Note</th>
+                                                                                        <?php } else if($returned_note) { ?>
+                                                                                        <th style="text-align: right">Returned Amount</th>
+                                                                                        <th style="text-align: center">Returned Note</th>
+                                                                                        <?php } ?>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <?php
@@ -125,6 +142,13 @@ if (array_key_exists('po', $_REQUEST)) {
                                                                                             <td style="text-align: left"><?php echo $singleLineItem->product_title; ?></td>
                                                                                             <td style="text-align: right"><?php echo wc_price($singleLineItem->vendor_price_last); ?></td>
                                                                                             <td style="text-align: right"><?php echo wc_price((float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity); ?></td>
+                                                                                            <?php if ($cancelled_note) { ?>
+                                                                                            <td style="text-align: right"><?php echo wc_price($singleLineItem->product_price * $singleLineItem->product_quantity_canceled); ?></td>
+                                                                                            <td style="text-align: left"><?php echo $singleLineItem->product_quantity_canceled_note; ?></td>
+                                                                                            <?php } else if($returned_note) { ?>
+                                                                                            <td style="text-align: right"><?php echo wc_price($singleLineItem->product_price * $singleLineItem->product_quantity_returned); ?></td>
+                                                                                            <td style="text-align: left"><?php echo $singleLineItem->product_quantity_returned_note; ?></td>
+                                                                                            <?php } ?>
                                                                                         </tr>
                                                                                         <?php $total += (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity ?>  
                                                                                                                                                                             

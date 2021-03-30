@@ -16,9 +16,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
         add_action('admin_menu', array($this, 'wcvimActionAdminMenu'));
         add_action('admin_menu', array($this, 'wcvimSaveAdminMenu'));
         add_action('admin_menu', array($this, 'wcvimPo'));
-        add_action('admin_menu', array($this, 'wcvimReceiveInventory'));
+        // add_action('admin_menu', array($this, 'wcvimReceiveInventory'));
+        add_action('admin_menu', array($this, 'wcvimReceiveInventoryRemove'));
         // hide backorder menu
-//        add_action('admin_menu', array($this, 'wcvimReceiveBackOrderItems'));
+        // add_action('admin_menu', array($this, 'wcvimReceiveBackOrderItems'));
         add_action('admin_menu', array($this, 'wcvimgeneratePo'));
 
         add_action("wp_ajax_generate_po", array($this, "generate_po"));
@@ -136,15 +137,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
             `vendor_price` decimal(10,2) DEFAULT NULL,
             PRIMARY KEY (`vpm_id`)
             ) $charset_collate;";
-        //        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        //                    `product_mapping_id` int(11) NOT NULL AUTO_INCREMENT,
-        //                    `post_id` int(11) NOT NULL,
-        //                    `vendor_id` int(11) NOT NULL,
-        //                    `vendor_sku` varchar(11) DEFAULT NULL,
-        //                    `vendor_price` decimal(11,2) DEFAULT NULL,
-        //                    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-        //                    PRIMARY KEY id (product_mapping_id)
-        //    ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -156,34 +148,34 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $table_name = $wpdb->prefix . 'vendor_po_lookup';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE `wp_vendor_po_lookup` (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `product_id` int(11) DEFAULT NULL,
-            `product_title` text,
-            `sku` text,
-            `regular_price` decimal(10,2) DEFAULT NULL,
-            `stock_status` text,
-            `stock` int(11) DEFAULT NULL,
-            `threshold_low` double DEFAULT NULL,
-            `threshold_reorder` int(11) DEFAULT NULL,
-            `reorder_qty` int(11) DEFAULT NULL,
-            `rare` int(11) DEFAULT NULL,
-            `category` text,
-            `vendor_id` text,
-            `vendor_name` text,
-            `vendor_sku` text,
-            `vendor_link` text,
-            `vendor_price_bulk` int(11) DEFAULT NULL,
-            `vendor_price_notes` text,
-            `vendor_price` text,
-            `primary_vendor_id` int(11) DEFAULT NULL,
-            `primary_vendor_name` text,
-            `on_order` int(11) DEFAULT NULL,
-            `sale_30_days` int(11) DEFAULT NULL,
-            `order_qty` int(11) DEFAULT NULL,
-            `on_vendor_bo` int(11) DEFAULT NULL,
-            `new` int(11) DEFAULT NULL,
-            PRIMARY KEY (`id`)
-            ) $charset_collate;";
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `product_id` int(11) DEFAULT NULL,
+        `product_title` text,
+        `sku` text,
+        `regular_price` decimal(10,2) DEFAULT NULL,
+        `stock_status` text,
+        `stock` int(11) DEFAULT NULL,
+        `threshold_low` double DEFAULT NULL,
+        `threshold_reorder` int(11) DEFAULT NULL,
+        `reorder_qty` int(11) DEFAULT NULL,
+        `rare` int(11) DEFAULT NULL,
+        `category` text,
+        `vendor_id` text,
+        `vendor_name` text,
+        `vendor_sku` text,
+        `vendor_link` text,
+        `vendor_price_bulk` int(11) DEFAULT NULL,
+        `vendor_price_notes` text,
+        `vendor_price` text,
+        `primary_vendor_id` int(11) DEFAULT NULL,
+        `primary_vendor_name` text,
+        `on_order` int(11) DEFAULT NULL,
+        `sale_30_days` int(11) DEFAULT NULL,
+        `order_qty` int(11) DEFAULT NULL,
+        `on_vendor_bo` int(11) DEFAULT NULL,
+        `new` int(11) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+        ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -195,21 +187,21 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $table_name = $wpdb->prefix . 'vendor_purchase_orders';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `vendor_id` int(11) DEFAULT NULL,
-            `order_id` int(11) DEFAULT NULL,
-            `post_status` varchar(200) DEFAULT NULL,
-            `post_old_status` varchar(20) DEFAULT NULL,
-            `order_date` datetime DEFAULT NULL,
-            `po_expected_date` int(11) DEFAULT NULL,
-            `expected_date` int(11) DEFAULT NULL,
-            `set_date` int(11) DEFAULT NULL,
-            `created_date` datetime DEFAULT NULL,
-            `created_by` int(11) DEFAULT NULL,
-            `updated_date` datetime DEFAULT NULL,
-            `updated_by` int(11) DEFAULT NULL,
-            PRIMARY KEY (`id`)
-            ) $charset_collate;";
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `vendor_id` int(11) DEFAULT NULL,
+        `order_id` int(11) DEFAULT NULL,
+        `post_status` varchar(200) DEFAULT NULL,
+        `post_old_status` varchar(20) DEFAULT NULL,
+        `order_date` datetime DEFAULT NULL,
+        `po_expected_date` int(11) DEFAULT NULL,
+        `expected_date` int(11) DEFAULT NULL,
+        `set_date` int(11) DEFAULT NULL,
+        `created_date` datetime DEFAULT NULL,
+        `created_by` int(11) DEFAULT NULL,
+        `updated_date` datetime DEFAULT NULL,
+        `updated_by` int(11) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+        ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -221,40 +213,42 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $table_name = $wpdb->prefix . 'vendor_purchase_orders_items';
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            `id`  int(11) NOT NULL AUTO_INCREMENT,
-  `product_id` int(11) NOT NULL,
-  `vendor_order_idFk` int(11) NOT NULL,
-  `product_title` text NOT NULL,
-  `product_sku` text NOT NULL,
-  `product_price` decimal(10,2) NOT NULL,
-  `product_ordered_quantity` int(11) NOT NULL,
-  `product_category` text DEFAULT NULL,
-  `product_expected_date` int(11) DEFAULT NULL,
-  `product_rare` tinyint(1) DEFAULT NULL,
-  `product_threshold_low` int(11) DEFAULT NULL,
-  `product_threshold_reorder` int(11) DEFAULT NULL,
-  `product_reorder_qty` int(11) DEFAULT NULL,
-  `vendor_sku` text DEFAULT NULL,
-  `vendor_name` text DEFAULT NULL,
-  `vendor_link` text DEFAULT NULL,
-  `vendor_price_last` decimal(10,2) DEFAULT NULL,
-  `vendor_price_bulk` decimal(10,2) DEFAULT NULL,
-  `vendor_price_notes` text DEFAULT NULL,
-  `product_quantity_received` int(11) DEFAULT NULL,
-  `product_quantity_back_order` int(11) DEFAULT NULL,
-  `product_quantity_canceled` int(11) DEFAULT NULL,
-  `product_quantity_returned` int(11) DEFAULT NULL,
-  `product_quantity_return_closed` int(11) DEFAULT NULL,
-  `product_expected_date_back_order` int(11) DEFAULT NULL,
-  `on_order_quantity` int(11) NOT NULL,
-  `sale_30_days` int(11) NOT NULL,
-  `product_stock` int(11) NOT NULL,
-  `created_date` datetime DEFAULT NULL,
-  `created_by` int(11) DEFAULT NULL,
-  `updated_date` datetime DEFAULT NULL,
-  `updated_by` int(11) DEFAULT NULL,
-  PRIMARY KEY id (`id`)
-            ) $charset_collate;";
+        `id`  int(11) NOT NULL AUTO_INCREMENT,
+        `product_id` int(11) NOT NULL,
+        `vendor_order_idFk` int(11) NOT NULL,
+        `product_title` text NOT NULL,
+        `product_sku` text NOT NULL,
+        `product_price` decimal(10,2) NOT NULL,
+        `product_ordered_quantity` int(11) NOT NULL,
+        `product_category` text DEFAULT NULL,
+        `product_expected_date` int(11) DEFAULT NULL,
+        `product_rare` tinyint(1) DEFAULT NULL,
+        `product_threshold_low` int(11) DEFAULT NULL,
+        `product_threshold_reorder` int(11) DEFAULT NULL,
+        `product_reorder_qty` int(11) DEFAULT NULL,
+        `vendor_sku` text DEFAULT NULL,
+        `vendor_name` text DEFAULT NULL,
+        `vendor_link` text DEFAULT NULL,
+        `vendor_price_last` decimal(10,2) DEFAULT NULL,
+        `vendor_price_bulk` decimal(10,2) DEFAULT NULL,
+        `vendor_price_notes` text DEFAULT NULL,
+        `product_quantity_received` int(11) DEFAULT NULL,
+        `product_quantity_back_order` int(11) DEFAULT NULL,
+        `product_quantity_canceled` int(11) DEFAULT NULL,
+        `product_quantity_returned` int(11) DEFAULT NULL,
+        `product_quantity_return_closed` int(11) DEFAULT NULL,
+        `product_expected_date_back_order` int(11) DEFAULT NULL,
+        `on_order_quantity` int(11) NOT NULL,
+        `sale_30_days` int(11) NOT NULL,
+        `product_stock` int(11) NOT NULL,
+        `product_quantity_returned_note` text DEFAULT NULL,
+        `product_quantity_canceled_note` text DEFAULT NULL,
+        `created_date` datetime DEFAULT NULL,
+        `created_by` int(11) DEFAULT NULL,
+        `updated_date` datetime DEFAULT NULL,
+        `updated_by` int(11) DEFAULT NULL,
+        PRIMARY KEY id (`id`)
+        ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
@@ -271,18 +265,20 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
     public function enqueueScript()
     {
-        ?>
+?>
         <style>
             .product-items-table th {
                 background-color: white !important;
                 font-size: 10px !important;
                 padding: 14px !important;
             }
-            .wp-list-table.wcvm-orders th{
+
+            .wp-list-table.wcvm-orders th {
                 background-color: white !important;
                 font-size: 10px !important;
                 padding: 14px !important;
             }
+
             .wp-list-table.wcvm-orders .manage-column {
                 font-size: 10px !important;
             }
@@ -304,16 +300,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
         wp_enqueue_style('jquery-ui-datepicker-style', '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('generate-po-script', plugin_dir_url(__FILE__) . 'assets/vendors.js', array('jquery'), '1.0.0', true);
-
         wp_localize_script('generate-po-script', 'generate_po_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
         ]);
-        //        wp_localize_script('generate-po-script', 'wcvm_ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
     }
 
     public function wcvimActionAdminMenu()
     {
         add_menu_page(__('Vendors Management', 'wcvim'), __('Vendors Management', 'wcvim'), 'manage_options', 'vendor-management', array($this, 'vendorManagemetMenuPage'));
+    }
+    public function wcvimReceiveInventoryRemove()
+    {
+        add_menu_page(__('Receive Inventory', 'wcvim'), __('Receive Inventory', 'wcvim'), 'manage_options', 'wcvm-ri', array($this, 'wcvimReceiveInventoryPage'));
+        remove_menu_page('wcvm-ri');
     }
 
     public function wcvimgeneratePo()
@@ -336,17 +335,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
         add_submenu_page('vendor-management', __('Receive Back Order Items', 'wcvim'), __('Receive Back Order Items', 'wcvim'), 'manage_options', 'wcvm-rboi', array($this, 'wcvimReceiveBackOrderItemsPage'));
     }
 
-    //    public function wcvimPOPageSlug() {
-    //        add_submenu_page(
-    //                null,
-    //                __('Purchase Order', 'wcvim'),
-    //                __('Purchase Order', 'wcvim'),
-    //                'manage_options',
-    //                'purchase-order',
-    //                array($this, 'wcvimPurchaseOrderPage')
-    //        );
-    //        add_menu_page(__('Update Vendor Product Mapping', 'wcvim'), __('Update Vendor Product Mapping', 'wcvim'), 'manage_options', 'uasortpdate-vendor-product-mapping', array($this, 'updateVendorProductMapping'));
-    //    }
     public function wcvmcvoActionPluginsLoaded()
     {
         require_once plugin_dir_path(__FILE__) . 'includes/vendor-management-cols.php';
@@ -357,25 +345,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
         global $wpdb;
         $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
         $vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';
-        //        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-        //            print_r($_POST);die;
-        //        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['unarchive'])) {
-            //            $order = get_post($_POST['ID']);
-            //            $order->post_status = $order->old_status ? $order->old_status : 'draft';
+
             $update_data['post_status'] = 'new-order';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
             $where_data['order_id'] = $_POST['ID'];
             $updated = $wpdb->update($vendor_purchase_order_table, $update_data, $where_data);
-
-        //            wp_update_post($order);
-            //            delete_post_meta($order->ID, 'old_status');
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['archive']) && empty($_POST['print']) && empty($_POST['action'])) {
-            //            print_r($_POST);
-            //            die;
             $order = get_post($_POST['ID']);
-
             $update_data['post_status'] = 'trash';
             $update_data['updated_date'] = date('Y/m/d H:i:s a');
             $update_data['updated_by'] = get_current_user_id();
@@ -384,8 +363,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $order->post_status = 'trash';
             wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
-//            header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
-            header('Location:' . plugin_dir_url(__FILE__).'/templates/print-template-page.php?po=' . $_POST['ID']);            
+            //            header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
+            header('Location:' . plugin_dir_url(__FILE__) . 'templates/print-template-page.php?po=' . $_POST['ID'] . '&status=' . $_POST['status']);
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
             $wpdb->delete($vendor_purchase_order_table, array('order_id' => $_POST['ID']));
@@ -402,8 +381,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
             $wpdb->delete($vendor_purchase_order_table, array('post_status' => 'trash'));
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['action'])) {
-            //            print_r($_POST);
-            //            die;
             $order = get_post($_POST['ID']);
             $order->post_status = $order->old_status ? $order->old_status : 'on-order';
 
@@ -413,14 +390,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 if ($_POST['action'] == 'update') {
                     $orderId = $_POST['ID'];
                 }
-                //                if (!empty($_POST['expected_date'])) {
-                //                    $vpo_UpdateData['po_expected_date'] = strtotime($_POST['expected_date']);
-                //                    $vpo_UpdateData['post_status'] = 'on-order';
-                //                }
-                //                $vpo_UpdateData['updated_date'] = date('Y/m/d H:i:s a');
-                //                $vpo_UpdateData['updated_by'] = get_current_user_id();
-                //                $where_vpo['order_id'] = $orderId;
-                //                $insertedPOId = $wpdb->update($vendor_purchase_order_table, $vpo_UpdateData, $where_vpo);
+
                 foreach ($_POST['__order_qty'] as $productId => $_) {
                     $poStatus = $_POST['status'];
                     $getPOLineItemDetails = $wpdb->get_results(""
@@ -444,7 +414,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         $updatePOProductData['updated_by'] = get_current_user_id();
                         $wherePOProductData['product_id'] = $productId;
                         $wherePOProductData['vendor_order_idFk'] = $getPOLineItemDetails[0]->vendor_order_idFk;
-                        //                        $wherePOProductData['order_id'] = $orderId;
                         $updated = $wpdb->update($vendor_purchase_order_items_table, $updatePOProductData, $wherePOProductData);
                     }
                 }
@@ -484,9 +453,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
         //    WHERE 1=1 AND p.post_status " . $query_status . " AND p.post_type = 'wcvm-order' ORDER BY p.ID DESC";
 
         $purchase_order_table_sql = "SELECT * FROM `" . $vendor_purchase_order_table . "` po"
-                . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
-                . " WHERE po.post_status " . $query_status . " ORDER BY po.order_id DESC";
-        //echo $purchase_order_table_sql;die;
+            . " LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk"
+            . " WHERE po.post_status " . $query_status . " ORDER BY po.order_id DESC";
         $orders = $wpdb->get_results($purchase_order_table_sql);
 
         if ($status == 'new-order') {
@@ -538,28 +506,22 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $product_update_last_date = get_option('_product_update_last_date');
             $vendor_management_last_date = get_option('_vendor_management_last_date'); ?>
             <div style="padding-bottom: 10px;clear: both;">
-                <?php
-                //echo '<input type="submit" name="wcvm_save" class="button button-primary" value="' . esc_html__('Update') . '">';
-                //echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                ?>
                 <input type="hidden" name="baseUrl" id="baseUrl" value="<?php echo plugin_dir_url(__FILE__); ?>">
                 <?php
                 echo '<input type="submit" id="generate-po-button" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
-            if ($product_update_last_date >= $vendor_management_last_date) {
+                if ($product_update_last_date >= $vendor_management_last_date) {
                 ?>
-                     <!--<a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>--> 
+                    <!--<a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-product-mapping"><?= esc_attr__('Sync Vendor Product', 'wcvm') ?></a>-->
                     <a style="" href="#" class="button button-primary sync-vendor-details sync-vendor-po"><?= esc_attr__('Sync Vendor PO', 'wcvm') ?></a>
-                     <!--<a style="" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>--> 
+                    <!--<a style="" href="#" class="button button-primary sync-vendor-details update-vendor-po"><?= esc_attr__('Update Vendor PO', 'wcvm') ?></a>-->
                     <div style="margin-top:10px;" class="text-danger">
                         <span style="padding:5px; font-size:12px"> Product Update Last Date: <?php echo $product_update_last_date; ?> Vendor Management Last Date: <?php echo $vendor_management_last_date; ?></span>
                     </div>
                 <?php
-            } ?>
+                } ?>
             </div>
         <?php
         } else {
-            //echo '<input type="submit" name="wcvm_save" class="button button-primary" value="' . esc_html__('Update') . '">';
-            //echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
             echo '<input onclick="jQuery(&apos;#save_button_hit&apos;).val(1)" type="submit" name="wcvm_save" class="button button-primary" value="' . esc_html__('Generate') . '">';
         }
     }
@@ -714,23 +676,28 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $selected_qty = '';
         $thirty_days_filter = '';
         $qty_on_hand_filter = '';
+        $percentage_filter = '';
         $vendors_selected = '';
         $status_selected = '';
         $purchase_orders_post_data = [];
         $selected_status = [];
         // print_r($_GET);
-        if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET)) {
+        if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET) || array_key_exists('percentage', $_GET)) {
             $thirty_days_filter = $_GET['30_days'];
             $qty_on_hand_filter = $_GET['qty_on_hand'];
+            $percentage_filter = $_GET['percentage'];
             if (!empty($thirty_days_filter)) {
                 $order_by[] = "v.sale_30_days " . $thirty_days_filter;
             }
             if (!empty($qty_on_hand_filter)) {
                 $order_by[] = "v.stock " . $qty_on_hand_filter;
             }
-        }else{
-            $thirty_days_filter = 'desc';
-            $order_by[] = "v.sale_30_days ". $thirty_days_filter;
+            if (!empty($percentage_filter)) {
+                $order_by[] = "v.stock " . $percentage_filter;
+            }
+        } else {
+            $percentage_filter = 'desc';
+            $order_by[] = "v.stock " . $percentage_filter;
         }
         $where = '';
         //$where = " WHERE v.stock_status IN ('outofstock','instock')";
@@ -772,10 +739,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         if (count($order_by) > 0) {
             $sql .= " ORDER BY " . implode(', ', $order_by);
         }
-        // echo $sql;
-        // die;
         $orderDetails = $wpdb->get_results($sql);
-        //         echo $wpdb->last_query;
         ?>
         <style>
             /*thead{
@@ -1056,7 +1020,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         </style>
         <div id='page-loader' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'>
             <img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src="<?php echo plugin_dir_url(__FILE__) . 'assets/img/loader.gif' ?>">
-        </div>        
+        </div>
         <div class="wrap wm-vm-go">
             <h1><?= esc_html__('Generate Purchase Orders', 'wcvm') ?></h1>
             <form action="" method="post">
@@ -1094,18 +1058,18 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 <select name="primary_vendor_filter" class="vendor_details scrollable" id="primary_vendor_filter" multiple="multiple" style="display:none">
                     <?php
                     global $wpdb;
-        $posts_table = $wpdb->prefix . "posts";
-        $posts_table_sql = ""
+                    $posts_table = $wpdb->prefix . "posts";
+                    $posts_table_sql = ""
                         . "SELECT p.ID,p.post_title, pm.meta_value as title_short
                                 FROM " . $wpdb->prefix . "posts p
                                 LEFT JOIN " . $wpdb->prefix . "postmeta pm ON pm.post_id = p.ID AND pm.meta_key = 'title_short'
                                 WHERE post_type = 'wcvm-vendor' OR post_type = 'wcvm-vendors' AND post_status = 'publish' ORDER BY p.post_title";
-        $posts = $wpdb->get_results($posts_table_sql);
-        foreach ($posts as $vendor) :
+                    $posts = $wpdb->get_results($posts_table_sql);
+                    foreach ($posts as $vendor) :
                         $selected = "";
-        if (in_array($vendor->ID, $purchase_orders_post_data)) {
-            $selected = 'selected';
-        } ?>
+                        if (in_array($vendor->ID, $purchase_orders_post_data)) {
+                            $selected = 'selected';
+                        } ?>
                         <option <?php echo $selected; ?> value="<?= esc_attr($vendor->ID) ?>"><?= esc_html($vendor->post_title) ?> (<?= esc_html($vendor->title_short) ?>)</option>
                     <?php endforeach ?>
                 </select>
@@ -1117,6 +1081,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                                                             ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
+                <input type="hidden" name="percentage" id="percentage" value="<?php echo $percentage_filter; ?>" />
 
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
             </form>
@@ -1146,22 +1111,31 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     <th class="center tenth-cell">
                         <?php
                         $extra_class_30_days = "";
-        $extra_class_qty = "";
+                        $extra_class_qty = "";
+                        $extra_class_percentage = "";
 
-        if ($thirty_days_filter == 'asc') {
-            $extra_class_30_days = "hiddenafter";
-        } elseif ($thirty_days_filter == 'desc') {
-            $extra_class_30_days = "hiddenbefore";
-        }
-        if ($qty_on_hand_filter == 'asc') {
-            $extra_class_qty = "hiddenafter";
-        } elseif ($qty_on_hand_filter == 'desc') {
-            $extra_class_qty = "hiddenbefore";
-        } ?>
+                        if ($thirty_days_filter == 'asc') {
+                            $extra_class_30_days = "hiddenafter";
+                        } elseif ($thirty_days_filter == 'desc') {
+                            $extra_class_30_days = "hiddenbefore";
+                        }
+                        if ($qty_on_hand_filter == 'asc') {
+                            $extra_class_qty = "hiddenafter";
+                        } elseif ($qty_on_hand_filter == 'desc') {
+                            $extra_class_qty = "hiddenbefore";
+                        }
+                        if ($percentage_filter == 'asc') {
+                            $extra_class_percentage = "hiddenafter";
+                        } elseif ($percentage_filter == 'desc') {
+                            $extra_class_percentage = "hiddenbefore";
+                        } ?>
                         <a id="qty" href="#" class="sort-by <?php echo $qty_on_hand_filter . " " . $extra_class_qty; ?>">QTY On Hand</a>
                     </th>
                     <th class="center eleventh-cell">
                         <a href="#" class="sort-by <?php echo $thirty_days_filter . " " . $extra_class_30_days; ?>" id='30-days'>30<br> Days</a>
+                    </th>
+                    <th class="center eleventh-cell">
+                        <a href="#" class="sort-by <?php echo $percentage_filter . " " . $extra_class_percentage; ?>" id='percentage'>Percent</a>
                     </th>
                     <!--                    <th class="center seventh-cell">Low<br>Thresh</th>
                     <th class="center seventh-cell">Reorder<br>Thresh</th>
@@ -1175,31 +1149,37 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <tbody>
                 <?php
                 $row_even_odd = array('even', 'odd');
-
-        $even_odd_counter = 0;
-        foreach ($orderDetails as $orderDetail) {
-            $vendors = explode(',', $orderDetail->vendor_name);
-            $vendor_ids = explode(',', $orderDetail->vendor_id);
-            $vendor_prices = explode(',', $orderDetail->vendor_price);
-            $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
-            //                    if ($orderDetail->rare) {
-            //                        $row_classes .= " rare_item";
-            //                    } else {
-            //                        $row_classes .= " non_rare_item";
-            //                    }
-            //
-            //                    if ($orderDetail->new) {
-            //                        $row_classes .= " new_item";
-            //                    } else {
-            //                        $row_classes .= " non_new_item";
-            //                    }
-            if ($orderDetail->sale_30_days) {
-                $row_classes .= " 30_days";
-            }
-            if ($orderDetail->stock) {
-                $row_classes .= " stock";
-            }
-            $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id; ?>
+                $percent_value = '';
+                $even_odd_counter = 0;
+                foreach ($orderDetails as $orderDetail) {
+                    $vendors = explode(',', $orderDetail->vendor_name);
+                    $vendor_ids = explode(',', $orderDetail->vendor_id);
+                    $vendor_prices = explode(',', $orderDetail->vendor_price);
+                    $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
+                    $thirty_days_sale = $orderDetail->sale_30_days;
+                    if($thirty_days_sale == 0) {
+                        $thirty_days_sale = 1;
+                    }
+                    $percent_value = $orderDetail->stock / $thirty_days_sale * 100;
+                    
+                    //                    if ($orderDetail->rare) {
+                    //                        $row_classes .= " rare_item";
+                    //                    } else {
+                    //                        $row_classes .= " non_rare_item";
+                    //                    }
+                    //
+                    //                    if ($orderDetail->new) {
+                    //                        $row_classes .= " new_item";
+                    //                    } else {
+                    //                        $row_classes .= " non_new_item";
+                    //                    }
+                    if ($orderDetail->sale_30_days) {
+                        $row_classes .= " 30_days";
+                    }
+                    if ($orderDetail->stock) {
+                        $row_classes .= " stock";
+                    }
+                    $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id; ?>
                     <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>'>
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->new) ? "&#10004;" : "";
                                                             ?></td>-->
@@ -1207,34 +1187,35 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                             ?></td>-->
                         <?php
                         $thumnailID = get_post_thumbnail_id($orderDetail->product_id);
-            //          $product_url = get_permalink($orderDetail->product_id);
-            $product_admin_url = get_edit_post_link($orderDetail->product_id);
-            $product_image_src = '';
-            $product_image_src = wc_placeholder_img_src();
-            if ($thumnailID) {
-                $image_src = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
-                //$image = woocommerce_get_product_thumbnail(); // returns product image
-                //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
-                $product_image_src = $image_src[0];
-            }
-            $siteUrl = str_replace('wp', '', get_site_url());
-            if ($_SERVER['HTTP_HOST'] == "localhost") {
-                $imagepath = str_replace(get_site_url().'/wp-content', WP_CONTENT_DIR, $product_image_src);
-            } else {
-                $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
-            }
-            if(!file_exists($imagepath)) {
-                $product_image_src = wc_placeholder_img_src();
-            }            
-            ?>
+                        //          $product_url = get_permalink($orderDetail->product_id);
+                        $product_admin_url = get_edit_post_link($orderDetail->product_id);
+                        $product_image_src = '';
+                        $product_image_src = wc_placeholder_img_src();
+                        if ($thumnailID) {
+                            $image_src = wp_get_attachment_image_src($thumnailID, 'thumbnail'); // returns product image source
+                            //$image = woocommerce_get_product_thumbnail(); // returns product image
+                            //$image = wp_get_attachment_image($thumnailID,'thumbnail'); //returns product image
+                            $product_image_src = $image_src[0];
+                        }
+                        $siteUrl = str_replace('wp', '', get_site_url());
+                        if ($_SERVER['HTTP_HOST'] == "localhost") {
+                            $imagepath = str_replace(get_site_url() . '/wp-content', WP_CONTENT_DIR, $product_image_src);
+                        } else {
+                            $imagepath = str_replace($siteUrl . 'app', WP_CONTENT_DIR, $product_image_src);
+                        }
+                        if (!file_exists($imagepath)) {
+                            $product_image_src = wc_placeholder_img_src();
+                        }
+                        ?>
                         <td class="center third-cell">
-                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url;?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
-                                                                                                                                                                                            ?></a>-->
+                            <!--<a class="sku-thumbnail" href="<?php // echo $product_url;
+                                                                ?>" data-image="http://localhost/wordpress-14/wp-content/uploads/2016/09/Honda-FOB-11-150x150.jpg"><?php // echo $orderDetail->sku
+                                                                                                                                                                    ?></a>-->
                             <a class="sku-thumbnail" href="<?php echo $product_admin_url; ?>" data-image="<?php echo $product_image_src; ?>" target="_blank"><?php echo $orderDetail->sku ?></a>
 
                         </td>
                         <td class="center fourth-cell"><?php echo $orderDetail->vendor_sku ?></td>
-                        <td class="center fifth-cell"><?php echo($orderDetail->category) ?></td>
+                        <td class="center fifth-cell"><?php echo ($orderDetail->category) ?></td>
                         <td class="center sixth-cell">
                             <?php
                             if ($orderDetail->product_stock_status == 'OUT') {
@@ -1244,7 +1225,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             } ?>
                         </td>
                         <td class="center seventh-cell"><?php echo wc_price($orderDetail->regular_price) ?></td>
-                            <?php $purchase_orders_post_data_single_price = 0;?>
+                        <?php $purchase_orders_post_data_single_price = 0; ?>
                         <td class="eighth-cell">
                             <select id="row-selected-vendor-<?php echo $orderDetail->id ?>" class="vendor-select">
                                 <?php
@@ -1256,10 +1237,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                     if ($selected == 'selected') {
                                         $purchase_orders_post_data_single_price = $vendor_prices[$i];
                                     }
-                                    if($i == 0 && $selected == '') {
+                                    if ($i == 0 && $selected == '') {
                                         $purchase_orders_post_data_single_price = $vendor_prices[$i];
                                     }
-                                     ?>
+                                ?>
                                     <option <?php echo $selected; ?> data-vendor_price="<?php echo get_woocommerce_currency_symbol() . trim(number_format($vendor_prices[$i], 2)); ?>" value="<?php echo $vendor_ids[$i]; ?>"><?php echo $vendors[$i]; ?></option>
                                 <?php
                                 } ?>
@@ -1268,6 +1249,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <td class="center seventh-cell"><?php echo wc_price($purchase_orders_post_data_single_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
+                        <td class="center eleventh-cell"><?php echo number_format($percent_value, 2) . '%' ?></td>
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low
                                                             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder
@@ -1281,7 +1263,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     </tr>
                 <?php
                     $even_odd_counter++;
-        } ?>
+                } ?>
             </tbody>
         </table>
         <!-- stylesheet -->
@@ -1305,7 +1287,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.js'; ?>"></script>
         <!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>-->
         <script src="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.min.js'; ?>"></script>
-        
+
 
 
         <!--  -->
@@ -1316,14 +1298,14 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 // $('.wm-vm-go input[name="filter_action"]').on('click', function() {
                 // 	$(this.form).attr('method', 'get');
                 // });
-//                $(".sku-thumbnail").mouseenter(function() {
-//                    var image_name = $(this).data('image');
-//                    var imageTag = '<div class="image" style="position:absolute;">' + '<img src="' + image_name + '" alt="image" height="100" />' + '</div>';
-//                    $(this).parent('td').append(imageTag);
-//                });
-//                $(".sku-thumbnail").mouseleave(function() {
-//                    $(this).parent('td').children('div.image').remove();
-//                });
+                //                $(".sku-thumbnail").mouseenter(function() {
+                //                    var image_name = $(this).data('image');
+                //                    var imageTag = '<div class="image" style="position:absolute;">' + '<img src="' + image_name + '" alt="image" height="100" />' + '</div>';
+                //                    $(this).parent('td').append(imageTag);
+                //                });
+                //                $(".sku-thumbnail").mouseleave(function() {
+                //                    $(this).parent('td').children('div.image').remove();
+                //                });
                 var sorted_by_days = false;
                 var sorted_by_qty = false;
                 $(".sort-by").each(function() {
@@ -1403,7 +1385,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     }
 
                     var vendors_selected;
-                    if($("#primary_vendor_filter").val()){
+                    if ($("#primary_vendor_filter").val()) {
                         vendors_selected = $("#primary_vendor_filter").val().join('|');
                     }
                     $("#selected_vendors").val(vendors_selected);
@@ -1437,7 +1419,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var rare_item_filter = '';
                     var selected_statuses = new Array();
                     var selected_vendors = $("#primary_vendor_filter").val();
-                    if(!selected_vendors){
+                    if (!selected_vendors) {
                         show_all = true;
                     }
                     //console.log("selected vendors are "+selected_vendors);
@@ -1485,18 +1467,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             if (!selected_vendor_class_found) {
                                 show_row = false;
                             }
-                        }
-                        else{
+                        } else {
                             console.log(pre_selected_vendors);
                             if (pre_selected_vendors.length && pre_selected_vendors[0] != '' && show_all) {
                                 form_submit = true;
-                                }
+                            }
                             show_row = true;
                         }
                         if (form_submit == true) {
                             var vendors_selected = $("#primary_vendor_filter").val();
                             $("#selected_vendors").val("");
-                            if(vendors_selected){
+                            if (vendors_selected) {
                                 $("#selected_vendors").val(vendors_selected.join('|'));
                             }
                             $("#page-loader").show();
@@ -1641,11 +1622,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
             'posts_per_page' => -1
         );
         $loop = new WP_Query($args);
-       
+
         $counter = 0;
         $truncate = "TRUNCATE TABLE " . $table;
         $wpdb->query($truncate);
-        
+
         foreach ($loop->posts as $singleItem) {
             $counter++;
             $product = wc_get_product($singleItem->ID);
@@ -1729,14 +1710,14 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     foreach ($vendor_ids as  $vendor_id) {
                         $vendor_id_array[] = $vendor_id;
                         $vendor_names[] = get_the_title($vendor_id);
-                        $vendor_skus[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_sku', true);
-                        $vendor_price[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_last', true);
-                        $vendor_price_bulk[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_bulk', true);
-                        $vendor_price_notes[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_price_notes', true);
-                        $vendor_price_link[] = get_post_meta($id, 'wcvm_'.$vendor_id.'_link', true);
+                        $vendor_skus[] = get_post_meta($id, 'wcvm_' . $vendor_id . '_sku', true);
+                        $vendor_price[] = get_post_meta($id, 'wcvm_' . $vendor_id . '_price_last', true);
+                        $vendor_price_bulk[] = get_post_meta($id, 'wcvm_' . $vendor_id . '_price_bulk', true);
+                        $vendor_price_notes[] = get_post_meta($id, 'wcvm_' . $vendor_id . '_price_notes', true);
+                        $vendor_price_link[] = get_post_meta($id, 'wcvm_' . $vendor_id . '_link', true);
                     }
                 }
-            
+
                 $insert_data['product_id'] = $id;
                 $insert_data['product_title'] = $name;
                 $insert_data['sku'] =  $sku;
@@ -1753,7 +1734,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $insert_data['vendor_sku'] =  implode(',', $vendor_skus);
                 $insert_data['vendor_link'] = implode(',', $vendor_price_link);
                 $insert_data['vendor_price_bulk'] = implode(',', $vendor_price_bulk);
-                $insert_data['vendor_price_notes'] =implode(', ', $vendor_price_notes);
+                $insert_data['vendor_price_notes'] = implode(', ', $vendor_price_notes);
                 $insert_data['vendor_price'] = implode(', ', $vendor_price);
                 $insert_data['primary_vendor_id'] = get_post_meta($id, 'wcvm_primary', true);
                 $insert_data['primary_vendor_name'] = get_the_title($insert_data['primary_vendor_id']);
@@ -1766,16 +1747,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
         }
         wp_reset_postdata();
-//        $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
-//        from
-//        (
-//        SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
-//        FROM `wp_vendor_purchase_orders_items` p
-//        join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
-//        where o.post_status = 'on-order' OR o.post_status LIKE '%back-order%'
-//        group by product_id,o.post_status
-//        )p
-//        group by product_id");
+        //        $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
+        //        from
+        //        (
+        //        SELECT product_id,o.post_status as order_status ,sum(product_ordered_quantity) as order_quantity
+        //        FROM `wp_vendor_purchase_orders_items` p
+        //        join wp_vendor_purchase_orders o on o.id = p.vendor_order_idfk
+        //        where o.post_status = 'on-order' OR o.post_status LIKE '%back-order%'
+        //        group by product_id,o.post_status
+        //        )p
+        //        group by product_id");
         $productOrderData = $wpdb->get_results("select product_id,group_concat(order_status) as order_status,group_concat(order_quantity) as order_quantity
         from
         (
@@ -1787,14 +1768,14 @@ class WC_Clear_Com_Vendor_Inventory_Management
         group by product_id,o.post_status
         )p
         group by product_id");
-        
+
         if ($productOrderData) {
             foreach ($productOrderData as $singleRow) {
                 $backOrders = 0;
                 $onOrders = 0;
                 $explodedStatusData = explode(",", $singleRow->order_status);
                 $explodedCountData = explode(",", $singleRow->order_quantity);
-                for ($i=0;$i<count($explodedStatusData);$i++) {
+                for ($i = 0; $i < count($explodedStatusData); $i++) {
                     if (strpos($explodedStatusData[$i], "back-order") !== false) {
                         $backOrders = (int)$backOrders + (int)$explodedCountData[$i];
                     }
@@ -1910,32 +1891,32 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $wpdb->update('wp_vendor_po_lookup', $updateData, $where);
             }
         }
-       
-//        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
-//                FROM
-//                    wp_posts orders
-//                JOIN
-//                    wp_postmeta quantity
-//                ON
-//                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
-//                WHERE
-//                    orders.post_type = "wcvm-order" AND orders.post_status IN ("on-order", "back-order")
-//                GROUP BY
-//                    quantity.meta_key, orders.post_status';
-//        $data = $wpdb->get_results($sql);
-//        if ($data) {
-//            foreach ($data as $single_row) {
-//                $updateOnOrderData = [];
-//                if ($single_row->post_status == 'on-order') {
-//                    $updateOnOrderData['on_order'] = $single_row->quantity;
-//                } else if ($single_row->post_status == 'back-order') {
-//                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
-//                }
-//
-//                $where['product_id'] = $single_row->product_id;
-//                $wpdb->update('wp_vendor_po_lookup', $updateOnOrderData, $where);
-//            }
-//        }
+
+        //        $sql = 'SELECT substring(quantity.meta_key,8,POSITION("_qty" IN quantity.meta_key)-8) as product_id, orders.post_status, SUM(quantity.meta_value) as quantity
+        //                FROM
+        //                    wp_posts orders
+        //                JOIN
+        //                    wp_postmeta quantity
+        //                ON
+        //                    quantity.post_id = orders.ID AND quantity.meta_key like "wcvmgo_%_qty"
+        //                WHERE
+        //                    orders.post_type = "wcvm-order" AND orders.post_status IN ("on-order", "back-order")
+        //                GROUP BY
+        //                    quantity.meta_key, orders.post_status';
+        //        $data = $wpdb->get_results($sql);
+        //        if ($data) {
+        //            foreach ($data as $single_row) {
+        //                $updateOnOrderData = [];
+        //                if ($single_row->post_status == 'on-order') {
+        //                    $updateOnOrderData['on_order'] = $single_row->quantity;
+        //                } else if ($single_row->post_status == 'back-order') {
+        //                    $updateOnOrderData['on_vendor_bo'] = $single_row->quantity;
+        //                }
+        //
+        //                $where['product_id'] = $single_row->product_id;
+        //                $wpdb->update('wp_vendor_po_lookup', $updateOnOrderData, $where);
+        //            }
+        //        }
         $sql = "select p.id as product_id
                 from wp_posts p 
                 join wp_postmeta m on m.post_id = p.ID and m.meta_key = 'wcvm_new'
@@ -1995,7 +1976,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
     public function vendorManagemetMenuPage()
     {
-        ?>
+    ?>
         <div class="wrap">
 
             <h1><?= esc_html__('Vendors', 'wcvim') ?> <a href="#edit-form" class="page-title-action" data-action="wcvim-edit"><?= esc_html__('Add Vendor') ?></a></h1>
@@ -2054,9 +2035,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <br class="clear">
             <?php
             global $wpdb;
-        $query = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'wcvm-vendor' AND post_status = 'publish'";
-        $data = $wpdb->get_results($query);
-        if ($data) {
+            $query = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'wcvm-vendor' AND post_status = 'publish'";
+            $data = $wpdb->get_results($query);
+            if ($data) {
             ?>
                 <style>
                     .wp-list-table.wcvm-vendors .table-view-list td {
@@ -2099,12 +2080,12 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                     if ($contact_name) {
                                         echo $contact_name . "<br>";
                                     }
-                            if ($contact_email) {
-                                echo $contact_email . "<br>";
-                            }
-                            if ($contact_phone) {
-                                echo $contact_phone . "<br>";
-                            } ?></td>
+                                    if ($contact_email) {
+                                        echo $contact_email . "<br>";
+                                    }
+                                    if ($contact_phone) {
+                                        echo $contact_phone . "<br>";
+                                    } ?></td>
                                 <td><?php echo $post_content; ?></td>
                                 <!--<td></td>-->
                             </tr>
@@ -2113,7 +2094,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     </tbody>
                 </table>
                 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
-<!--                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
+                <!--                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>-->
                 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
                 <script>
                     jQuery(document).ready(function() {
@@ -2134,7 +2115,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     }
                 </style>
             <?php
-        } ?>
+            } ?>
         </div>
         <?php add_thickbox(); ?>
         <script type="text/javascript">

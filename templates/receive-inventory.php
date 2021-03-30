@@ -4,6 +4,22 @@
  * @var WP_Post[] $vendors
  */
 ?>
+<style>
+textarea::-webkit-input-placeholder {
+    padding: 7px;
+}
+textarea:-moz-placeholder {
+    /* Firefox 18- */
+    padding: 7px;
+}
+textarea::-moz-placeholder {
+    /* Firefox 19+ */
+    padding: 7px;
+}
+textarea:-ms-input-placeholder {
+    padding: 7px;
+}
+</style>
 <div class="wrap">
     <?php
     /* start post request */
@@ -145,6 +161,8 @@
                         $data['product_quantity_canceled'] = (int) $_POST['product_quantity_canceled'][$single_order->product_id];
                         $data['product_quantity_returned'] = (int) $_POST['product_quantity_returned'][$single_order->product_id];
                         $data['product_expected_date_back_order'] = $_POST['product_expected_date_back_order'][$single_order->product_id];
+                        $data['product_quantity_returned_note'] = $_POST['product_quantity_returned_note'][$single_order->product_id];
+                        $data['product_quantity_canceled_note'] = $_POST['product_quantity_canceled_note'][$single_order->product_id];
                         
                         if ($data['product_quantity_back_order'] && $data['product_expected_date_back_order']) {
                             $data['product_expected_date_back_order'] = strtotime($data['product_expected_date_back_order']);
@@ -209,6 +227,8 @@
                         $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                         $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
                         $update_data['product_quantity_returned'] = $data['product_quantity_returned'];
+                        $update_data['product_quantity_returned_note'] = $data['product_quantity_returned_note'];
+                        $update_data['product_quantity_canceled_note'] = $data['product_quantity_canceled_note'];
                         if (!empty($expectedDate)) {
                             $update_data['product_expected_date'] = $expectedDate;
                         }
@@ -416,12 +436,22 @@
                             <td><?php echo wc_price($order->vendor_price_last); ?></td>
                             <td id="quantity_<?php echo $order->product_id; ?>" data-quantity="<?php echo $product_quantity; ?>"><?php echo $product_quantity; ?></td>
                             <td><input type="text" name="product_quantity_received[<?php echo $order->product_id; ?>]" data-role="product_quantity_received" value="<?php echo $product_quantity_received; ?>" style="width:60px;"></td>
-                            <td><input type="text" name="product_quantity_returned[<?php echo $order->product_id; ?>]" data-role="product_quantity_returned" value="<?php echo $product_quantity_returned; ?>" style="width:60px;"></td>
+                            <td><input type="text" id="<?php echo $order->product_id; ?>" name="product_quantity_returned[<?php echo $order->product_id; ?>]" data-role="product_quantity_returned" value="<?php echo $product_quantity_returned; ?>" style="width:60px;"></td>
                             <!--<td><input type="text" name="product_quantity_back_order[<?php // echo $order->product_id; ?>]" data-role="product_quantity_back_order" value="<?php echo $product_quantity_back_order; ?>" style="width:60px;"></td>-->
-                            <td><input type="text" name="product_quantity_canceled[<?php echo $order->product_id; ?>]" data-role="product_quantity_canceled" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
-                            <!--<td><input type="text" autocomplete="off" name="product_expected_date_back_order[<?php // echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php echo $product_expected_date_back_order; ?>"></td>-->                    
+                            <td><input type="text" id="<?php echo $order->product_id; ?>" name="product_quantity_canceled[<?php echo $order->product_id; ?>]" data-role="product_quantity_canceled" value="<?php echo $product_quantity_canceled; ?>" style="width:60px;"></td>
+                            <!--<td><input type="text" autocomplete="off" name="product_expected_date_back_order[<?php // echo $order->product_id; ?>]" style="text-align: center;width: 70px;font-size: 10px;" data-role="datetime" value="<?php // echo $product_expected_date_back_order; ?>"></td>-->                    
             <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
                             <!--<td></td>-->
+                        </tr>
+                        <tr>
+                            <td colspan="11">
+                                <textarea class="hidden" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="11">
+                                <textarea class="hidden" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Cancelled:" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
+                            </td>    
                         </tr>
                     <?php } ?>
                 </tbody>
@@ -466,6 +496,18 @@
 <script>
     jQuery(document).ready(function ($) {
         "use strict";
+
+        $(document).on('keyup', 'input', function () {
+            var id = $(this).attr('id');
+            var input_type = $(this).data('role');
+            console.log(input_type);
+            $('[name ="' + input_type + '_note[' + id + ']"]').addClass('hidden');
+            $('[name ="' + input_type + '_note[' + id + ']"]').addClass('hidden');
+            if($(this).val() > 0) {
+                $('[name ="' + input_type + '_note[' + id + ']"]').removeClass('hidden');
+                $('[name ="' + input_type + '_note[' + id + ']"]').removeClass('hidden');
+            }
+         });
 
         /* start validate receiven inventory inputs */
         $(document).on('click', 'button[data-role="receive-inventory"]', function () {
