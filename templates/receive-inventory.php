@@ -443,12 +443,12 @@ textarea:-ms-input-placeholder {
             <!--                    <td><input type="text" value="" style="width:60px;"></td>-->
                             <!--<td></td>-->
                         </tr>
-                        <tr>
+                        <tr class="hidden" id="product_quantity_returned_note-<?php echo $order->product_id; ?>">
                             <td colspan="11">
                                 <textarea class="hidden" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="hidden" id="product_quantity_canceled_note-<?php echo $order->product_id; ?>">
                             <td colspan="11">
                                 <textarea class="hidden" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Cancelled:" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
                             </td>    
@@ -500,12 +500,11 @@ textarea:-ms-input-placeholder {
         $(document).on('keyup', 'input', function () {
             var id = $(this).attr('id');
             var input_type = $(this).data('role');
-            console.log(input_type);
             $('[name ="' + input_type + '_note[' + id + ']"]').addClass('hidden');
-            $('[name ="' + input_type + '_note[' + id + ']"]').addClass('hidden');
+            $('#' + input_type + '_note-' + id).addClass('hidden');
             if($(this).val() > 0) {
                 $('[name ="' + input_type + '_note[' + id + ']"]').removeClass('hidden');
-                $('[name ="' + input_type + '_note[' + id + ']"]').removeClass('hidden');
+                $('#' + input_type + '_note-' + id).removeClass('hidden');
             }
          });
 
