@@ -171,6 +171,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         `primary_vendor_name` text,
         `on_order` int(11) DEFAULT NULL,
         `sale_30_days` int(11) DEFAULT NULL,
+        `stock_30_days_sale_percent` decimal(10,2) DEFAULT NULL,
         `order_qty` int(11) DEFAULT NULL,
         `on_vendor_bo` int(11) DEFAULT NULL,
         `new` int(11) DEFAULT NULL,
@@ -770,11 +771,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $order_by[] = "v.stock " . $qty_on_hand_filter;
             }
             if (!empty($percentage_filter)) {
-                $order_by[] = "v.stock " . $percentage_filter;
+                $order_by[] = "v.stock_30_days_sale_percent " . $percentage_filter;
             }
         } else {
             $percentage_filter = 'desc';
-            $order_by[] = "v.stock " . $percentage_filter;
+            $order_by[] = "v.stock_30_days_sale_percent " . $percentage_filter;
         }
         $where = '';
         //$where = " WHERE v.stock_status IN ('outofstock','instock')";
@@ -1158,7 +1159,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                                                                             ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
-                <input type="hidden" name="percentage" id="percentage" value="<?php echo $percentage_filter; ?>" />
+                <input type="hidden" name="percentage" id="percentage_filter" value="<?php echo $percentage_filter; ?>" />
 
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
             </form>
@@ -1212,7 +1213,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <a href="#" class="sort-by <?php echo $thirty_days_filter . " " . $extra_class_30_days; ?>" id='30-days'>30<br> Days</a>
                     </th>
                     <th class="center eleventh-cell">
-                        <a href="#" class="sort-by <?php echo $percentage_filter . " " . $extra_class_percentage; ?>" id='percentage'>Percent</a>
+                        <a href="#" class="sort-by <?php echo $percentage_filter . " " . $extra_class_percentage; ?>" id='percentage'>QTY On Hand / 30 Days</a>
                     </th>
                     <!--                    <th class="center seventh-cell">Low<br>Thresh</th>
                     <th class="center seventh-cell">Reorder<br>Thresh</th>
@@ -1226,18 +1227,12 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <tbody>
                 <?php
                 $row_even_odd = array('even', 'odd');
-                $percent_value = '';
                 $even_odd_counter = 0;
                 foreach ($orderDetails as $orderDetail) {
                     $vendors = explode(',', $orderDetail->vendor_name);
                     $vendor_ids = explode(',', $orderDetail->vendor_id);
                     $vendor_prices = explode(',', $orderDetail->vendor_price);
                     $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
-                    $thirty_days_sale = $orderDetail->sale_30_days;
-                    if($thirty_days_sale == 0) {
-                        $thirty_days_sale = 1;
-                    }
-                    $percent_value = $orderDetail->stock / $thirty_days_sale * 100;
                     
                     //                    if ($orderDetail->rare) {
                     //                        $row_classes .= " rare_item";
@@ -1326,7 +1321,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <td class="center seventh-cell"><?php echo wc_price($purchase_orders_post_data_single_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
-                        <td class="center eleventh-cell"><?php echo number_format($percent_value, 2) . '%' ?></td>
+                        <td class="center eleventh-cell"><?php echo number_format($orderDetail->stock_30_days_sale_percent, 2) . '%' ?></td>
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low
                                                             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder
@@ -1391,6 +1386,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             sorted_by_days = true;
                         } else if ($(this).attr('id') == 'qty') {
                             sorted_by_qty = true;
+                        } else if ($(this).attr('id') == 'percentage') {
+                            sorted_by_qty = true;
                         }
                     }
                 });
@@ -1435,6 +1432,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 $(this).removeClass('hiddenbefore');
                                 $(this).removeClass('hiddenafter');
                             }
+                        } else if ($(this).attr('id') == 'percentage') {
+                            if (sorted_by_qty) {
+                                if ($(this).hasClass('hiddenafter')) {
+                                    $(this).removeClass('hiddenafter');
+                                    $(this).addClass('hiddenbefore');
+                                } else if ($(this).hasClass('hiddenbefore')) {
+                                    $(this).removeClass('hiddenbefore');
+                                    $(this).addClass('hiddenafter');
+                                }
+                            } else {
+                                $(this).removeClass('hiddenbefore');
+                                $(this).removeClass('hiddenafter');
+                            }
                         }
                     }
                 });
@@ -1450,6 +1460,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $("#30_days").val('asc');
                         }
                         $("#qty_on_hand").val("");
+                        $("#percentage_filter").val("");
                     } else if ($(this).attr('id') == 'qty') {
                         if ($(this).hasClass('asc')) {
                             $("#qty_on_hand").val('desc');
@@ -1459,6 +1470,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $("#qty_on_hand").val('asc');
                         }
                         $("#30_days").val("");
+                        $("#percentage_filter").val("");
+                    } else if ($(this).attr('id') == 'percentage') {
+                        if ($(this).hasClass('asc')) {
+                            $("#percentage_filter").val('desc');
+                        } else if ($(this).hasClass('desc')) {
+                            $("#percentage_filter").val('asc');
+                        } else {
+                            $("#percentage_filter").val('asc');
+                        }
+                        $("#30_days").val("");
+                        $("#qty_on_hand").val("");
                     }
 
                     var vendors_selected;
@@ -1909,6 +1931,21 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $ajaxResponse['success'] = true;
         }
 
+        $sql = "select * from wp_vendor_po_lookup";
+        $data = $wpdb->get_results($sql);
+        if($data) {
+            $percent_value = '';
+            foreach ($data as $single_row) {
+                $thirty_days_sale = $single_row->sale_30_days;
+                    if($thirty_days_sale == 0) {
+                        $thirty_days_sale = 1;
+                    }
+                $percent_value = $single_row->stock / $thirty_days_sale * 100;
+                $updateNewData['stock_30_days_sale_percent'] = $percent_value;
+                $where['product_id'] = $single_row->product_id;
+                $wpdb->update('wp_vendor_po_lookup', $updateNewData, $where);
+            }  
+        }
         $deleteQuery = "DELETE FROM wp_vendor_po_lookup WHERE id  NOT IN (
             SELECT id 
             FROM `wp_vendor_po_lookup` 
