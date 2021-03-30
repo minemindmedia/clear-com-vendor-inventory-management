@@ -84,12 +84,18 @@
                         <th><?php echo $header; ?></th><?php
                     }
                     ?>
+                    <th style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><div class="text-sm font-semibold">Return QTY</div></th>                                                
                 </tr>
             </tfoot>
 
             </table>
 
             <div class="flex space-x-2">
+            <div class="self-center text-base font-semibold">
+                <button type="button" data-id="<?= esc_attr($last_order_id) ?>" class="open-return block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                    <?php echo 'Open New Return'; ?>
+                </button>
+            </div>
                         <div class="flex-1"></div>
                 <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
@@ -134,7 +140,11 @@
                     <div class="flex flex-1">
 
                     </div>
-
+                    <div style="display:none;" class="self-center text-base font-semibold order-headers-<?php echo $order->order_id ?>">
+                        <button type="submit" name="action" value="new-return" data-role="new-return" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
+                            <?php echo 'Return'; ?>
+                        </button>
+                    </div>
                     <div class="self-center text-base font-semibold">
                         <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '- Collapse'; ?>">
                             <?php echo '+ Expand'; ?>
@@ -160,6 +170,7 @@
                                     <?php
                                 }
                                 ?>
+                                <th style="display:none;" class="order-headers-<?php echo $order->order_id ?>"><div class="text-sm font-semibold">Return QTY</div></th>                                
                             </tr>
                         </thead>
                         <tbody>
@@ -246,8 +257,8 @@
 //                            }
                                 ?>
 
-                                <td><input readonly="true" type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
-
+                                <td><input readonly="true" type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" data-quantity="<?php echo $order_product_Qty;     ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
+                                <td style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><input type="text" data-role="product_quantity_returned"name="<?php echo 'product_quantity_returned[' . $order->product_id . ']'; ?>" data-role="product_quantity_returned" value="0" style="width:60px;"></td>
                                 
                         </tr>
 
@@ -264,12 +275,18 @@
                                 ?><th><?php echo $header; ?></th><?php
                             }
                             ?>
+                            <th style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><div class="text-sm font-semibold">Return QTY</div></th>                            
                         </tr>
                     </tfoot>
 
                 </table>
 
                 <div class="flex space-x-2">
+                <div class="self-center text-base font-semibold">
+                <button type="button" data-id="<?= esc_attr($last_order_id) ?>" class="open-return block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                    <?php echo 'Open New Return'; ?>
+                </button>
+            </div>                
                         <div class="flex-1"></div>
                 <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">

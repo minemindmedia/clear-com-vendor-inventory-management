@@ -1,17 +1,47 @@
 jQuery(document).ready(function ($) {
     $("#filter-vendor").show();
     $("#filter_action").show();
-    $(".sku-thumbnail").mouseenter(function() {
+    $(".open-return").on('click', function () {
+        var header;
+        var orderId;
+        orderId = $(this).data('id');
+        $(".order-headers-" + orderId + "").show();
+    });
+    $(document).on('click', 'button[data-role="new-return"]', function () {
+        var element = $(this);
+        var form = element.parents('form:first');
+        var isValid = false;
+        $.each($('[data-quantity]', form), function (key, item) {
+            item = $(item);
+            var quantity = parseInt(item.attr('data-quantity'));
+            var returned = $('input[data-role="product_quantity_returned"]', item.parents('tr:first')).val();
+
+            returned = returned ? parseInt(returned) : 0;
+            if (returned <= quantity) {
+                isValid = true;
+            } else {
+                isValid = false;
+            }
+            if (!isValid) {
+                alert("'Return Qty' should be less than or equal to 'Received Qty'");
+                return false;
+            }        
+        });
+                return isValid;
+        
+    });
+
+    $(".sku-thumbnail").mouseenter(function () {
         var image_name = $(this).data('image');
         var imageTag = '<div class="image" style="position:absolute;">' + '<img class="image-class" style="height:5rem !important;border:none !important" src="' + image_name + '" alt="image" height="100" />' + '</div>';
         $(this).parent('td').append(imageTag);
     });
-    $(".sku-thumbnail").mouseleave(function() {
+    $(".sku-thumbnail").mouseleave(function () {
         $(this).parent('td').children('div.image').hide();
     });
-        var container = $('#wcvmcpAdminProduct');
-        // adding vendor
-    container.on('click', '[data-role="add"]', function() {
+    var container = $('#wcvmcpAdminProduct');
+    // adding vendor
+    container.on('click', '[data-role="add"]', function () {
         var select = $('#wcvm_add', container);
         var id = select.val();
         if (!id) {
@@ -22,49 +52,49 @@ jQuery(document).ready(function ($) {
 
         var prototype = $('[data-role="prototype"]', container).clone();
         prototype.attr('data-role', null);
-        $.each($('[name="wcvm[]"]', prototype), function(key, element) {
+        $.each($('[name="wcvm[]"]', prototype), function (key, element) {
             element = $(element);
             element.val(id);
         });
-        $.each($('[data-role="delete"]', prototype), function(key, element) {
+        $.each($('[data-role="delete"]', prototype), function (key, element) {
             element = $(element);
             element.attr('data-id', id);
         });
-        $.each($('[data-role="primary"]', prototype), function(key, element) {
+        $.each($('[data-role="primary"]', prototype), function (key, element) {
             element = $(element);
             element.val(id);
         });
-        $.each($('[for*=":ID:"]', prototype), function(key, element) {
+        $.each($('[for*=":ID:"]', prototype), function (key, element) {
             element = $(element);
             element.attr('for', element.attr('for').replace(':ID:', id));
         });
-        $.each($('[id*=":ID:"]', prototype), function(key, element) {
+        $.each($('[id*=":ID:"]', prototype), function (key, element) {
             element = $(element);
             element.attr('id', element.attr('id').replace(':ID:', id));
         });
-        $.each($('[name*=":ID:"]', prototype), function(key, element) {
+        $.each($('[name*=":ID:"]', prototype), function (key, element) {
             element = $(element);
             element.attr('name', element.attr('name').replace(':ID:', id));
         });
-        $.each($('[data-id*=":ID:"]', prototype), function(key, element) {
+        $.each($('[data-id*=":ID:"]', prototype), function (key, element) {
             element = $(element);
             element.attr('data-id', element.attr('data-id').replace(':ID:', id));
         });
-        $.each($('[data-role="title"]', prototype), function(key, element) {
+        $.each($('[data-role="title"]', prototype), function (key, element) {
             element = $(element);
             element.text(title);
         });
         $('[data-role="border"]', container).before(prototype);
         prototype.slideDown();
     });
-        // deleting vendor
-    container.on('click', '[data-role="delete"]', function() {
+    // deleting vendor
+    container.on('click', '[data-role="delete"]', function () {
         var element = $(this);
         var select = $('#wcvm_add', container);
         var id = element.attr('data-id');
         $('[value="' + id + '"]', select).attr('disabled', null);
         select.val('');
-        element.parents('div.options_group:first').slideUp(function() {
+        element.parents('div.options_group:first').slideUp(function () {
             $(this).remove();
         });
     });
@@ -126,10 +156,10 @@ jQuery(document).ready(function ($) {
                 console.log(response.insert);
                 window.location.href = response.redirect_url
             });
-                }else{
+        } else {
             $("#loading").remove();
             alert('Please Select some Products to generate Purchase Order');
-                }
+        }
 
     });
     $('.vendor-select').on('keyup change', function (e) {
@@ -147,11 +177,11 @@ jQuery(document).ready(function ($) {
     $('.sync-vendor-details').on('click', function (e) {
         e.preventDefault();
         var sync_action = '';
-        if($(this).hasClass('sync-vendor-product-mapping')) {
+        if ($(this).hasClass('sync-vendor-product-mapping')) {
             sync_action = 'sync_vendor_product_mapping_table';
-        } else if($(this).hasClass('sync-vendor-po')) {
+        } else if ($(this).hasClass('sync-vendor-po')) {
             sync_action = 'sync_vendor_po_lookup_table';
-        } else if($(this).hasClass('update-vendor-po')) {
+        } else if ($(this).hasClass('update-vendor-po')) {
             sync_action = 'update_vendor_po_lookup';
         }
         $("body").append("<div id='wcvim_spinner' style='width: 100%;height: 100%;top: 0;left: 0;position: fixed;opacity: 0.7; background-color: #fff;z-index: 99;text-align: center;'><img style=' position: absolute;top: 50%;left: 50%;z-index:100 ' width='50' height='50' class='label-spinner' src='" + home_url + "'></div>");
@@ -200,13 +230,13 @@ jQuery(document).ready(function ($) {
                 $("form#" + searchValue).show();
 
             }
-        }else{
-             $("form.purchase-order").show();
+        } else {
+            $("form.purchase-order").show();
         }
     });
 
 });
 //jQuery(window).load(function() {
-jQuery(window).bind("load", function() {
+jQuery(window).bind("load", function () {
     jQuery("#page-loader").fadeOut("slow");
 });
