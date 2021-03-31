@@ -281,6 +281,7 @@ textarea:-ms-input-placeholder {
         <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://kit.fontawesome.com/4de99c111d.js" crossorigin="anonymous"></script>
         <?php
+        require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
         global $wpdb;
         $records = false;
         $status = "";
@@ -488,7 +489,10 @@ textarea:-ms-input-placeholder {
         <br><br>
         <?php
     } if (!$records) {
-        echo 'No Orders Found';
+        ?>
+        <div class="flex border-2 border-t-8 border-green-600 p-8 mb-4 bg-gray-50 text-lg text-semibold">
+            No orders are currently completed.
+        </div><?php
     }
     ?>
 </div>

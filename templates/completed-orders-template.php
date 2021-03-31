@@ -84,20 +84,20 @@
                         <th><?php echo $header; ?></th><?php
                     }
                     ?>
-                    <th style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><div class="text-sm font-semibold">Return QTY</div></th>                                                
+                    <th style="display:none;" class="order-headers-<?php echo $last_order_id; ?>"><div class="text-sm font-semibold">Return QTY</div></th>                                                
                 </tr>
             </tfoot>
 
             </table>
 
             <div class="flex space-x-2">
-            <div class="self-center text-base font-semibold">
-                <button type="button" data-id="<?= esc_attr($last_order_id) ?>" class="open-return block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
-                    <?php echo 'Open New Return'; ?>
-                </button>
-            </div>
-                        <div class="flex-1"></div>
-                <div>
+            <div class="flex-1"></div>
+                <div style="display:none" class="self-center text-base font-semibold order-headers-<?php echo $last_order_id; ?>">
+                        <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
+                            <?php echo 'Save Returns'; ?>
+                        </button>
+                    </div>
+                    <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
                     <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="print" class="svg-inline--fa fa-print fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"></path></svg>
                         <span class="self-center"><?= esc_html__('Print Order', 'wcvm') ?></span>
@@ -140,11 +140,11 @@
                     <div class="flex flex-1">
 
                     </div>
-                    <div style="display:none;" class="self-center text-base font-semibold order-headers-<?php echo $order->order_id ?>">
-                        <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
-                            <?php echo 'Save Returns'; ?>
-                        </button>
-                    </div>
+                    <div class="self-center text-base font-semibold">
+                <button type="button" value="open-return" id="open-return-<?php echo $order->order_id; ?>" data-id="<?= esc_attr($order->order_id) ?>" class="open-return return-<?php echo $order->order_id; ?> block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                    <?php echo 'Open New Return'; ?>
+                </button>
+            </div>                    
                     <div class="self-center text-base font-semibold">
                         <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '- Collapse'; ?>">
                             <?php echo '+ Expand'; ?>
@@ -255,13 +255,18 @@
                                     $order_product_Qty = 0;
                                 }
 //                            }
+                                $product_quantity_returned = 0;
                                 ?>
 
                                 <td><input readonly="true" type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" data-quantity="<?php echo $order_product_Qty;     ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
-                                <td style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><input type="text" data-role="product_quantity_returned"name="<?php echo 'product_quantity_returned[' . $order->product_id . ']'; ?>" data-role="product_quantity_returned" value="0" style="width:60px;"></td>
+                                <td style="display:none;" class="order-headers-<?php echo $last_order_id ?>"><input type="text" data-role="product_quantity_returned" id="<?php echo $order->product_id; ?>" name="<?php echo 'product_quantity_returned[' . $order->product_id . ']'; ?>" data-role="product_quantity_returned" value="<?php echo $product_quantity_returned; ?>" style="width:60px;"></td>
                                 
                         </tr>
-
+                        <tr class="hidden order-headers-<?php echo $last_order_id ?>" id="product_quantity_returned_note-<?php echo $order->product_id; ?>">
+                            <td colspan="10">
+                                <textarea class="hidden" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_returned; ?>" style="width:100%;"></textarea>
+                            </td>
+                        </tr>
                         <?php
 //                        }
                     }
@@ -282,12 +287,12 @@
                 </table>
 
                 <div class="flex space-x-2">
-                <div class="self-center text-base font-semibold">
-                <button type="button" data-id="<?= esc_attr($last_order_id) ?>" class="open-return block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
-                    <?php echo 'Open New Return'; ?>
-                </button>
-            </div>                
                         <div class="flex-1"></div>
+                        <div style="display:none;" class="self-center text-base font-semibold order-headers-<?php echo $order->order_id ?>">
+                        <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
+                            <?php echo 'Save Returns'; ?>
+                        </button>
+                    </div>
                 <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
                     <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="print" class="svg-inline--fa fa-print fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"></path></svg>
@@ -353,6 +358,25 @@ function get_print_status($order = FALSE) {
     }
 }
 ?>
+<script>
+    jQuery(document).ready(function ($) {
+        "use strict";
+
+        $(document).on('keyup', 'input', function () {
+            var id = $(this).attr('id');
+            console.log(id);
+            var input_type = $(this).data('role');
+            console.log(input_type);
+            $('[name ="' + input_type + '_note[' + id + ']"]').addClass('hidden');
+            $('#' + input_type + '_note-' + id).addClass('hidden');
+            if($(this).val() > 0) {
+                $('[name ="' + input_type + '_note[' + id + ']"]').removeClass('hidden');
+                $('[name ="' + input_type + '_note[' + id + ']"]').prop('required',true);
+                $('#' + input_type + '_note-' + id).removeClass('hidden');
+            }
+         });
+         });
+</script>
 <!--<script>
     function mark_closed(id)
     {

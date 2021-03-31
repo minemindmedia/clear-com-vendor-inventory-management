@@ -22,7 +22,8 @@
 
 </style>
 <div class="wrap">
-    <?php
+    <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
+<?php
     global $wpdb;
     $records = false;
 
@@ -300,8 +301,17 @@
 <!--                                <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>-->
                                 
                         </tr>
-
+                            <?php
+                            $product_quantity_canceled_note = $order->product_quantity_canceled_note;
+                            if($order_product_Qty && $product_quantity_canceled_note != ''){
+                                ?>
+                                <tr id="product_quantity_canceled_note-<?php echo $order->product_id; ?>">
+                                    <td colspan="9">
+                                        <textarea readonly="true" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="QTY Returned Notes" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled_note; ?>" style="width:100%;padding-left:10px;"><?php echo $product_quantity_canceled_note; ?></textarea>
+                                    </td>
+                                </tr>
                         <?php
+                        }
 //                        }
                     }
                     if ($records) {

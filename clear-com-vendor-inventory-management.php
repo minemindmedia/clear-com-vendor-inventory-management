@@ -312,8 +312,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
     }
     public function wcvimReceiveInventoryRemove()
     {
-        add_menu_page(__('Receive Inventory', 'wcvim'), __('Receive Inventory', 'wcvim'), 'manage_options', 'wcvm-ri', array($this, 'wcvimReceiveInventoryPage'));
-        remove_menu_page('wcvm-ri');
+//        add_menu_page(__('Receive Inventory', 'wcvim'), __('Receive Inventory', 'wcvim'), 'manage_options', 'wcvm-ri', array($this, 'wcvimReceiveInventoryPage'));
+//        remove_menu_page('wcvm-ri');
     }
 
     public function wcvimgeneratePo()
@@ -343,6 +343,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
     public function wcvimPurchaseOrderPage()
     {
+        $menu = isset($_REQUEST['menu']) ? $_REQUEST['menu'] : '';
+        if($menu){
+            $this->wcvimReceiveInventoryPage();
+        }else{
         global $wpdb;
         $vendor_purchase_order_table = $wpdb->prefix . 'vendor_purchase_orders';
         $vendor_purchase_order_items_table = $wpdb->prefix . 'vendor_purchase_orders_items';
@@ -387,6 +391,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $orderId = $_POST['ID'];
                 $valid = true;
                 foreach ($_POST['__order_qty'] as $productId => $_) {
+                    $updatePOProductData = array();
                     $poStatus = $_POST['status'];
                     $getPOLineItemDetails = $wpdb->get_results(""
                             . "SELECT * FROM " . $vendor_purchase_order_table . " po "
@@ -403,6 +408,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $valid = false;
                         }
                         if ($valid) {
+                            if($_POST['product_quantity_returned_note'][$productId] != ""){
+                                $updatePOProductData['product_quantity_returned_note'] = $getPOLineItemDetails[0]->product_quantity_returned_note ." ". $_POST['product_quantity_returned_note'][$productId];
+                            }
                             $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
                             $updatePOProductData['updated_by'] = get_current_user_id();
                             $wherePOProductData['product_id'] = $productId;
@@ -453,7 +461,6 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $update_po_data['updated_by'] = get_current_user_id();
                             $where_po['order_id'] = $orderId;
                             $updated = $wpdb->update($vendor_purchase_order_table, $update_po_data, $where_po);
-                            wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=returned'));                                                        
                         }
                     }
                 }
@@ -553,6 +560,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             require_once plugin_dir_path(__FILE__) . 'templates/trash-template.php';
         }
         //        require_once plugin_dir_path(__FILE__) . 'templates/purchase_order_page.php';
+    }
     }
 
     public function wcvimReceiveInventoryPage()
@@ -785,6 +793,26 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $purchase_orders_post_data = explode("|", $_GET['selected_vendors']);
                 $where = " WHERE v.primary_vendor_id IN (" . implode(",", $purchase_orders_post_data) . ")";
             }
+        }
+        $strt_range = 0;
+        $end_range = 0;
+        if (array_key_exists('strt_range', $_GET)) {
+            if ($_GET['strt_range'] != "") {
+                $strt_range = $_GET['strt_range'];
+            }
+        }
+        if (array_key_exists('end_range', $_GET)) {
+            if ($_GET['end_range'] != "") {
+                $end_range = $_GET['end_range'];
+            }
+        }
+        if($strt_range || $end_range){
+            if($where == ""){
+                $where = " WHERE ";
+            }else{
+                $where .=" AND ";
+            }
+            $where .= " v.stock_30_days_sale_percent BETWEEN $strt_range AND $end_range ";
         }
         /* if (array_key_exists('selected_status', $_GET)) {
           if ($_GET['selected_status'] != "") {
@@ -1155,12 +1183,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>" />
+                <input type="hidden" name="prev_strt_range" id="prev_strt_range" value="<?php if($strt_range){echo $strt_range;} ?>" />
+                <input type="hidden" name="prev_end_range" id="prev_end_range" value="<?php if($strt_range){echo $strt_range;} ?>" />
                 <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;
                                                                                             ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
                 <input type="hidden" name="percentage" id="percentage_filter" value="<?php echo $percentage_filter; ?>" />
 
+                <input type="text" name="strt_range" id="strt_range" placeholder="Input Range Value" value="<?php if($strt_range){echo $strt_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                
+                <input type="text" name="end_range" id="end_range" placeholder="Input Range Value" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
             </form>
             <!-- end filter section -->
@@ -1219,7 +1251,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     <th class="center seventh-cell">Reorder<br>Thresh</th>
                     <th class="center seventh-cell">Reorder<br>QTY</th>-->
                     <th class="center seventh-cell">On<br>Order</th>
-                    <th class="center seventh-cell">On<br>Vendor<br>BO</th>
+<!--                    <th class="center seventh-cell">On<br>Vendor<br>BO</th>-->
                     <th class="center seventh-cell">Order<br>QTY</th>
                     <th class="center seventh-cell">Add<br>To<br>PO</th>
                 </tr>
@@ -1251,8 +1283,13 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     if ($orderDetail->stock) {
                         $row_classes .= " stock";
                     }
+                    $percent = false;
+//                    if($orderDetail->stock_30_days_sale_percent > 0){
+                        $row_classes .= " percent";
+                        $percent = true;
+//                    }
                     $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id; ?>
-                    <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>'>
+                    <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>' <?php if($percent){ ?>data-percentage="<?php echo $orderDetail->stock_30_days_sale_percent; }?>">
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->new) ? "&#10004;" : "";
                                                             ?></td>-->
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->rare) ? "&#10004;" : "";
@@ -1329,7 +1366,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->reorder_qty
                                                             ?></td>-->
                         <td class="center seventh-cell"><?php echo $orderDetail->on_order ? $orderDetail->on_order : 0 ?></td>
-                        <td class="center seventh-cell"><?php echo $orderDetail->on_vendor_bo; ?></td>
+                        <!--<td class="center seventh-cell"><?php // echo $orderDetail->on_vendor_bo; ?></td>-->
                         <td class="center seventh-cell"><input id='order-quantity-<?php echo $orderDetail->id ?>' tabindex="<?php echo $even_odd_counter + 1; ?>" type="text" style="width:50px" value="0"></td>
                         <td class="center seventh-cell"><input type="checkbox" class='po-selected-products' value="<?php echo $orderDetail->id ?>"></td>
                     </tr>
@@ -1518,6 +1555,29 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var rare_item_filter = '';
                     var selected_statuses = new Array();
                     var selected_vendors = $("#primary_vendor_filter").val();
+                    var strt_range = $("#strt_range").val();
+                    var end_range = $("#end_range").val();
+                    var prev_strt_range = $("#prev_strt_range").val();
+                    var prev_end_range = $("#prev_end_range").val();
+                    var temp;
+                    strt_range = $.isNumeric(strt_range) ? strt_range : 0;
+                    end_range = $.isNumeric(end_range) ? end_range : 0;                    
+                    if(strt_range > end_range){
+                        temp = strt_range;
+                        strt_range = end_range;
+                        end_range = temp;
+                    }
+                    if(strt_range < 0 ){
+                        strt_range = 0;
+                    }
+                    if(end_range > 100){
+                        end_range = 100;
+                    }
+                    console.log('log'+strt_range);
+                    $("#end_range").val(end_range);
+                    $("#strt_range").val(strt_range);
+                    console.log("start "+strt_range);
+                    console.log("END "+end_range);
                     if (!selected_vendors) {
                         show_all = true;
                     }
@@ -1551,6 +1611,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         //         show_row = false;
                         //     }
                         // }
+                        
                         if (!show_all) {
                             var selected_vendor_class_found = 0;
                             for (var vendor_counter = 0; vendor_counter < selected_vendors.length; vendor_counter++) {
@@ -1567,12 +1628,33 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 show_row = false;
                             }
                         } else {
-                            console.log(pre_selected_vendors);
+//                            console.log(pre_selected_vendors);
                             if (pre_selected_vendors.length && pre_selected_vendors[0] != '' && show_all) {
                                 form_submit = true;
                             }
                             show_row = true;
                         }
+                        if(show_row){
+                            if(strt_range || end_range){
+                                var percentage;
+                                var id;
+                                if($(this).hasClass("percent")){
+                                    if(strt_range < prev_strt_range || prev_end_range ){
+                                        form_submit = true;
+                                    }
+                                    percentage = $(this).data('percentage');
+                                    if(percentage > strt_range && percentage < end_range){
+                                        show_row = true;
+                                    }else{
+                                        show_row = false;
+                                    }
+                                }else{
+                                    show_row = false;
+
+                                }                                                
+                            }
+                        }
+                                                
                         if (form_submit == true) {
                             var vendors_selected = $("#primary_vendor_filter").val();
                             $("#selected_vendors").val("");
@@ -1582,9 +1664,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $("#page-loader").show();
                             $("#sort-form").submit();
                         } else {
-
-
                             if (!show_row) {
+//                                console.log($(this));
                                 $(this).hide();
                             } else {
                                 $(this).show();

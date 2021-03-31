@@ -22,7 +22,8 @@
 
 </style>
 <div class="wrap">
-    <?php
+    <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
+<?php
     global $wpdb;
     $records = false;
 

@@ -2,10 +2,22 @@ jQuery(document).ready(function ($) {
     $("#filter-vendor").show();
     $("#filter_action").show();
     $(".open-return").on('click', function () {
-        var header;
+        var buttonVal;
         var orderId;
+        var buttonId;
+        buttonId = $(this).id;
         orderId = $(this).data('id');
-        $(".order-headers-" + orderId + "").show();
+        buttonVal = $(this).val();
+        console.log(buttonVal);
+        if(buttonVal == "close"){
+            $(".order-headers-" + orderId + "").hide();
+            $(this).text('Open New Return');
+            $(this).val('open-return');
+        }else{
+            $(".order-headers-" + orderId + "").show();
+            $(this).text('Exit Returns');
+            $(this).val('close');
+        }
     });
     $(document).on('click', 'button[data-role="new-return"]', function () {
         var element = $(this);
