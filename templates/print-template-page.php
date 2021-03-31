@@ -43,7 +43,169 @@ if (array_key_exists('status', $_GET)) {
 }
 
 ?>
+
+<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://kit.fontawesome.com/4de99c111d.js" crossorigin="anonymous"></script>
+
+
+<div class="flex flex-col divide-y-2 divide-gray-300 divide-solid w-full p-16 mx-auto">
+    <div class="flex flex-wrap items-center pb-8">
+        <div class="flex-1">
+            <img src="https://clearcomkeys.com/app/themes/clearcomkeys/dist/images/clearcomlogo.png" alt="">
+        </div>
+        <div class="font-bold text-base">Your source for automotive replacement keys and fobs</div>
+    </div>
+    <div class="flex py-8">
+        <div class="w-1/3">
+            <div class="flex flex-col">
+                <div class="font-bold text-xl">Vendor Name:</div>
+                <div><?php echo $vendor->post_title; ?></div>
+                <div><?= esc_html($vendor->contact_name) ?></div>
+                <div><?= esc_html($vendor->contact_phone) ?></div>
+                <div><?= esc_html($vendor->contact_email) ?></div>
+            </div>
+        </div>
+        <div class="w-1/3">
+            <div class="flex flex-col">
+                <div class="font-bold text-xl">Billing Address:</div>
+                <div>ClearCom Technologies Inc</div>
+                <div>Wenda Crabb</div>
+                <div>435-759-2495</div>
+                <div>PO BOX 307</div>
+                <div>Kanosh, UT 84637</div>
+            </div>
+        </div>
+        <div class="w-1/3">
+            <div class="flex flex-col">
+                <div class="font-bold text-xl">Ship to Address:</div>
+                <div>45 N 200 W</div>
+                <div>Kanosh, UT 84637</div>
+            </div>
+        </div>
+    </div>
+    <table class="table w-full py-8">
+        
+            <thead>
+                <tr class="text-left">
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Quantity:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Vendor SKU:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">ClearCom SKU:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Product Description:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Price:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Total:</th>
+                </tr>
+            </thead>
+            
+
+
+
+                <?php
+                    $itemQty = '';
+                    $itemExtendedPrice = '';
+                    $itemTotalPrice = '';
+                    foreach ($order_details as $singleLineItem):
+                        $itemQty = $singleLineItem->product_ordered_quantity;
+                        $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
+                        $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
+                        if($returned_note) {
+                            if($singleLineItem->product_quantity_returned > 0) {
+                                $itemQty = $singleLineItem->product_quantity_returned;
+                                $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
+                                $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
+                            }
+                        }
+                ?>
+            <tbody>
+                <tr>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo $itemQty; ?>
+                </td>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo $singleLineItem->vendor_sku; ?>
+                </td>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo $singleLineItem->product_sku; ?>
+                </td>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo $singleLineItem->product_title; ?>
+                </td>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo wc_price($singleLineItem->vendor_price_last); ?>
+                </td>
+                <td class="p-4 border-b border-gray-300">
+                    <?php echo wc_price($itemExtendedPrice); ?>
+                </td>
+
+                
+                <?php $total += $itemTotalPrice; ?>      
+                </tr>
+
+                <tr>
+                    <td colspan="6" class="p-4 border-l-8 border-b-2 border-gray-300">
+                        <div class="block"><span class="font-bold">Cancellation Note:</span> This is the spot where the cancellation note will go.</div>
+                        <div class="block"><span class="font-bold">Return Note:</span> This is the spot where the return note will go.</div>
+                    </td>
+                </tr>
+            </tbody>
+
+            
+            
+                <?php endforeach ?>  
+
+            <tfoot>
+                <tr>
+                    <td class="table-cell"></td>
+                    <td class="table-cell"></td>
+                    <td class="table-cell"></td>
+                    <td class="table-cell"></td>
+                    <td class="p-4 border-b border-l border-gray-300 font-bold text-lg">
+                        Grand Total:
+                    </td>
+                    <td class="p-4 border-b border-gray-300 aligh-right">
+                        <?php echo wc_price($total); ?>
+                    </td>
+                </tr>
+            </tfoot>
+            
+        
+    </table>
+</div>
+
+
+
+
+
+
+
+<div class="h-96"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <body class="email" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
+
     <div id="wrapper" dir="ltr">
         <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
             <tbody><tr>
@@ -220,6 +382,6 @@ if (array_key_exists('status', $_GET)) {
 
 
     <script>
-        window.print();
+        //window.print();
     </script>
 </body>
