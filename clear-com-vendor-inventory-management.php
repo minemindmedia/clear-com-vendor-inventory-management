@@ -390,6 +390,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             if ($_POST['action'] == 'new-return') {
                 $orderId = $_POST['ID'];
                 $valid = true;
+                $redirect = false;
                 foreach ($_POST['__order_qty'] as $productId => $_) {
                     $updatePOProductData = array();
                     $poStatus = $_POST['status'];
@@ -461,8 +462,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $update_po_data['updated_by'] = get_current_user_id();
                             $where_po['order_id'] = $orderId;
                             $updated = $wpdb->update($vendor_purchase_order_table, $update_po_data, $where_po);
+                            
+                            if($updated){
+                                if(!$redirect){
+                                    $redirect = true;
+                                }
+                            }
                         }
                     }
+                }
+                if($redirect){
+                    wp_redirect(site_url('/wp-admin/admin.php?page=wcvm-epo&status=returned'));
                 }
             } else {
             $order = get_post($_POST['ID']);
@@ -1183,7 +1193,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>" />
-                <input type="hidden" name="prev_strt_range" id="prev_strt_range" value="<?php if($strt_range){echo $strt_range;} ?>" />
+                <input type="hidden" name="prev_strt_range" id="prev_strt_range" value="<?php echo $strt_range; ?>" />
                 <input type="hidden" name="prev_end_range" id="prev_end_range" value="<?php if($strt_range){echo $strt_range;} ?>" />
                 <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;
                                                                                             ?>"/>-->
@@ -1561,21 +1571,31 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var prev_end_range = $("#prev_end_range").val();
                     var temp;
                     strt_range = $.isNumeric(strt_range) ? strt_range : 0;
-                    end_range = $.isNumeric(end_range) ? end_range : 0;                    
-                    if(strt_range > end_range){
-                        temp = strt_range;
-                        strt_range = end_range;
-                        end_range = temp;
-                    }
+                    end_range = $.isNumeric(end_range) ? end_range : 0;      
                     if(strt_range < 0 ){
                         strt_range = 0;
                     }
                     if(end_range > 100){
                         end_range = 100;
                     }
-                    console.log('log'+strt_range);
+if(strt_range && !end_range){
+    end_range = 100;
+}
+else if(end_range && !strt_range){
+    strt_range = 0;
+}                    
+                    if(strt_range || end_range){
                     $("#end_range").val(end_range);
                     $("#strt_range").val(strt_range);
+                    console.log("start "+strt_range);
+                    console.log("END "+end_range);
+                }                    
+//                    if(strt_range > end_range){
+//                        temp = strt_range;
+//                        strt_range = end_range;
+//                        end_range = temp;
+//                    }
+
                     console.log("start "+strt_range);
                     console.log("END "+end_range);
                     if (!selected_vendors) {
@@ -1639,11 +1659,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 var percentage;
                                 var id;
                                 if($(this).hasClass("percent")){
-                                    if(strt_range < prev_strt_range || prev_end_range ){
+                                    if(strt_range < prev_strt_range || end_range > prev_end_range ){
                                         form_submit = true;
                                     }
                                     percentage = $(this).data('percentage');
-                                    if(percentage > strt_range && percentage < end_range){
+                                    if(percentage >= strt_range && percentage <= end_range){
                                         show_row = true;
                                     }else{
                                         show_row = false;
