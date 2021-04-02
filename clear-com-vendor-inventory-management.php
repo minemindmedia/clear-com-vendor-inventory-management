@@ -818,15 +818,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $end_range = $_GET['end_range'];
             }
         }
-        if(!$end_range && $strt_range){
-            if($where == ""){
-                $where = " WHERE ";
-            }else{
-                $where .=" AND ";
-            }
-            $where .= " v.stock_30_days_sale_percent > $strt_range ";
-        }
-        elseif(($strt_range || !$strt_range) && $end_range){
+        if($strt_range || $end_range){
             if($where == ""){
                 $where = " WHERE ";
             }else{
@@ -1585,21 +1577,28 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     end_range = $.isNumeric(end_range) ? end_range : 0;   
                     strt_range = parseFloat(strt_range);
                     end_range = parseFloat(end_range);
-
-        if(strt_range && end_range){
-            $("#end_range").val(end_range);
-            $("#strt_range").val(strt_range);
-            filter = true;
-
-        }else if((strt_range || !strt_range) && end_range){
-                    $("#end_range").val(end_range);
-                    filter = true;
-                }else if(strt_range && (end_range || !end_range)){
-                    $("#strt_range").val(strt_range);
-                    filter = true;
-                }else if(prev_strt_range > 0 || prev_end_range > 0){
-                    filter = true;
-                }
+                    if(strt_range){
+                        $("#strt_range").val(strt_range);
+                        filter = true;
+                    }
+                    if(end_range){
+                        $("#end_range").val(end_range);
+                        filter = true;
+                    }else if(prev_strt_range > 0 || prev_end_range > 0){
+                                filter = true;
+                            }
+                            if(end_range == 0){
+                                end_range = 100;
+                            }
+//        else if((strt_range || !strt_range) && end_range){
+//                    $("#end_range").val(end_range);
+//                    filter = true;
+//                }else if(strt_range && (end_range || !end_range)){
+//                    $("#strt_range").val(strt_range);
+//                    filter = true;
+//                }else if(prev_strt_range > 0 || prev_end_range > 0){
+//                    filter = true;
+//                }
                     if (!selected_vendors) {
                         show_all = true;
                     }
@@ -1661,7 +1660,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 var percentage;
                                 var id;
                                 if($(this).hasClass("percent")){
-                                    if(strt_range < prev_strt_range || ((end_range == 0) || ((prev_end_range > 0) && (end_range > prev_end_range)))){
+                                    if(strt_range < prev_strt_range || ((prev_end_range > 0) && (end_range > prev_end_range))){
                                         form_submit = true;
                                     }
                                     percentage = $(this).data('percentage');
