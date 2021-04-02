@@ -806,6 +806,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
         }
         $strt_range = 0;
         $end_range = 0;
+        $prev_strt_range = 0;
+        $prev_end_range = 0;
         if (array_key_exists('strt_range', $_GET)) {
             if ($_GET['strt_range'] != "") {
                 $strt_range = $_GET['strt_range'];
@@ -816,7 +818,15 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $end_range = $_GET['end_range'];
             }
         }
-        if($strt_range || $end_range){
+        if(!$end_range && $strt_range){
+            if($where == ""){
+                $where = " WHERE ";
+            }else{
+                $where .=" AND ";
+            }
+            $where .= " v.stock_30_days_sale_percent > $strt_range ";
+        }
+        elseif(($strt_range || !$strt_range) && $end_range){
             if($where == ""){
                 $where = " WHERE ";
             }else{
@@ -1193,8 +1203,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
             <form id="sort-form" action="" method="get">
                 <input type="hidden" name="page" value="generate-purchase-order">
                 <input type="hidden" name="selected_vendors" id="selected_vendors" value="<?php echo $vendors_selected; ?>" />
-                <input type="hidden" name="prev_strt_range" id="prev_strt_range" value="<?php echo $strt_range; ?>" />
-                <input type="hidden" name="prev_end_range" id="prev_end_range" value="<?php if($strt_range){echo $strt_range;} ?>" />
+                <input type="hidden" name="prev_strt_range" id="prev_strt_range" value="<?php if($strt_range > $prev_strt_range){echo $strt_range;} ?>" />
+                <input type="hidden" name="prev_end_range" id="prev_end_range" value="<?php if(!$end_range || $end_range > $prev_end_range){echo $end_range;} ?>" />
                 <!--<input type="hidden" name="selected_status" id="selected_status" value="<?php // echo $status_selected;
                                                                                             ?>"/>-->
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
@@ -1561,6 +1571,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 // document.getElementsByClassName("btn dropdown-toggle btn-default")[0].style.borderColor = "red";
                 $('#filter-vendor').on('click', function(e) {
                     e.preventDefault();
+                    var filter = false;
                     var show_all = false;
                     var rare_item_filter = '';
                     var selected_statuses = new Array();
@@ -1571,33 +1582,24 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var prev_end_range = $("#prev_end_range").val();
                     var temp;
                     strt_range = $.isNumeric(strt_range) ? strt_range : 0;
-                    end_range = $.isNumeric(end_range) ? end_range : 0;      
-                    if(strt_range < 0 ){
-                        strt_range = 0;
-                    }
-                    if(end_range > 100){
-                        end_range = 100;
-                    }
-if(strt_range && !end_range){
-    end_range = 100;
-}
-else if(end_range && !strt_range){
-    strt_range = 0;
-}                    
-                    if(strt_range || end_range){
-                    $("#end_range").val(end_range);
-                    $("#strt_range").val(strt_range);
-                    console.log("start "+strt_range);
-                    console.log("END "+end_range);
-                }                    
-//                    if(strt_range > end_range){
-//                        temp = strt_range;
-//                        strt_range = end_range;
-//                        end_range = temp;
-//                    }
+                    end_range = $.isNumeric(end_range) ? end_range : 0;   
+                    strt_range = parseFloat(strt_range);
+                    end_range = parseFloat(end_range);
 
-                    console.log("start "+strt_range);
-                    console.log("END "+end_range);
+        if(strt_range && end_range){
+            $("#end_range").val(end_range);
+            $("#strt_range").val(strt_range);
+            filter = true;
+
+        }else if((strt_range || !strt_range) && end_range){
+                    $("#end_range").val(end_range);
+                    filter = true;
+                }else if(strt_range && (end_range || !end_range)){
+                    $("#strt_range").val(strt_range);
+                    filter = true;
+                }else if(prev_strt_range > 0 || prev_end_range > 0){
+                    filter = true;
+                }
                     if (!selected_vendors) {
                         show_all = true;
                     }
@@ -1655,16 +1657,25 @@ else if(end_range && !strt_range){
                             show_row = true;
                         }
                         if(show_row){
-                            if(strt_range || end_range){
+                            if(filter){
                                 var percentage;
                                 var id;
                                 if($(this).hasClass("percent")){
-                                    if(strt_range < prev_strt_range || end_range > prev_end_range ){
+                                    if(strt_range < prev_strt_range || ((end_range == 0) || ((prev_end_range > 0) && (end_range > prev_end_range)))){
                                         form_submit = true;
                                     }
                                     percentage = $(this).data('percentage');
-                                    if(percentage >= strt_range && percentage <= end_range){
-                                        show_row = true;
+                                    percentage = parseFloat(percentage);
+                                    if(percentage >= strt_range){
+                                        if(end_range > 0){
+                                            if(percentage <= end_range){
+                                                show_row = true;
+                                            }else{
+                                                show_row = false;
+                                            }
+                                        }else{
+                                            show_row = true;
+                                        }
                                     }else{
                                         show_row = false;
                                     }
@@ -1685,7 +1696,6 @@ else if(end_range && !strt_range){
                             $("#sort-form").submit();
                         } else {
                             if (!show_row) {
-//                                console.log($(this));
                                 $(this).hide();
                             } else {
                                 $(this).show();
