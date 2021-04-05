@@ -1574,20 +1574,28 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var prev_end_range = $("#prev_end_range").val();
                     var temp;
                     strt_range = $.isNumeric(strt_range) ? strt_range : 0;
+                    console.log(strt_range);
                     end_range = $.isNumeric(end_range) ? end_range : 0;   
                     strt_range = parseFloat(strt_range);
                     end_range = parseFloat(end_range);
+                    debugger;
                     if(strt_range){
+                        if(strt_range < 0){
+                            strt_range = 0;
+                        }
                         $("#strt_range").val(strt_range);
                         filter = true;
                     }
                     if(end_range){
-                        $("#end_range").val(end_range);
+                        if(end_range > 100){
+                            end_range = 100;
+                        }
                         filter = true;
+                        $("#end_range").val(end_range);                        
                     }else if(prev_strt_range > 0 || prev_end_range > 0){
                                 filter = true;
                             }
-                            if(end_range == 0){
+                            if(end_range == 0 ){
                                 end_range = 100;
                             }
 //        else if((strt_range || !strt_range) && end_range){
@@ -1599,6 +1607,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 //                }else if(prev_strt_range > 0 || prev_end_range > 0){
 //                    filter = true;
 //                }
+debugger
                     if (!selected_vendors) {
                         show_all = true;
                     }
@@ -1632,7 +1641,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         //         show_row = false;
                         //     }
                         // }
-                        
+                        debugger;
                         if (!show_all) {
                             var selected_vendor_class_found = 0;
                             for (var vendor_counter = 0; vendor_counter < selected_vendors.length; vendor_counter++) {
