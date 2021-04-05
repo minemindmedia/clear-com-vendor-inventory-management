@@ -1574,11 +1574,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var prev_end_range = $("#prev_end_range").val();
                     var temp;
                     strt_range = $.isNumeric(strt_range) ? strt_range : 0;
-                    console.log(strt_range);
                     end_range = $.isNumeric(end_range) ? end_range : 0;   
                     strt_range = parseFloat(strt_range);
                     end_range = parseFloat(end_range);
-                    debugger;
+//                    debugger;
+//                    if(end_range == 0 && strt_range == 0){
+//                        end_range = $("#end_range").val();
+//                        strt_range = $("#strt_range").val();
+//                        console.log(" ssssss "+end_range);
+//                        console.log(" ssssss "+strt_range);
+//                    }else{
                     if(strt_range){
                         if(strt_range < 0){
                             strt_range = 0;
@@ -1586,18 +1591,24 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         $("#strt_range").val(strt_range);
                         filter = true;
                     }
-                    if(end_range){
-                        if(end_range > 100){
-                            end_range = 100;
-                        }
+                    if(end_range > 100 || end_range < 0){
+                        end_range = 100;
                         filter = true;
-                        $("#end_range").val(end_range);                        
-                    }else if(prev_strt_range > 0 || prev_end_range > 0){
-                                filter = true;
-                            }
-                            if(end_range == 0 ){
-                                end_range = 100;
-                            }
+                        $("#end_range").val(end_range);
+                    }
+                    else if(end_range > 0 && end_range <= 100){
+                        filter = true;
+                        $("#end_range").val(end_range);
+                    }
+                    if(strt_range && !end_range){
+                        end_range = 100;
+                        filter = true;
+                        $("#end_range").val(end_range);
+                    }
+                    if(prev_strt_range > 0 || prev_end_range > 0){
+                        filter = true;
+                    }
+//                }
 //        else if((strt_range || !strt_range) && end_range){
 //                    $("#end_range").val(end_range);
 //                    filter = true;
@@ -1607,8 +1618,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 //                }else if(prev_strt_range > 0 || prev_end_range > 0){
 //                    filter = true;
 //                }
-debugger
-                    if (!selected_vendors) {
+                    if (!selected_vendors || selected_vendors.length == 0) {
                         show_all = true;
                     }
                     //console.log("selected vendors are "+selected_vendors);
@@ -1641,7 +1651,6 @@ debugger
                         //         show_row = false;
                         //     }
                         // }
-                        debugger;
                         if (!show_all) {
                             var selected_vendor_class_found = 0;
                             for (var vendor_counter = 0; vendor_counter < selected_vendors.length; vendor_counter++) {
@@ -1669,9 +1678,18 @@ debugger
                                 var percentage;
                                 var id;
                                 if($(this).hasClass("percent")){
-                                    if(strt_range < prev_strt_range || ((prev_end_range > 0) && (end_range > prev_end_range))){
+                                    if(strt_range < prev_strt_range){
+                                        $("#prev_strt_range").val(strt_range);
                                         form_submit = true;
                                     }
+                                    if( prev_end_range > 0 && end_range > prev_end_range){
+                                        $("#prev_end_range").val(end_range);
+                                        form_submit = true;
+                                    }
+                                    else if((end_range == 0 && strt_range == 0) && (prev_strt_range > 0 || prev_end_range > 0)){
+                                        form_submit = true;                                        
+                                    }
+                                    if( form_submit == false){
                                     percentage = $(this).data('percentage');
                                     percentage = parseFloat(percentage);
                                     if(percentage >= strt_range){
@@ -1687,6 +1705,7 @@ debugger
                                     }else{
                                         show_row = false;
                                     }
+                                }
                                 }else{
                                     show_row = false;
 
