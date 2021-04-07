@@ -94,7 +94,7 @@
             <div class="flex-1"></div>
                 <div style="display:none" class="self-center text-base font-semibold order-headers-<?php echo $last_order_id; ?>">
                         <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
-                            <?php echo 'Save Returns'; ?>
+                            <?php echo 'Create Return'; ?>
                         </button>
                     </div>
                     <div>
@@ -141,12 +141,12 @@
 
                     </div>
                     <div class="self-center text-base font-semibold">
-                <button type="button" value="open-return" id="open-return-<?php echo $order->order_id; ?>" data-id="<?= esc_attr($order->order_id) ?>" class="open-return return-<?php echo $order->order_id; ?> block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
+                <button type="button" value="open-return" id="open-return-<?php echo $order->order_id; ?>" data-id="<?= esc_attr($order->order_id) ?>" class="open-return return-<?php echo $order->order_id; ?> block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0 hidden">
                     <?php echo 'Open New Return'; ?>
                 </button>
             </div>                    
                     <div class="self-center text-base font-semibold">
-                        <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '- Collapse'; ?>">
+                        <button type="button" class="completed-po block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '- Collapse'; ?>">
                             <?php echo '+ Expand'; ?>
                         </button>
                     </div>
@@ -264,7 +264,7 @@
                         </tr>
                         <tr class="hidden order-headers-<?php echo $last_order_id ?>" id="product_quantity_returned_note-<?php echo $order->product_id; ?>">
                             <td colspan="10">
-                                <textarea class="hidden" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_returned; ?>" style="width:100%;"></textarea>
+                                <textarea class="hidden p-2" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_returned; ?>" style="width:100%;"></textarea>
                             </td>
                         </tr>
                         <?php
@@ -290,7 +290,7 @@
                         <div class="flex-1"></div>
                         <div style="display:none;" class="self-center text-base font-semibold order-headers-<?php echo $order->order_id ?>">
                         <button type="submit" name="action" value="new-return" data-role="new-return" class="lock px-2 py-1.5 border-2 border-purple-700 bg-purple-700 hover:bg-purple-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>">
-                            <?php echo 'Save Returns'; ?>
+                            <?php echo 'Create Return'; ?>
                         </button>
                     </div>
                 <div>

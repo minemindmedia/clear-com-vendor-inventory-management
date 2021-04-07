@@ -30,10 +30,10 @@ $status = $menu;
     <?php // endif ?>
     </a>-->
 
-    <a class="relative p-2 bg-green-600  text-white hover:text-white text-md rounded hover:underline focus:text-white focus:outline-none" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&menu=receive-inventory') ?>">
+    <a class="relative p-2 bg-yellow-400  text-white hover:text-white text-md rounded hover:underline focus:text-white focus:outline-none" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&menu=receive-inventory') ?>">
     <?= esc_html__('Receive Inventory', 'wcvm') ?>
     <?php if ($status == 'receive-inventory') : ?>
-        <svg class="absolute right-0 mr-2 transform rotate-45 text-green-600 w-4 h-4 mx-auto z-0" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="triangle" class="svg-inline--fa fa-triangle fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M329.6 24c-18.4-32-64.7-32-83.2 0L6.5 440c-18.4 31.9 4.6 72 41.6 72H528c36.9 0 60-40 41.6-72l-240-416z"></path></svg>
+        <svg class="absolute right-0 mr-2 transform rotate-45 text-yellow-400 w-4 h-4 mx-auto z-0" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="triangle" class="svg-inline--fa fa-triangle fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M329.6 24c-18.4-32-64.7-32-83.2 0L6.5 440c-18.4 31.9 4.6 72 41.6 72H528c36.9 0 60-40 41.6-72l-240-416z"></path></svg>
     <?php endif ?>
     </a>
     <a class="relative p-2 bg-red-600  text-white hover:text-white text-md rounded hover:underline focus:text-white focus:outline-none" href="<?= site_url('/wp-admin/admin.php?page=wcvm-epo&status=completed') ?>">

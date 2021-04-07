@@ -4,22 +4,6 @@
  * @var WP_Post[] $vendors
  */
 ?>
-<style>
-textarea::-webkit-input-placeholder {
-    padding: 7px;
-}
-textarea:-moz-placeholder {
-    /* Firefox 18- */
-    padding: 7px;
-}
-textarea::-moz-placeholder {
-    /* Firefox 19+ */
-    padding: 7px;
-}
-textarea:-ms-input-placeholder {
-    padding: 7px;
-}
-</style>
 <div class="wrap">
     <?php
     /* start post request */
@@ -446,12 +430,12 @@ textarea:-ms-input-placeholder {
                         </tr>
                         <tr class="hidden" id="product_quantity_returned_note-<?php echo $order->product_id; ?>">
                             <td colspan="11">
-                                <textarea class="hidden" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
+                                <textarea class="hidden p-2" type="text" name="product_quantity_returned_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Returned:" data-role="product_quantity_returned_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
                             </td>
                         </tr>
                         <tr class="hidden" id="product_quantity_canceled_note-<?php echo $order->product_id; ?>">
                             <td colspan="11">
-                                <textarea class="hidden" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Cancelled:" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
+                                <textarea class="hidden p-2" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="Enter notes for QTY Cancelled:" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled; ?>" style="width:100%;"></textarea>
                             </td>    
                         </tr>
                     <?php } ?>

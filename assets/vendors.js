@@ -1,6 +1,14 @@
 jQuery(document).ready(function ($) {
     $("#filter-vendor").show();
     $("#filter_action").show();
+    // hide open return button on collapse
+    $(".completed-po").on('click', function () {
+        $("#open-return-" + $(this).data('id')).addClass("hidden");
+        if($(this).text().trim() == "+ Expand") {
+            $("#open-return-" + $(this).data('id')).removeClass("hidden");
+        }
+    });
+
     $(".open-return").on('click', function () {
         var buttonVal;
         var orderId;
@@ -19,6 +27,7 @@ jQuery(document).ready(function ($) {
             $(this).val('close');
         }
     });
+
     $(document).on('click', 'button[data-role="new-return"]', function () {
         var element = $(this);
         var form = element.parents('form:first');
