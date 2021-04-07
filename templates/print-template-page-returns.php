@@ -89,6 +89,7 @@ if (array_key_exists('status', $_GET)) {
                 <div><span class="font-semibold">PO #:</span> 88756</div>
                 <div><span class="font-semibold">PO Date:</span> 03/25/2021</div>
                 <div><span class="font-semibold">PO Expected Date:</span> 04/12/2021</div>
+                <div><span class="font-semibold">Return Date:</span> 04/18/2021</div>
             </div>
         </div>
     </div>
@@ -97,11 +98,12 @@ if (array_key_exists('status', $_GET)) {
             <thead>
                 <tr class="text-left">
                     <th class="p-4 border-b border-gray-500 font-bold text-lg">Quantity:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">QTY Returned:</th>
                     <th class="p-4 border-b border-gray-500 font-bold text-lg">Vendor SKU:</th>
                     <th class="p-4 border-b border-gray-500 font-bold text-lg">ClearCom SKU:</th>
                     <th class="p-4 border-b border-gray-500 font-bold text-lg">Product Description:</th>
                     <th class="p-4 border-b border-gray-500 font-bold text-lg">Price:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Total:</th>
+                    <th class="p-4 border-b border-gray-500 font-bold text-lg">Refund Total:</th>
                 </tr>
             </thead>
             
@@ -130,6 +132,9 @@ if (array_key_exists('status', $_GET)) {
                     <?php echo $itemQty; ?>
                 </td>
                 <td class="p-4 border-b border-gray-300">
+                    {{ returned amount }}
+                </td>
+                <td class="p-4 border-b border-gray-300">
                     <?php echo $singleLineItem->vendor_sku; ?>
                 </td>
                 <td class="p-4 border-b border-gray-300">
@@ -142,13 +147,19 @@ if (array_key_exists('status', $_GET)) {
                     <?php echo wc_price($singleLineItem->vendor_price_last); ?>
                 </td>
                 <td class="p-4 border-b border-gray-300">
-                    <?php echo wc_price($itemExtendedPrice); ?>
+                    {{ refund total }}
                 </td>
 
                 
                 <?php $total += $itemTotalPrice; ?>      
                 </tr>
 
+                <tr>
+                    <td colspan="7" class="p-4 border-l-8 border-b-2 border-gray-300">
+                        <div class="block"><span class="font-bold">Cancellation Note:</span> This is the spot where the cancellation note will go.</div>
+                        <div class="block"><span class="font-bold">Return Note:</span> This is the spot where the return note will go.</div>
+                    </td>
+                </tr>
             </tbody>
 
             
@@ -161,8 +172,9 @@ if (array_key_exists('status', $_GET)) {
                     <td class="table-cell"></td>
                     <td class="table-cell"></td>
                     <td class="table-cell"></td>
+                    <td class="table-cell"></td>
                     <td class="p-4 border-b border-l border-gray-300 font-bold text-lg">
-                        Grand Total:
+                        Grand Refund Total:
                     </td>
                     <td class="p-4 border-b border-gray-300 aligh-right">
                         <?php echo wc_price($total); ?>
