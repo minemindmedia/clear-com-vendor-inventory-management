@@ -1203,8 +1203,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
                 <input type="hidden" name="percentage" id="percentage_filter" value="<?php echo $percentage_filter; ?>" />
 
-                <input type="text" name="strt_range" id="strt_range" placeholder="Input Range Value" value="<?php if($strt_range){echo $strt_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                
-                <input type="text" name="end_range" id="end_range" placeholder="Input Range Value" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
+                <input type="text" name="strt_range" id="strt_range" placeholder="QTY On Hand % From" value="<?php if($strt_range){echo $strt_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                
+                <input type="text" name="end_range" id="end_range" placeholder="QTY On Hand % To" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
             </form>
             <!-- end filter section -->
@@ -1295,11 +1295,13 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     if ($orderDetail->stock) {
                         $row_classes .= " stock";
                     }
-                    $percent = false;
-//                    if($orderDetail->stock_30_days_sale_percent > 0){
+                    $percent = true;
+                   if(($orderDetail->stock == 1 && $orderDetail->sale_30_days == 1) || ($orderDetail->stock == 2 && ($orderDetail->sale_30_days == 2 || $orderDetail->sale_30_days == 3)) || ($orderDetail->stock == 3 && ($orderDetail->sale_30_days == 4 || $orderDetail->sale_30_days == 5)) || ($orderDetail->stock == 4 && ($orderDetail->sale_30_days == 6 || $orderDetail->sale_30_days == 7)) || ($orderDetail->stock == 5 && ($orderDetail->sale_30_days == 8 || $orderDetail->sale_30_days == 9)) || ($orderDetail->stock == 6 && $orderDetail->sale_30_days == 11)) {
+                        $percent = false;
+                   }
+                   if($percent) {
                         $row_classes .= " percent";
-                        $percent = true;
-//                    }
+                   }
                     $row_classes .= " " . strtolower($orderDetail->product_stock_status) . " " . "primary_vendor_" . $orderDetail->primary_vendor_id; ?>
                     <tr class="<?php echo $row_classes; ?>" id='row-<?php echo $orderDetail->id ?>' <?php if($percent){ ?>data-percentage="<?php echo $orderDetail->stock_30_days_sale_percent; }?>">
                         <!--<td class="center first-cell"><?php // echo ($orderDetail->new) ? "&#10004;" : "";
@@ -1394,6 +1396,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
         <!--        <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">-->
         <link rel=" stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap.min.css'; ?>">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <!--        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">-->
         <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/bootstrap-multiselect.css'; ?>">
         <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) . 'assets/extras/tailwind.css'; ?>">
@@ -1556,9 +1559,16 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     includeSelectAllOption: true,
                     enableFiltering: true,
                     enableCaseInsensitiveFiltering: true,
-                    maxHeight: 350,
+                    maxHeight: 380,
                     filterPlaceholder: 'Search for Vendor',
                     nonSelectedText: 'Select Vendors',
+                    nSelectedText: 'Selecciones',
+                    enableHTML: true,
+                    templates: {
+                        filter: '<li class="multiselect-item multiselect-filter"><div class="input-group mb-3"><div class="input-group-prepend"><span class="input-group-text"><i class="fa fa-search"></i></span></div><input class="form-control multiselect-search" type="text" /></div></li>',
+                        filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fa fa-times"></i></button></span>'
+
+                    }
                 });
                 // document.getElementsByClassName("btn dropdown-toggle btn-default")[0].style.borderColor = "red";
                 $('#filter-vendor').on('click', function(e) {
@@ -1707,8 +1717,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                     }
                                 }
                                 }else{
-                                    show_row = false;
-
+                                    show_row = true;
                                 }                                                
                             }
                         }
