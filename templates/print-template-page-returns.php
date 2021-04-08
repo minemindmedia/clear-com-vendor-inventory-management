@@ -101,11 +101,11 @@ if (array_key_exists('po', $_REQUEST)) {
                 </tr>
             </thead>
             <?php
-            $itemQty = '';
-            $itemExtendedPrice = '';
-            $itemTotalPrice = '';
+            $itemQty = 0;
+            $itemExtendedPrice = 0;
+            $itemTotalPrice = 0;
             foreach ($order_details as $singleLineItem) {
-                $itemQty = $singleLineItem->product_ordered_quantity;
+                // $itemQty = $singleLineItem->product_ordered_quantity;
                 $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
                 $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
                 if ($returned_note) {
