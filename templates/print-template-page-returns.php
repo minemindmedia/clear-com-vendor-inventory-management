@@ -54,7 +54,7 @@ if (array_key_exists('po', $_REQUEST)) {
             <div class="w-1/4">
                 <div class="flex flex-col p-8">
                     <div class="font-bold text-xl">Vendor Name:</div>
-                    <div><?= esc_html($vendor->title_short) ?></div>
+                    <div><?= esc_html($vendor->post_title) ?></div>
                     <div><?= esc_html($vendor->address) ?></div>
                     <div><?= esc_html(($vendor->city ? $vendor->city . ', ' : '') . ($vendor->state ? $vendor->state . ', ' : '') . ($vendor->zip ? $vendor->zip : '')) ?></div>
                     <div><?= esc_html($vendor->contact_phone) ?></div>
