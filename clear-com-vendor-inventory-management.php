@@ -197,6 +197,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         `po_expected_date` int(11) DEFAULT NULL,
         `expected_date` int(11) DEFAULT NULL,
         `set_date` int(11) DEFAULT NULL,
+        `returned_date` datetime DEFAULT NULL,
         `created_date` datetime DEFAULT NULL,
         `created_by` int(11) DEFAULT NULL,
         `updated_date` datetime DEFAULT NULL,
@@ -424,6 +425,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
                             $order_product_details = $wpdb->get_results($order_product_sql);
                             $status = "";
+                            $returned_date = NULL;
                             foreach ($order_product_details as $order) {
                                 if ($order->product_quantity_received) {
                                     $status .= "completed";
@@ -445,6 +447,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                         $status .= "|";
                                     }
                                     $status .= "returned";
+                                    $returned_date = date('Y/m/d H:i:s a');
                                 }
                                 if ($order->product_quantity_return_closed) {
                                     if ($status != "") {
@@ -458,6 +461,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $postStatus = implode('|', array_unique(explode('|', $status)));
 
                             $update_po_data['post_status'] = $postStatus;
+                            $update_po_data['returned_date'] = $returned_date;
                             $update_po_data['updated_date'] = date('Y/m/d H:i:s a');
                             $update_po_data['updated_by'] = get_current_user_id();
                             $where_po['order_id'] = $orderId;
@@ -2223,6 +2227,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
             update_post_meta($data['ID'], 'contact_email', $_POST['contact_email']);
             update_post_meta($data['ID'], 'contact_phone', $_POST['contact_phone']);
             update_post_meta($data['ID'], 'post_content', $_POST['post_content']);
+            update_post_meta($data['ID'], 'address', $_POST['address']);
+            update_post_meta($data['ID'], 'city', $_POST['city']);
+            update_post_meta($data['ID'], 'state', $_POST['state']);
+            update_post_meta($data['ID'], 'zip', $_POST['zip']);
         }
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'bulk-wcvm-vendors') && isset($_POST['action']) && $_POST['action'] == 'delete') {
             foreach ($_POST['post'] as $id) {
@@ -2256,6 +2264,22 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <tr>
                             <td><label for="post_title"><?= esc_html__('Name', 'wcvim') ?></label> <span style="color: red">*</span></td>
                             <td><input type="text" id="post_title" name="post_title" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="address"><?= esc_html__('Address', 'wcvim') ?></label></td>
+                            <td><input type="text" id="address" name="address" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="city"><?= esc_html__('City', 'wcvim') ?></label></td>
+                            <td><input type="text" id="city" name="city" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="state"><?= esc_html__('State', 'wcvim') ?></label></td>
+                            <td><input type="text" id="state" name="state" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td><label for="zip"><?= esc_html__('Zip', 'wcvim') ?></label></td>
+                            <td><input type="text" id="zip" name="zip" value="" style="width: 100%;"></td>
                         </tr>
                         <tr>
                             <td><label for="website"><?= esc_html__('Website', 'wcvim') ?></label></td>
@@ -2331,10 +2355,14 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $website = get_post_meta($single_row->ID, 'website', true);
                             $contact_email = get_post_meta($single_row->ID, 'contact_email', true);
                             $contact_phone = get_post_meta($single_row->ID, 'contact_phone', true);
-                            $post_content = get_post_meta($single_row->ID, 'post_content', true); ?>
+                            $post_content = get_post_meta($single_row->ID, 'post_content', true);
+                            $address = get_post_meta($single_row->ID, 'address', true);
+                            $city = get_post_meta($single_row->ID, 'city', true);
+                            $state = get_post_meta($single_row->ID, 'state', true);
+                            $zip = get_post_meta($single_row->ID, 'zip', true); ?>
                             <tr>
                                 <td><?php echo $code . ' / ' . $title_short . "<br>"; ?>
-                                    <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
+                                    <?php echo '<a href="#edit-record" data-action="wcvim-edit" data-address="' . $address . '" data-city="' . $city . '" data-state="' . $state . '" data-zip="' . $zip . '" data-code="' . $code . '" data-contact-name="' . $contact_name . '" data-contact-phone="' . $contact_phone . '" data-post-title="' . $post_title . '"  data-title-short="' . $title_short . '"data-phone="' . $phone . '"data-email="' . $contact_email . '"data-website="' . $website . '" data-record="' . esc_attr(json_encode($single_row)) . '">' . esc_html__('Edit', 'wcvim') . '</a>' ?>
                                 </td>
                                 <td><?php echo $post_title . "<br>" . $phone . "<br>" . $website; ?></td>
                                 <td><?php
@@ -2394,6 +2422,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     var title_short = element.attr("data-title-short");
                     var title_post = element.attr("data-post-title");
                     var contact_phone = element.attr("data-contact-phone");
+                    var address = element.attr("data-address");
+                    var city = element.attr("data-city");
+                    var state = element.attr("data-state");
+                    var zip = element.attr("data-zip");
                     console.log(data);
                     jQuery("#code").val(code);
                     jQuery("#title_short").val(title_short);
@@ -2403,6 +2435,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     jQuery("#contact_name").val(contact_name);
                     jQuery("#contact_email").val(contact_email);
                     jQuery("#contact_phone").val(contact_phone);
+                    jQuery("#address").val(address);
+                    jQuery("#city").val(city);
+                    jQuery("#state").val(state);
+                    jQuery("#zip").val(zip);
                     var container = jQuery("#TB_ajaxContent");
                     if (data) {
                         jQuery.each(JSON.parse(data), function(key, value) {
