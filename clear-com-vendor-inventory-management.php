@@ -171,7 +171,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         `primary_vendor_name` text,
         `on_order` int(11) DEFAULT NULL,
         `sale_30_days` int(11) DEFAULT NULL,
-        `stock_30_days_sale_percent` decimal(10,2) DEFAULT NULL,
+        `stock_30_days_sale_percent` VARCHAR(11) DEFAULT NULL,
         `order_qty` int(11) DEFAULT NULL,
         `on_vendor_bo` int(11) DEFAULT NULL,
         `new` int(11) DEFAULT NULL,
@@ -1280,6 +1280,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     $vendors = explode(',', $orderDetail->vendor_name);
                     $vendor_ids = explode(',', $orderDetail->vendor_id);
                     $vendor_prices = explode(',', $orderDetail->vendor_price);
+                    $stock_30_days_sale_percent = $orderDetail->stock_30_days_sale_percent;
+                    if(is_numeric($stock_30_days_sale_percent)) {
+                        $stock_30_days_sale_percent = floatval(number_format($orderDetail->stock_30_days_sale_percent, 2)) . '%';
+                    }
                     $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
                     
                     //                    if ($orderDetail->rare) {
@@ -1376,7 +1380,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         <td class="center seventh-cell"><?php echo wc_price($purchase_orders_post_data_single_price); ?></td>
                         <td class="center tenth-cell"><?php echo $orderDetail->stock ?></td>
                         <td class="center eleventh-cell"><?php echo $orderDetail->sale_30_days ?></td>
-                        <td class="center eleventh-cell"><?php echo $orderDetail->stock_30_days_sale_percent. '%' ?></td>
+                        <td class="center eleventh-cell"><?php echo $stock_30_days_sale_percent; ?></td>
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_low
                                                             ?></td>-->
                         <!--<td class="center seventh-cell"><?php // echo $orderDetail->threshold_reorder
@@ -2088,10 +2092,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $percent_value = '';
             foreach ($data as $single_row) {
                 $thirty_days_sale = $single_row->sale_30_days;
-                    if($thirty_days_sale == 0) {
-                        $thirty_days_sale = 1;
+                $qty_on_hand = $single_row->stock;
+                $percent_value = 'N/A';
+                    if($thirty_days_sale != 0) {
+                        $percent_value = $qty_on_hand / $thirty_days_sale * 100;
                     }
-                $percent_value = $single_row->stock / $thirty_days_sale * 100;
                 $updateNewData['stock_30_days_sale_percent'] = $percent_value;
                 $where['product_id'] = $single_row->product_id;
                 $wpdb->update('wp_vendor_po_lookup', $updateNewData, $where);

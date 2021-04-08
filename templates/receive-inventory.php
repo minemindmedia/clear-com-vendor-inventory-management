@@ -246,13 +246,13 @@
                     <div>
                         <div class="flex space-x-4">
                             <div>
-                            <button type="submit" name="action" value="update" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-green-700 bg-green-700 hover:bg-green-900 text-white hover:text-white text-xs rounded m-0">
+                            <button type="submit" name="action" value="update" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-yellow-500 bg-yellow-500 hover:bg-yellow-700 text-white hover:text-white text-xs rounded m-0">
                             <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="layer-plus" class="svg-inline--fa fa-layer-plus fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M304 144h64v64c0 8.84 7.16 16 16 16h32c8.84 0 16-7.16 16-16v-64h64c8.84 0 16-7.16 16-16V96c0-8.84-7.16-16-16-16h-64V16c0-8.84-7.16-16-16-16h-32c-8.84 0-16 7.16-16 16v64h-64c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16zm195.59 220.1l-58.54-26.53-161.19 73.06c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.95 337.57 12.41 364.1c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 404.1c16.55-7.5 16.55-32.5 0-40zM12.41 275.9l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L448 299.28V280.7c-15.32 4.38-31.27 7.29-48 7.29-88.01 0-160.72-64.67-173.72-149.04L12.41 235.9c-16.55 7.5-16.55 32.5 0 40z"></path></svg>
                             <?= esc_html__('Set Inventory', 'wcvm') ?>
                     </button>
                             </div>
                             <div>
-                            <button type="submit" name="action" value="archive" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-green-700 bg-green-700 hover:bg-green-900 text-white hover:text-white text-xs rounded m-0">
+                            <button type="submit" name="action" value="archive" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-yellow-500 bg-yellow-500 hover:bg-yellow-700 text-white hover:text-white text-xs rounded m-0">
                             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="archive" class="inline w-3 h-3 mr-1 self-center" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"></path></svg>
                         <?= esc_html__('Set Inventory & Archive', 'wcvm') ?>
                     </button>
@@ -273,7 +273,7 @@
                 $last_order_id = $order->order_id;
                 $records = true;
                 ?>
-                <form id="form_<?php echo $order->order_id; ?>" action="" method="post" class="purchase-order border-2 border-t-8 border-green-600 p-8 mb-4 bg-gray-50">
+                <form id="form_<?php echo $order->order_id; ?>" action="" method="post" class="purchase-order border-2 border-t-8 border-yellow-400 p-8 mb-4 bg-gray-50">
                     <input type="hidden" name="ID" value="<?= esc_attr($order->order_id) ?>">
                     <div class="flex space-x-8 text-base font-semibold">
                         <div><?= sprintf(esc_html__('PO #: %s', 'wcvm'), esc_html($order->order_id)) ?></div>
@@ -356,13 +356,13 @@
                     <div>
                         <div class="flex space-x-4">
                             <div>
-                            <button type="submit" name="action" value="update" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-green-700 bg-green-700 hover:bg-green-900 text-white hover:text-white text-xs rounded m-0">
+                            <button type="submit" name="action" value="update" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-yellow-500 bg-yellow-500 hover:bg-yellow-700 text-white hover:text-white text-xs rounded m-0">
                             <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="layer-plus" class="svg-inline--fa fa-layer-plus fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M304 144h64v64c0 8.84 7.16 16 16 16h32c8.84 0 16-7.16 16-16v-64h64c8.84 0 16-7.16 16-16V96c0-8.84-7.16-16-16-16h-64V16c0-8.84-7.16-16-16-16h-32c-8.84 0-16 7.16-16 16v64h-64c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16zm195.59 220.1l-58.54-26.53-161.19 73.06c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.95 337.57 12.41 364.1c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 404.1c16.55-7.5 16.55-32.5 0-40zM12.41 275.9l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L448 299.28V280.7c-15.32 4.38-31.27 7.29-48 7.29-88.01 0-160.72-64.67-173.72-149.04L12.41 235.9c-16.55 7.5-16.55 32.5 0 40z"></path></svg>
                             <?= esc_html__('Set Inventory', 'wcvm') ?>
                     </button>
                             </div>
                             <div>
-                            <button type="submit" name="action" value="archive" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-green-700 bg-green-700 hover:bg-green-900 text-white hover:text-white text-xs rounded m-0">
+                            <button type="submit" name="action" value="archive" data-role="receive-inventory" class="flex block px-2 py-1.5 border-2 border-yellow-500 bg-yellow-500 hover:bg-yellow-700 text-white hover:text-white text-xs rounded m-0">
                             <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="archive" class="inline w-3 h-3 mr-1 self-center" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"></path></svg>
                         <?= esc_html__('Set Inventory & Archive', 'wcvm') ?>
                     </button>
@@ -377,7 +377,7 @@
         <?php
     } if (!$records) {
         ?>
-        <div class="flex border-2 border-t-8 border-green-600 p-8 mb-4 bg-gray-50 text-lg text-semibold">
+        <div class="flex border-2 border-t-8 border-yellow-400 p-8 mb-4 bg-gray-50 text-lg text-semibold">
             No orders are currently completed.
         </div><?php
     }

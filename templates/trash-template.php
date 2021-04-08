@@ -109,7 +109,7 @@
 
             </table>
 
-            <div class="flex">
+            <!-- <div class="flex">
                     <div class="flex-1"></div>
                     <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
@@ -117,7 +117,7 @@
                         <span class="self-center"><?= esc_html__('Print Order', 'wcvm') ?></span>
                     </button>
                 </div>
-                </div>
+                </div> -->
             </div>
             <div style="clear: both;"></div>
      
@@ -316,7 +316,7 @@
 
                 </table>
 
-                <div class="flex">
+                <!-- <div class="flex">
                     <div class="flex-1"></div>
                     <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
@@ -324,7 +324,7 @@
                         <span class="self-center"><?= esc_html__('Print Order', 'wcvm') ?></span>
                     </button>
                 </div>
-                </div>
+                </div> -->
 
         </form>
 
