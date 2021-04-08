@@ -54,10 +54,10 @@ if (array_key_exists('po', $_REQUEST)) {
             <div class="w-1/4">
                 <div class="flex flex-col p-8">
                     <div class="font-bold text-xl">Vendor Name:</div>
-                    <div>{{ short name }}</div>
-                    <div>{{ address }}</div>
-                    <div>{{ city }}, {{ state }}, {{ zip }}</div>
-                    <div>{{ phone }}</div>
+                    <div><?= esc_html($vendor->title_short) ?></div>
+                    <div><?= esc_html($vendor->address) ?></div>
+                    <div><?= esc_html(($vendor->city ? $vendor->city . ', ' : '') . ($vendor->state ? $vendor->state . ', ' : '') . ($vendor->zip ? $vendor->zip : '')) ?></div>
+                    <div><?= esc_html($vendor->contact_phone) ?></div>
                 </div>
             </div>
             <div class="w-1/4">
@@ -81,10 +81,10 @@ if (array_key_exists('po', $_REQUEST)) {
             <div class="w-1/4">
                 <div class="flex flex-col border border-gray-500 p-8">
                     <div class="font-bold text-xl">Order Information:</div>
-                    <div><span class="font-semibold">PO #:</span> 88756</div>
-                    <div><span class="font-semibold">PO Date:</span> 03/25/2021</div>
-                    <div><span class="font-semibold">PO Expected Date:</span> 04/12/2021</div>
-                    <div><span class="font-semibold">Return Date:</span> 04/18/2021</div>
+                    <div><span class="font-semibold">PO #:</span> <?= esc_html($order->ID) ?></div>
+                    <div><span class="font-semibold">PO Date:</span> <?= esc_html(date('m/d/Y', strtotime($order->post_date))) ?></div>
+                    <div><span class="font-semibold">PO Expected Date:</span> <?= esc_html(date('m/d/Y', $order_details[0]->po_expected_date)) ?></div>
+                    <div><span class="font-semibold">Return Date:</span> <?= esc_html(date('m/d/Y', strtotime($order_details[0]->returned_date))) ?></div>
                 </div>
             </div>
         </div>
@@ -119,10 +119,10 @@ if (array_key_exists('po', $_REQUEST)) {
                 <tbody>
                     <tr>
                         <td class="p-4 border-b border-gray-300">
-                            <?php echo $itemQty; ?>
+                            <?php echo $singleLineItem->product_ordered_quantity; ?>
                         </td>
                         <td class="p-4 border-b border-gray-300">
-                            {{ returned amount }}
+                            <?php echo $itemQty; ?>
                         </td>
                         <td class="p-4 border-b border-gray-300">
                             <?php echo $singleLineItem->vendor_sku; ?>
@@ -137,14 +137,14 @@ if (array_key_exists('po', $_REQUEST)) {
                             <?php echo wc_price($singleLineItem->vendor_price_last); ?>
                         </td>
                         <td class="p-4 border-b border-gray-300">
-                            {{ refund total }}
+                            <?php echo wc_price($itemTotalPrice); ?>
                         </td>
                         <?php $total += $itemTotalPrice; ?>
                     </tr>
                     <tr>
                         <td colspan="7" class="p-4 border-l-8 border-b-2 border-gray-300">
-                            <div class="block"><span class="font-bold">Cancellation Note:</span> This is the spot where the cancellation note will go.</div>
-                            <div class="block"><span class="font-bold">Return Note:</span> This is the spot where the return note will go.</div>
+                            <div class="block"><span class="font-bold">Cancellation Note:</span> <?php echo $singleLineItem->product_quantity_canceled_note; ?></div>
+                            <div class="block"><span class="font-bold">Return Note:</span> <?php echo $singleLineItem->product_quantity_returned_note; ?></div>
                         </td>
                     </tr>
                 </tbody>
@@ -169,7 +169,7 @@ if (array_key_exists('po', $_REQUEST)) {
     <div class="h-96"></div>
 
     <body class="email" leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
-        <div id="wrapper" dir="ltr">
+        <div style="display:none;" id="wrapper" dir="ltr">
             <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
                 <tbody>
                     <tr>

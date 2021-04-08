@@ -369,8 +369,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $order->post_status = 'trash';
             wp_update_post($order);
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['print'])) {
-            //            header('Location:' . site_url('/wp-content/plugins/clear-com-vendor-inventory-management/templates/print-template-page.php?po=' . $_POST['ID']));
-            header('Location:' . plugin_dir_url(__FILE__) . 'templates/print-template-page.php?po=' . $_POST['ID'] . '&status=' . $_POST['status']);
+            $print_page = '';
+            if($_POST['status'] == 'canceled' || $_POST['status']  == 'returned') {
+                $print_page = '-returns';
+            }
+            ?>
+            <script>
+                var url = "<?php echo plugin_dir_url(__FILE__) . 'templates/print-template-page' . $print_page . '.php?po=' . $_POST['ID'] . '&status=' . $_POST['status']; ?>"
+                window.open(url, '_blank').focus();
+            </script>
+            <?php
+            header("Refresh:0; url=" . $_SERVER['REQUEST_URI'] . "&status=" . $_POST['status']);
             exit();
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['delete'])) {
             $wpdb->delete($vendor_purchase_order_table, array('order_id' => $_POST['ID']));

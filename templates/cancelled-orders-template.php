@@ -307,7 +307,7 @@
                                 ?>
                                 <tr id="product_quantity_canceled_note-<?php echo $order->product_id; ?>">
                                     <td colspan="9">
-                                        <textarea readonly="true" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="QTY Returned Notes" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled_note; ?>" style="width:100%;padding-left:10px;"><?php echo $product_quantity_canceled_note; ?></textarea>
+                                        <textarea class="p-2" readonly="true" type="text" name="product_quantity_canceled_note[<?php echo $order->product_id; ?>]" placeholder="QTY Returned Notes" data-role="product_quantity_canceled_note" value="<?php echo $product_quantity_canceled_note; ?>" style="width:100%;padding-left:10px;"><?php echo $product_quantity_canceled_note; ?></textarea>
                                     </td>
                                 </tr>
                         <?php
