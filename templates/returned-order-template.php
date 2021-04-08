@@ -148,6 +148,9 @@
                     <div class="self-center text-base font-semibold">
                         <?= sprintf(esc_html__('PO Date: %s'), date('m/d/Y', strtotime($order->order_date))) ?>
                     </div>
+                    <div class="self-center text-base font-semibold">
+                        <?= sprintf(esc_html__('Return Date: %s'), date('m/d/Y', strtotime($order->returned_date))) ?>
+                    </div>
 
                     <div class="flex flex-1">
 
