@@ -2103,7 +2103,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             foreach ($data as $single_row) {
                 $thirty_days_sale = $single_row->sale_30_days;
                 $qty_on_hand = $single_row->stock;
-                $percent_value = 0;
+                $percent_value = -1;
                     if($thirty_days_sale != 0) {
                         $percent_value = ($qty_on_hand / $thirty_days_sale * 100);
                     }
