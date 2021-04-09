@@ -20,7 +20,6 @@
         border: 1px solid #c1121f;
         box-shadow: 0 0 10px #c1121f;
     }
-
 </style>
 <div class="wrap">
 <h1><?= esc_html__('View/Edit Purchase Orders', 'wcvm') ?></h1>
@@ -108,7 +107,7 @@
 
             <?php if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
                 <div class="flex space-x-2">
-                   <div><input class="block py-8" type="date" name="expected_date" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" ></div>
+                   <div><input class="block py-8" id="calendar" type="text" autocomplete="off" name="expected_date" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" ></div>
                    <div><input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" ></div>
                    <div class="flex-1">
                        <button type="submit" name="action" value="update" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
@@ -328,7 +327,7 @@
 
                 <?php // if ($order->post_status == 'new-order' || $order->post_status == 'on-order'): ?>
                     <div class="flex space-x-2">
-                        <div><input class="block py-8" type="date" autocomplete="off" name="expected_date" style="width:150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" ></div>
+                        <div><input class="block py-8" id="calendar" type="text" autocomplete="off" name="expected_date" style="width:150px;" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" placeholder="<?= esc_attr__('dd-mm-yyyy', 'wcvm') ?>" ></div>
                         <div><input type="hidden" name="__expected_date" data-role="date-time" value="<?= esc_attr($last_expected_date ? date('Y-m-d', $last_expected_date) : '') ?>" >                    </div>
                         <div class="flex-1">
                             <button type="submit" name="action" value="update" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
@@ -405,6 +404,11 @@ function get_print_status($order = FALSE) {
 }
 ?>
 <script>
+    jQuery(function() {
+        jQuery("#calendar").datepicker({
+            dateFormat: 'dd-mm-yy'
+        });
+    });
 //    function mark_closed(id)
 //    {
 //        var ids_to_delete = "";
