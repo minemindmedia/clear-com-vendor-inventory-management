@@ -171,7 +171,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
         `primary_vendor_name` text,
         `on_order` int(11) DEFAULT NULL,
         `sale_30_days` int(11) DEFAULT NULL,
-        `stock_30_days_sale_percent` VARCHAR(11) DEFAULT NULL,
+        `stock_30_days_sale_percent` decimal(10,2) DEFAULT NULL,
         `order_qty` int(11) DEFAULT NULL,
         `on_vendor_bo` int(11) DEFAULT NULL,
         `new` int(11) DEFAULT NULL,
@@ -421,7 +421,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                         if ($valid) {
                             if($_POST['product_quantity_returned_note'][$productId] != ""){
-                                $updatePOProductData['product_quantity_returned_note'] = $getPOLineItemDetails[0]->product_quantity_returned_note ." ". $_POST['product_quantity_returned_note'][$productId];
+                                $updatePOProductData['product_quantity_returned_note'] = stripslashes($getPOLineItemDetails[0]->product_quantity_returned_note ." ". $_POST['product_quantity_returned_note'][$productId]);
                             }
                             $updatePOProductData['updated_date'] = date('Y/m/d H:i:s a');
                             $updatePOProductData['updated_by'] = get_current_user_id();
@@ -1290,9 +1290,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     $vendors = explode(',', $orderDetail->vendor_name);
                     $vendor_ids = explode(',', $orderDetail->vendor_id);
                     $vendor_prices = explode(',', $orderDetail->vendor_price);
-                    $stock_30_days_sale_percent = $orderDetail->stock_30_days_sale_percent;
-                    if(is_numeric($stock_30_days_sale_percent)) {
-                        $stock_30_days_sale_percent = floatval(number_format($orderDetail->stock_30_days_sale_percent, 2)) . '%';
+                    $stock_30_days_sale_percent = 'N/A';
+                    if($orderDetail->sale_30_days != 0) {
+                        $stock_30_days_sale_percent = floatval($orderDetail->stock_30_days_sale_percent) . '%';
                     }
                     $row_classes = "generate-po-row " . $row_even_odd[$even_odd_counter % 2];
                     
@@ -2103,9 +2103,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
             foreach ($data as $single_row) {
                 $thirty_days_sale = $single_row->sale_30_days;
                 $qty_on_hand = $single_row->stock;
-                $percent_value = 'N/A';
+                $percent_value = 0;
                     if($thirty_days_sale != 0) {
-                        $percent_value = $qty_on_hand / $thirty_days_sale * 100;
+                        $percent_value = ($qty_on_hand / $thirty_days_sale * 100);
                     }
                 $updateNewData['stock_30_days_sale_percent'] = $percent_value;
                 $where['product_id'] = $single_row->product_id;

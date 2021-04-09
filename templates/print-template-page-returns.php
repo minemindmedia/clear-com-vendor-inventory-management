@@ -105,7 +105,7 @@ if (array_key_exists('po', $_REQUEST)) {
             $itemExtendedPrice = 0;
             $itemTotalPrice = 0;
             foreach ($order_details as $singleLineItem) {
-                // $itemQty = $singleLineItem->product_ordered_quantity;
+                $itemQty = 0;
                 $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
                 $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
                 if ($returned_note) {

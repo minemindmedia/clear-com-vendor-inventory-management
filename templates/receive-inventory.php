@@ -113,8 +113,8 @@
                         $update_data['product_quantity_back_order'] = $data['product_quantity_back_order'];
                         $update_data['product_quantity_canceled'] = $data['product_quantity_canceled'];
                         $update_data['product_quantity_returned'] = $data['product_quantity_returned'];
-                        $update_data['product_quantity_returned_note'] = $data['product_quantity_returned_note'];
-                        $update_data['product_quantity_canceled_note'] = $data['product_quantity_canceled_note'];
+                        $update_data['product_quantity_returned_note'] = stripslashes($data['product_quantity_returned_note']);
+                        $update_data['product_quantity_canceled_note'] = stripslashes($data['product_quantity_canceled_note']);
                         if (!empty($expectedDate)) {
                             $update_data['product_expected_date'] = $expectedDate;
                         }
