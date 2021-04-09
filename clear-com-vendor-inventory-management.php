@@ -832,14 +832,26 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 $end_range = $_GET['end_range'];
             }
         }
+        $exception_ids = '';
+        $exception_id = '';
+        if (array_key_exists('exception_ids', $_GET)) {
+            if ($_GET['exception_ids'] != "") {
+                $ids = str_replace('%', ',', $_GET['exception_ids']);
+                $exception_ids = $ids;
+               $exception_id = " OR v.id IN ($ids) ";
+            }
+        }
+
         if($strt_range || $end_range){
             if($where == ""){
                 $where = " WHERE ";
             }else{
                 $where .=" AND ";
             }
-            $where .= " v.stock_30_days_sale_percent BETWEEN $strt_range AND $end_range ";
+            $where .= " (v.stock_30_days_sale_percent BETWEEN $strt_range AND $end_range $exception_id ) ";
         }
+
+        
         /* if (array_key_exists('selected_status', $_GET)) {
           if ($_GET['selected_status'] != "") {
           $status_selected = $_GET['selected_status'];
@@ -872,6 +884,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
             $sql .= " ORDER BY " . implode(', ', $order_by);
         }
         $orderDetails = $wpdb->get_results($sql);
+        // echo $wpdb->last_query;
         ?>
         <style>
             /*thead{
@@ -1219,6 +1232,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 
                 <input type="text" name="strt_range" id="strt_range" placeholder="QTY On Hand % From" value="<?php if($strt_range){echo $strt_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                
                 <input type="text" name="end_range" id="end_range" placeholder="QTY On Hand % To" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
+                <input type="hidden" name="exception_ids" id="exception_ids" value="">
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
             </form>
             <!-- end filter section -->
@@ -1316,6 +1330,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     $percent = true;
                    if(($orderDetail->stock == 1 && $orderDetail->sale_30_days == 1) || ($orderDetail->stock == 2 && ($orderDetail->sale_30_days == 2 || $orderDetail->sale_30_days == 3)) || ($orderDetail->stock == 3 && ($orderDetail->sale_30_days == 4 || $orderDetail->sale_30_days == 5)) || ($orderDetail->stock == 4 && ($orderDetail->sale_30_days == 6 || $orderDetail->sale_30_days == 7)) || ($orderDetail->stock == 5 && ($orderDetail->sale_30_days == 8 || $orderDetail->sale_30_days == 9)) || ($orderDetail->stock == 6 && $orderDetail->sale_30_days == 11)) {
                         $percent = false;
+                        $exception_ids .= $orderDetail->id . ',';
                    }
                    if($percent) {
                         $row_classes .= " percent";
@@ -1405,6 +1420,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 <?php
                     $even_odd_counter++;
                 } ?>
+                <input type="hidden" name="exception_id" id="exception_id" value="<?php echo $exception_ids; ?>">
             </tbody>
         </table>
         <!-- stylesheet -->
@@ -1437,6 +1453,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
         <script type="text/javascript">
             jQuery(document).ready(function($) {
                 "use strict";
+                var exception_id = jQuery("#exception_id").val()
+                jQuery("#exception_ids").val(exception_id.replace(/,\s*$/, ""));
                 // $('.wm-vm-go input[name="filter_action"]').on('click', function() {
                 //  $(this.form).attr('method', 'get');
                 // });
