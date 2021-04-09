@@ -106,13 +106,13 @@ if (array_key_exists('po', $_REQUEST)) {
             $itemTotalPrice = 0;
             foreach ($order_details as $singleLineItem) {
                 $itemQty = 0;
-                $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
-                $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_ordered_quantity;
+                $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $itemQty;
+                $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $itemQty;
                 if ($returned_note) {
                     if ($singleLineItem->product_quantity_returned > 0) {
                         $itemQty = $singleLineItem->product_quantity_returned;
-                        $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
-                        $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $singleLineItem->product_quantity_returned;
+                        $itemExtendedPrice = (float) $singleLineItem->vendor_price_last * $itemQty;
+                        $itemTotalPrice = (float) $singleLineItem->vendor_price_last * $itemQty;
                     }
                 }
             ?>
