@@ -22,6 +22,7 @@
 
 </style>
 <div class="wrap">
+<h1><?= esc_html__('Completed Orders', 'wcvm') ?></h1>
     <?php
     global $wpdb;
     $records = false;
@@ -43,10 +44,6 @@
 
         <div class="flex">
             <div class="flex-1">
-            <h1><?= esc_html__('Completed Orders', 'wcvm') ?></h1>
-        <div class="block mb-4"></div>
-        <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-<script src="https://kit.fontawesome.com/4de99c111d.js" crossorigin="anonymous"></script>
                 <?php $table_headers = $table->get_completed_orders_column_list(); 
                     require_once plugin_dir_path(__FILE__) . 'po-status-bar.php';
                 ?>
