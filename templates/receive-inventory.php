@@ -378,7 +378,7 @@
     } if (!$records) {
         ?>
         <div class="flex border-2 border-t-8 border-yellow-400 p-8 mb-4 bg-gray-50 text-lg text-semibold">
-            No orders are currently completed.
+            There are no orders set to be received.
         </div><?php
     }
     ?>
