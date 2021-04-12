@@ -2089,7 +2089,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 ON
                     quantity.order_item_id = items.order_item_id AND quantity.meta_key = '_qty'
                 WHERE
-                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
+                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 30 DAY ) as date)
                 GROUP BY product_id";
         $data = $wpdb->get_results($sql);
         if ($data) {
@@ -2179,7 +2179,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 ON
                     quantity.order_item_id = items.order_item_id AND quantity.meta_key = '_qty'
                 WHERE
-                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 300 DAY ) as date)
+                    orders.post_type = 'shop_order' AND orders.post_date > cast(DATE_SUB( now(), INTERVAL 30 DAY ) as date)
                 GROUP BY product_id";
         $data = $wpdb->get_results($sql);
         if ($data) {
