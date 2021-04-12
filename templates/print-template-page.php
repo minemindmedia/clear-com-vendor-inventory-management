@@ -31,7 +31,7 @@ if (array_key_exists('po', $_REQUEST)) {
 
     $cancelled_note = false;
     $returned_note = false;
-
+    $po_expected_date = isset($order_details[0]->po_expected_date) ? date('m/d/Y', $order_details[0]->po_expected_date) : '';
     if (array_key_exists('status', $_GET)) {
         if ($_GET['status'] == 'canceled') {
             $cancelled_note = true;
@@ -85,7 +85,7 @@ if (array_key_exists('po', $_REQUEST)) {
                     <div class="font-bold text-xl">Order Information:</div>
                     <div><span class="font-semibold">PO #:</span> <?= esc_html($order->ID) ?></div>
                     <div><span class="font-semibold">PO Date:</span> <?= esc_html(date('m/d/Y', strtotime($order->post_date))) ?></div>
-                    <div><span class="font-semibold">PO Expected Date:</span> <?= esc_html(date('m/d/Y', $order_details[0]->po_expected_date)) ?></div>
+                    <div><span class="font-semibold">PO Expected Date:</span> <?= esc_html($po_expected_date) ?></div>
                 </div>
             </div>
         </div>
