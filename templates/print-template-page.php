@@ -48,56 +48,57 @@ if (array_key_exists('po', $_REQUEST)) {
     <div class="flex flex-col divide-y-2 divide-gray-300 divide-solid w-full p-16 mx-auto">
         <div class="flex flex-wrap items-center pb-8">
             <div class="flex-1">
-                <img src="https://clearcomkeys.com/app/themes/clearcomkeys/dist/images/clearcomlogo.png" alt="" class="w-72">
+                <img src="https://clearcomkeys.com/app/themes/clearcomkeys/dist/images/clearcomlogo.png" alt="" class="w-96">
+                <div class="font-bold text-base">Your source for automotive replacement keys and fobs</div>
             </div>
-            <div class="font-bold text-xs">Your source for automotive replacement keys and fobs</div>
+            <div class="w-1/4">
+                <div class="flex flex-col border border-gray-500 p-8">
+                    <div class="font-bold text-base">Order Information:</div>
+                    <div><span class="font-semibold text-sm">PO #:</span> <?= esc_html($order->ID) ?></div>
+                    <div><span class="font-semibold text-sm">PO Date:</span> <?= esc_html(date('m/d/Y', strtotime($order->post_date))) ?></div>
+                    <div><span class="font-semibold text-sm">PO Expected Date:</span> <?= esc_html($po_expected_date) ?></div>
+                </div>
+            </div>
         </div>
         <div class="flex py-8">
-            <div class="w-1/4">
-                <div class="flex flex-col p-8 text-xs">
-                    <div class="font-bold text-sm">Vendor Name:</div>
-                    <div><?= esc_html($vendor->post_title) ?></div>
-                    <div><?= esc_html($vendor->address) ?></div>
-                    <div><?= esc_html(($vendor->city ? $vendor->city . ', ' : '') . ($vendor->state ? $vendor->state . ', ' : '') . ($vendor->zip ? $vendor->zip : '')) ?></div>
-                    <div><?= esc_html($vendor->contact_phone) ?></div>
+            <div class="w-1/3">
+                <div class="flex flex-col p-8 text-sm">
+                    <div class="font-bold text-base">Vendor Name:</div>
+                    <div class="text-base"><?= esc_html($vendor->post_title) ?></div>
+                    <div class="text-base"><?= esc_html($vendor->address) ?></div>
+                    <div class="text-base"><?= esc_html(($vendor->city ? $vendor->city . ', ' : '') . ($vendor->state ? $vendor->state . ', ' : '') . ($vendor->zip ? $vendor->zip : '')) ?></div>
+                    <div class="text-base"><?= esc_html($vendor->contact_phone) ?></div>
                 </div>
             </div>
-            <div class="w-1/4">
-                <div class="flex flex-col p-8 text-xs">
-                    <div class="font-bold text-sm">Billing Address:</div>
-                    <div>ClearCom Technologies Inc</div>
-                    <div>435-759-2495</div>
-                    <div>PO BOX 307</div>
-                    <div>Kanosh, UT 84637</div>
+            <div class="w-1/3">
+                <div class="flex flex-col p-8">
+                    <div class="font-bold text-base">Billing Address:</div>
+                    <div class="text-base">ClearCom Technologies Inc</div>
+                    <div class="text-base">435-759-2495</div>
+                    <div class="text-base">PO BOX 307</div>
+                    <div class="text-base">Kanosh, UT 84637</div>
                 </div>
             </div>
-            <div class="w-1/4">
-                <div class="flex flex-col p-8 text-xs">
-                    <div class="font-bold text-sm">Ship to Address:</div>
-                    <div>ClearCom Technologies Inc</div>
-                    <div>435-759-2495</div>
-                    <div>45 N 200 W</div>
-                    <div>Kanosh, UT 84637</div>
+            <div class="w-1/3">
+                <div class="flex flex-col p-8">
+                    <div class="font-bold text-base">Ship to Address:</div>
+                    <div class="text-base">ClearCom Technologies Inc</div>
+                    <div class="text-base">435-759-2495</div>
+                    <div class="text-base">45 N 200 W</div>
+                    <div class="text-base">Kanosh, UT 84637</div>
                 </div>
             </div>
-            <div class="w-1/4">
-                <div class="flex flex-col border border-gray-500 p-8 text-xs">
-                    <div class="font-bold text-sm">Order Information:</div>
-                    <div><span class="font-semibold">PO #:</span> <?= esc_html($order->ID) ?></div>
-                    <div><span class="font-semibold">PO Date:</span> <?= esc_html(date('m/d/Y', strtotime($order->post_date))) ?></div>
-                    <div><span class="font-semibold">PO Expected Date:</span> <?= esc_html($po_expected_date) ?></div>
-                </div>
-            </div>
+
         </div>
         <table class="table w-full py-8">
             <thead>
                 <tr class="text-left">
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">Quantity:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">Vendor SKU:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">ClearCom SKU:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">Product Description:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">Price:</th>
-                    <th class="p-4 border-b border-gray-500 font-bold text-sm">Total:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">QTY:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">Vendor SKU:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">CC SKU:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">Details:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">Price:</th>
+                    <th class="p-2 border-b border-gray-500 font-bold text-base">Total:</th>
                 </tr>
             </thead>
             <?php
@@ -118,22 +119,22 @@ if (array_key_exists('po', $_REQUEST)) {
             ?>
                 <tbody>
                     <tr>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo $itemQty; ?>
                         </td>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo $singleLineItem->vendor_sku; ?>
                         </td>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo $singleLineItem->product_sku; ?>
                         </td>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo $singleLineItem->product_title; ?>
                         </td>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo wc_price($singleLineItem->vendor_price_last); ?>
                         </td>
-                        <td class="p-4 border-b border-gray-300 text-xs">
+                        <td class="p-2 border-b border-gray-300 text-base">
                             <?php echo wc_price($itemExtendedPrice); ?>
                         </td>
                         <?php $total += $itemTotalPrice; ?>
@@ -146,10 +147,10 @@ if (array_key_exists('po', $_REQUEST)) {
                     <td class="table-cell"></td>
                     <td class="table-cell"></td>
                     <td class="table-cell"></td>
-                    <td class="p-4 border-b border-l border-gray-300 font-bold text-xs">
+                    <td class="p-2 border-b border-l border-gray-300 font-bold text-base">
                         Grand Total:
                     </td>
-                    <td class="p-4 border-b border-gray-300 aligh-right text-xs">
+                    <td class="p-2 border-b border-gray-300 aligh-right text-base">
                         <?php echo wc_price($total); ?>
                     </td>
                 </tr>
