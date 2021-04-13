@@ -27,7 +27,8 @@
                 if ($single_order->post_status == 'trash') {
                     continue;
                 }
-
+                $_POST['product_quantity_back_order'][$single_order->product_id] = 0;
+                $_POST['product_expected_date_back_order'][$single_order->product_id] = '';     
                 if ($single_order->product_ordered_quantity != (int) $_POST['product_quantity_received'][$single_order->product_id] + (int) $_POST['product_quantity_back_order'][$single_order->product_id] + (int) $_POST['product_quantity_canceled'][$single_order->product_id] + (int) $_POST['product_quantity_returned'][$single_order->product_id]) {
                     $isValid = false;
                     break;
@@ -128,6 +129,10 @@
                         $quantity_to_deduct_from_on_order = $data['product_quantity_received'] + $data['product_quantity_canceled'] + $data['product_quantity_returned'] + $data['product_quantity_back_order'];
                         $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_vendor_bo = on_vendor_bo + ".$data['product_quantity_back_order']." ,stock = stock + " . $data['product_quantity_received'] . ",on_order = on_order - " . $quantity_to_deduct_from_on_order . " WHERE product_id = " . $single_order->product_id . "";
                         $wpdb->query($updateOnOrderQuery);
+                        $val = get_post_meta($single_order->product_id ,'_stock');
+                        $exsitingStock = $val[0];
+                        $updateStock = $exsitingStock + $data['product_quantity_received']; 
+                        update_post_meta($single_order->product_id, '_stock', $updateStock);                        
                     }
                         if ($_POST['action'] == 'archive') {
                             if ($order->post_status != "") {
