@@ -787,15 +787,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $thirty_days_filter = '';
         $qty_on_hand_filter = '';
         $percentage_filter = '';
+        $cc_sku_filter = '';
         $vendors_selected = '';
         $status_selected = '';
         $purchase_orders_post_data = [];
         $selected_status = [];
         // print_r($_GET);
-        if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET) || array_key_exists('percentage', $_GET)) {
+        if (array_key_exists('30_days', $_GET) || array_key_exists('qty_on_hand', $_GET) || array_key_exists('percentage', $_GET) || array_key_exists('cc_sku', $_GET)) {
             $thirty_days_filter = $_GET['30_days'];
             $qty_on_hand_filter = $_GET['qty_on_hand'];
             $percentage_filter = $_GET['percentage'];
+            $cc_sku_filter = $_GET['cc_sku'];
             if (!empty($thirty_days_filter)) {
                 $order_by[] = "v.sale_30_days " . $thirty_days_filter;
             }
@@ -804,6 +806,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
             }
             if (!empty($percentage_filter)) {
                 $order_by[] = "v.stock_30_days_sale_percent " . $percentage_filter;
+            }
+            if (!empty($cc_sku_filter)) {
+                $order_by[] = "v.sku " . $cc_sku_filter;
             }
         } else {
             $percentage_filter = 'asc';
@@ -1229,6 +1234,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 <input type="hidden" name="30_days" id="30_days" value="<?php echo $thirty_days_filter; ?>" />
                 <input type="hidden" name="qty_on_hand" id="qty_on_hand" value="<?php echo $qty_on_hand_filter; ?>" />
                 <input type="hidden" name="percentage" id="percentage_filter" value="<?php echo $percentage_filter; ?>" />
+                <input type="hidden" name="cc_sku" id="cc_sku" value="<?php echo $cc_sku_filter; ?>" />
 
                 <input type="text" name="strt_range" id="strt_range" placeholder="QTY On Hand % From" value="<?php if($strt_range){echo $strt_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                
                 <input type="text" name="end_range" id="end_range" placeholder="QTY On Hand % To" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
@@ -1249,20 +1255,11 @@ class WC_Clear_Com_Vendor_Inventory_Management
         <table id="po-items-table" class="product-items-table" style="margin-top: 25px;">
             <thead>
                 <tr>
-                    <!--                    <th class="center first-cell">New</th>
-                    <th class="center first-cell">Rare</th>-->
-                    <th class="center third-cell">CC SKU</th>
-                    <th class="center fourth-cell">Vendor SKU</th>
-                    <th class="center fifth-cell">Category/Tags</th>
-                    <th class="center sixth-cell">Stock<br />Status</th>
-                    <th class="center seventh-cell">Our<br />Price</th>
-                    <th class="center eighth-cell">Select<br>Vendor</th>
-                    <th class="center seventh-cell">Vendor<br>Price</th>
-                    <th class="center tenth-cell">
-                        <?php
+                <?php
                         $extra_class_30_days = "";
                         $extra_class_qty = "";
                         $extra_class_percentage = "";
+                        $extra_class_cc_sku = "";
 
                         if ($thirty_days_filter == 'asc') {
                             $extra_class_30_days = "hiddenafter";
@@ -1278,7 +1275,24 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             $extra_class_percentage = "hiddenafter";
                         } elseif ($percentage_filter == 'desc') {
                             $extra_class_percentage = "hiddenbefore";
-                        } ?>
+                        }
+                        if ($cc_sku_filter == 'asc') {
+                            $extra_class_cc_sku = "hiddenafter";
+                        } elseif ($cc_sku_filter == 'desc') {
+                            $extra_class_cc_sku = "hiddenbefore";
+                        }
+                         ?>
+
+                    <!--                    <th class="center first-cell">New</th>
+                    <th class="center first-cell">Rare</th>-->
+                    <th class="center third-cell"><a href="#" class="sort-by <?php echo $cc_sku_filter . " " . $extra_class_cc_sku; ?>" id='cc-sku'>CC SKU</a></th>
+                    <th class="center fourth-cell">Vendor SKU</th>
+                    <th class="center fifth-cell">Category/Tags</th>
+                    <th class="center sixth-cell">Stock<br />Status</th>
+                    <th class="center seventh-cell">Our<br />Price</th>
+                    <th class="center eighth-cell">Select<br>Vendor</th>
+                    <th class="center seventh-cell">Vendor<br>Price</th>
+                    <th class="center tenth-cell">
                         <a id="qty" href="#" class="sort-by <?php echo $qty_on_hand_filter . " " . $extra_class_qty; ?>">QTY On Hand</a>
                     </th>
                     <th class="center eleventh-cell">
@@ -1468,6 +1482,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 //                });
                 var sorted_by_days = false;
                 var sorted_by_qty = false;
+                var sorted_by_sku = false;
                 $(".sort-by").each(function() {
                     if ($(this).hasClass('asc') || $(this).hasClass('desc')) {
                         if ($(this).attr('id') == '30-days') {
@@ -1476,6 +1491,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                             sorted_by_qty = true;
                         } else if ($(this).attr('id') == 'percentage') {
                             sorted_by_qty = true;
+                        } else if ($(this).attr('id') == 'cc-sku') {
+                            sorted_by_sku = true;
                         }
                     }
                 });
@@ -1533,6 +1550,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 $(this).removeClass('hiddenbefore');
                                 $(this).removeClass('hiddenafter');
                             }
+                        } else if ($(this).attr('id') == 'cc-sku') {
+                            if (sorted_by_sku) {
+                                if ($(this).hasClass('hiddenafter')) {
+                                    $(this).removeClass('hiddenafter');
+                                    $(this).addClass('hiddenbefore');
+                                } else if ($(this).hasClass('hiddenbefore')) {
+                                    $(this).removeClass('hiddenbefore');
+                                    $(this).addClass('hiddenafter');
+                                }
+                            } else {
+                                $(this).removeClass('hiddenbefore');
+                                $(this).removeClass('hiddenafter');
+                            }
                         }
                     }
                 });
@@ -1549,6 +1579,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                         $("#qty_on_hand").val("");
                         $("#percentage_filter").val("");
+                        $("#cc_sku").val("");
                     } else if ($(this).attr('id') == 'qty') {
                         if ($(this).hasClass('asc')) {
                             $("#qty_on_hand").val('desc');
@@ -1559,6 +1590,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                         $("#30_days").val("");
                         $("#percentage_filter").val("");
+                        $("#cc_sku").val("");
                     } else if ($(this).attr('id') == 'percentage') {
                         if ($(this).hasClass('asc')) {
                             $("#percentage_filter").val('desc');
@@ -1569,6 +1601,19 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                         $("#30_days").val("");
                         $("#qty_on_hand").val("");
+                        $("#cc_sku").val("");
+                    } else if ($(this).attr('id') == 'cc-sku') {
+                        console.log('cccccccc');
+                        if ($(this).hasClass('asc')) {
+                            $("#cc_sku").val('desc');
+                        } else if ($(this).hasClass('desc')) {
+                            $("#cc_sku").val('asc');
+                        } else {
+                            $("#cc_sku").val('asc');
+                        }
+                        $("#30_days").val("");
+                        $("#qty_on_hand").val("");
+                        $("#percentage_filter").val("");
                     }
 
                     var vendors_selected;
