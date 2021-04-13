@@ -3,6 +3,11 @@
  * @var WP_Post $product
  * @var WP_Post[] $vendors
  */
+global $wpdb;
+$product_id = $_GET['post'];
+$sql = "SELECT * FROM " . $wpdb->prefix . "vendor_po_lookup WHERE product_id = " . $product_id;
+$product_details = $wpdb->get_results($sql);
+
 ?>
 <div id="wcvmcpAdminProduct" class="panel woocommerce_options_panel">
     <div class="options_group">
@@ -62,7 +67,7 @@
             </p>
             <p class="form-field">
                 <label><?= esc_html__('30 Day Sales History', 'wcvm') ?></label>
-                <?= esc_html($product->_qty_history_30) ?>
+                <?= esc_html($product_details[0]->sale_30_days) ?>
             </p>
         </div>
         <div style="width: 50%;float: left;">
