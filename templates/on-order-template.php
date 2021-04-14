@@ -167,9 +167,9 @@
                         });
                     </script>
                 <?php // endif ?>
-                    <div style="padding-top: 5px;float: right">
-                        <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($order->ID) ?>">
-                        <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
+                    <div class="w-3/12">
+                        <input type="text" name="_sku" value="" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($order->ID) ?>">
+                        <button type="submit" name="action" value="add" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0 float-right"><?= esc_html__('Add Product', 'wcvm') ?></button>
                     </div>
                     
                  <div>
@@ -385,9 +385,9 @@
                         });
                     </script>
                 <?php // endif ?>
-                <div style="padding-top: 5px;float: right">
-                    <input type="text" name="_sku" value="" style="height: 26px;" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($order->ID) ?>">
-                    <button type="submit" name="action" value="add" class="button"><?= esc_html__('Add Product', 'wcvm') ?></button>
+                <div class="w-3/12">
+                    <input type="text" name="_sku" value="" data-role="product-sku" placeholder="<?= esc_html__('SKU', 'wcvm') ?>" data-id="<?= esc_attr($order->ID) ?>">
+                    <button type="submit" name="action" value="add" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0 float-right"><?= esc_html__('Add Product', 'wcvm') ?></button>
                 </div>                    
                  <div>
                     <button type="submit" name="print" value="print" class="flex block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0">
