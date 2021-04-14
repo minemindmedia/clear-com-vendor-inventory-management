@@ -146,8 +146,11 @@ if (array_key_exists('po', $_REQUEST)) {
                         ?>
                     <tr>
                         <td colspan="7" class="p-4 border-l-8 border-b-2 border-gray-300">
-                            <div class="block"><span class="font-bold">Cancellation Note:</span> <?php echo $singleLineItem->product_quantity_canceled_note; ?></div>
-                            <div class="block"><span class="font-bold">Return Note:</span> <?php echo $singleLineItem->product_quantity_returned_note; ?></div>
+                            <?php if($singleLineItem->product_quantity_canceled_note) { ?>
+                                <div class="block"><span class="font-bold">Cancellation Note:</span> <?php echo $singleLineItem->product_quantity_canceled_note; ?></div>
+                            <?php } if($singleLineItem->product_quantity_returned_note) { ?>
+                                <div class="block"><span class="font-bold">Return Note:</span> <?php echo $singleLineItem->product_quantity_returned_note; ?></div>
+                            <?php } ?>
                         </td>
                     </tr>
                     <?php 
