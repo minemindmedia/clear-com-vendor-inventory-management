@@ -495,10 +495,59 @@ class WC_Clear_Com_Vendor_Inventory_Management
             if (!empty($_POST['__order_qty'])) {
                 $vendorId = get_post_field('post_parent', $_POST['ID'], 'raw');
 
-                if ($_POST['action'] == 'update') {
+                if ($_POST['action'] == 'update' || $_POST['action'] == 'add') {
                     $orderId = $_POST['ID'];
                 }
+            if ($_POST['action'] == 'add') {
+                $productId = wc_get_product_id_by_sku($_POST['_sku']);
+                $vendorIds = $wpdb->get_results(""
+                        . "SELECT vendor_id FROM wp_vendor_po_lookup WHERE product_id = ".$productId."");
+                if($vendorIds){
+                $vendors = explode (",", $vendorIds[0]->vendor_id); 
+                }else{
+                    $vendors = array();
+                }
+                if ($productId && in_array($vendorId, $vendors)) {
+                    $products = get_post_meta($_POST['ID'], 'wcvmgo', true);
+                    $productDetails = $wpdb->get_results("Select * from wp_vendor_po_lookup where product_id = ".$productId."
+                        ");
+                    $getPOItemsDetails = $wpdb->get_results(""
+                        . "SELECT * FROM " . $vendor_purchase_order_table . " po "
+                        . "LEFT JOIN " . $vendor_purchase_order_items_table . " poi ON po.id = poi.vendor_order_idFk "
+                        . "WHERE order_id = " . $orderId . " AND post_status = '" . $_POST['status'] . "'");
+                    $newItem = true;
+                    foreach ($getPOItemsDetails as $singleItem){
+                        if($productId == $singleItem->product_id){
+                            $newItem = false;
+                            break;
+                        }
+                    }
+                    if($newItem){
+                        $vendor_purchase_order_item_table = $wpdb->prefix . 'vendor_purchase_orders_items';
+                        $insertPOProductData['vendor_order_idFk'] = $getPOItemsDetails[0]->vendor_order_idFk;
+                        $insertPOProductData['product_id'] = $productId;
+                        $insertPOProductData['product_title'] = $productDetails[0]->product_title;
+                        $insertPOProductData['product_sku'] = $productDetails[0]->sku;
+                        $insertPOProductData['product_price'] = $productDetails[0]->regular_price;
+                        $insertPOProductData['product_rare'] = $productDetails[0]->rare;
+                        $insertPOProductData['product_ordered_quantity'] = $productDetails[0]->order_qty;
+                        $insertPOProductData['product_category'] = $productDetails[0]->category;
+                        $insertPOProductData['vendor_sku'] = $productDetails[0]->vendor_sku;
+                        $insertPOProductData['vendor_name'] = $productDetails[0]->vendor_name;
+                        $insertPOProductData['vendor_price_last'] = $productDetails[0]->vendor_price;
+                        $insertPOProductData['vendor_link'] = $productDetails[0]->vendor_link;
+                        $insertPOProductData['vendor_price_bulk'] = $productDetails[0]->vendor_price_bulk;
+                        $insertPOProductData['vendor_price_notes'] = $productDetails[0]->vendor_price_notes;
+                        $insertPOProductData['on_order_quantity'] = $productDetails[0]->on_order;
+                        $insertPOProductData['sale_30_days'] = $productDetails[0]->sale_30_days;
+                        $insertPOProductData['product_stock'] = $productDetails[0]->stock;
+                        $insertPOProductData['created_date'] = date('Y/m/d H:i:s a');
+                        $insertPOProductData['created_by'] = get_current_user_id();
+                        $insertedPOLineItem = $wpdb->insert($vendor_purchase_order_item_table, $insertPOProductData);
+                    }
 
+                }
+            }
                 foreach ($_POST['__order_qty'] as $productId => $_) {
                     $poStatus = $_POST['status'];
                     $getPOLineItemDetails = $wpdb->get_results(""
