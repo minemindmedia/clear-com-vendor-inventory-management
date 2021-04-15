@@ -546,6 +546,17 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         $insertedPOLineItem = $wpdb->insert($vendor_purchase_order_item_table, $insertPOProductData);
                     }
 
+                }else{
+                    ?>
+                    <script>
+                        jQuery(document).ready(function(){
+                           var vendorName = "<?php echo get_the_title($vendorId); ?>";
+                           console.log(vendorName)
+                        alert("Product not found for current vendor: "+vendorName);
+                        });
+                    </script>
+                        <?php
+                    
                 }
             }
                 foreach ($_POST['__order_qty'] as $productId => $_) {
