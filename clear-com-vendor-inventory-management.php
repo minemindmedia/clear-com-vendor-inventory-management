@@ -550,9 +550,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     ?>
                     <script>
                         jQuery(document).ready(function(){
-                           var vendorName = "<?php echo get_the_title($vendorId); ?>";
-                           console.log(vendorName)
-                        alert("Product not found for current vendor: "+vendorName);
+                        alert("This sku does not belong to vendor of this purchase order.");
                         });
                     </script>
                         <?php
