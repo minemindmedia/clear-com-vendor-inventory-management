@@ -523,6 +523,12 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         }
                     }
                     if($newItem){
+                        $productVendorIds = explode(",", $productDetails[0]->vendor_id);
+                        $productVendorPrices = explode(",", $productDetails[0]->vendor_price);
+                        $productVendorSkus = explode(",", $productDetails[0]->vendor_sku);
+                        $index = array_search($vendorId, $productVendorIds);
+                        $productVendorPrice = $productVendorPrices[$index];
+                        $productVendorSku = $productVendorSkus[$index];
                         $vendor_purchase_order_item_table = $wpdb->prefix . 'vendor_purchase_orders_items';
                         $insertPOProductData['vendor_order_idFk'] = $getPOItemsDetails[0]->vendor_order_idFk;
                         $insertPOProductData['product_id'] = $productId;
@@ -532,9 +538,9 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         $insertPOProductData['product_rare'] = $productDetails[0]->rare;
                         $insertPOProductData['product_ordered_quantity'] = $productDetails[0]->order_qty;
                         $insertPOProductData['product_category'] = $productDetails[0]->category;
-                        $insertPOProductData['vendor_sku'] = $productDetails[0]->vendor_sku;
+                        $insertPOProductData['vendor_sku'] = $productVendorSku;
                         $insertPOProductData['vendor_name'] = $productDetails[0]->vendor_name;
-                        $insertPOProductData['vendor_price_last'] = $productDetails[0]->vendor_price;
+                        $insertPOProductData['vendor_price_last'] = $productVendorPrice;
                         $insertPOProductData['vendor_link'] = $productDetails[0]->vendor_link;
                         $insertPOProductData['vendor_price_bulk'] = $productDetails[0]->vendor_price_bulk;
                         $insertPOProductData['vendor_price_notes'] = $productDetails[0]->vendor_price_notes;

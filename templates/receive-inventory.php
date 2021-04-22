@@ -129,10 +129,19 @@
                         $quantity_to_deduct_from_on_order = $data['product_quantity_received'] + $data['product_quantity_canceled'] + $data['product_quantity_returned'] + $data['product_quantity_back_order'];
                         $updateOnOrderQuery = "UPDATE wp_vendor_po_lookup SET on_vendor_bo = on_vendor_bo + ".$data['product_quantity_back_order']." ,stock = stock + " . $data['product_quantity_received'] . ",on_order = on_order - " . $quantity_to_deduct_from_on_order . " WHERE product_id = " . $single_order->product_id . "";
                         $wpdb->query($updateOnOrderQuery);
-                        $val = get_post_meta($single_order->product_id ,'_stock');
-                        $exsitingStock = $val[0];
-                        $updateStock = $exsitingStock + $data['product_quantity_received']; 
-                        update_post_meta($single_order->product_id, '_stock', $updateStock);                        
+                        $product = new WC_Product( $single_order->product_id );
+                        // Get product stock quantity and stock status
+                        $stock= $product->get_stock_quantity();
+                        
+                        $stock_quantity = $stock + $data['product_quantity_received'];
+                        $product->set_stock_quantity($stock_quantity);
+                        if($stock_quantity){
+                            $product->set_stock_status('instock');
+                        }
+
+                        // Save the data and refresh caches
+                        $product->save();                        
+                        
                     }
                         if ($_POST['action'] == 'archive') {
                             if ($order->post_status != "") {
