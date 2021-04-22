@@ -135,12 +135,22 @@ jQuery(document).ready(function ($) {
 
     }
     $(".checkall").on("click", function() {
-        $("input:checkbox").each(function() {
-            if ($(this).hasClass('po-selected-products')){
-                console.log('\s');
+        var value = $(this).val();
+        //update checkall value
+           var updatedVal = value;
+           if(value == "true"){
+               updatedVal = false;
+           }else{
+               updatedVal = true;
+           }        
+        $(".po-selected-products").each(function() {
+            var isChecked = $(this).is(':checked');
+            //only trigger click if not already
+            if(isChecked != updatedVal){
                 $(this).trigger('click');
             }
-           }); 
+        }); 
+        $(this).val(updatedVal);
     });    
     var selected_ids = new Array();
     $('.po-selected-products').on('click', function () {
