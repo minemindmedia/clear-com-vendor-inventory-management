@@ -74,6 +74,7 @@ class Vendor_Management_Columns {
         $columns_array['_qty_history_30'] = __('<div class="text-sm font-semibold">30 Days</div>', 'wcvm');
         $columns_array['_wcvm_on_order'] = __('<div class="text-sm font-semibold">On Order</div>', 'wcvm');
         $columns_array['__order_qty'] = __('<div class="text-sm font-semibold">Order QTY</div>', 'wcvm');
+        $columns_array['__delete'] = __('<div class="text-sm font-semibold">Delete</div>', 'wcvm');        
 
         return $columns_array;
     }

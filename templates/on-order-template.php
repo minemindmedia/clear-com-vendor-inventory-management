@@ -218,13 +218,19 @@
 
                     </div>
                     <div class="self-center text-base font-semibold">
-                    
-                    
+                        <div class="flex space-x-4">
+                            <div>
+                                <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="flex block px-2 py-1.5 border-2 border-red-700 hover:border-red-500 text-red-700 hover:text-red-500 text-xs rounded delete_selected">
+                                <svg class="inline w-3 h-3 mr-1 self-center" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="mouse-pointer" class="svg-inline--fa fa-mouse-pointer fa-w-10" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z"></path></svg>
+                                <span class="self-center">Delete Selected Lines</span>
+                            </a>
+                            </div>
                             <div>
                                 <button type="button" class="block px-2 py-1.5 border-2 border-gray-700 bg-gray-700 hover:bg-gray-900 text-white hover:text-white text-xs rounded m-0" data-id="<?= esc_attr($order->order_id) ?>" data-role="order-title" data-label="<?php echo '+ Expand'; ?>">
                                     <?php echo '- Collapse'; ?>
                                 </button>
                             </div>
+                        </div>
                       
                     </div>
 
@@ -345,7 +351,7 @@
 
                                 <td><input type="text" name="<?php echo '__order_qty[' . $order->product_id . ']'; ?>" value="<?php echo $order_product_Qty; ?>" style="width:60px;"></td>
 
-<!--                                <td><input class="deleting" id = "<?php // echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>-->
+                                <td><input class="deleting" id = "<?php echo $order->product_id; ?>" name="<?php echo '__delete[' . $order->product_id . ']'; ?>" type="checkbox"></td>
                                 
                         </tr>
 
@@ -456,42 +462,43 @@ function get_print_status($order = FALSE) {
 }
 ?>
 
-<!--<script>
-    function mark_closed(id)
-    {
-        var ids_to_delete = "";
-        var order_to_process = id;
-        jQuery(".deleting").each(function (index) {
-            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
-            if (jQuery(this).is(':checked'))
-            {
-                if (ids_to_delete != "")
-                {
-                    ids_to_delete += ",";
-                }
-                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
-            }
-        });
-        jQuery.ajax({
-            type: "POST",
-            data: {
-                ids_to_delete: ids_to_delete,
-                order_to_process: order_to_process
-            },
-            url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/extras/close_selected_returns.php",
-            beforeSend: function () {
-                // setting a timeout
-                //$(placeholder).addClass('loading');
-            },
-            success: function (data)
-            {
-                if (data == 1)
-                {
-                    location.reload();
-                }
-            }
-        });
-    }
+<script>
+    
+//    function mark_closed(id)
+//    {
+//        var ids_to_delete = "";
+//        var order_to_process = id;
+//        jQuery(".deleting").each(function (index) {
+//            var element_to_play = jQuery(this).parent().parent().parent().parent().parent();
+//            if (jQuery(this).is(':checked'))
+//            {
+//                if (ids_to_delete != "")
+//                {
+//                    ids_to_delete += ",";
+//                }
+//                ids_to_delete += this.id + "_" + jQuery(element_to_play).attr("id");
+//            }
+//        });
+//        jQuery.ajax({
+//            type: "POST",
+//            data: {
+//                ids_to_delete: ids_to_delete,
+//                order_to_process: order_to_process
+//            },
+//            url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/extras/close_selected_returns.php",
+//            beforeSend: function () {
+//                // setting a timeout
+//                //$(placeholder).addClass('loading');
+//            },
+//            success: function (data)
+//            {
+//                if (data == 1)
+//                {
+//                    location.reload();
+//                }
+//            }
+//        });
+//    }
     jQuery(".delete_selected").bind("click", function () {
         console.log('s');
         var ids_to_delete = "";
@@ -519,7 +526,7 @@ function get_print_status($order = FALSE) {
                     ids_to_delete: ids_to_delete,
                     order_to_process: order_to_process
                 },
-                url: "<?php echo site_url(); ?>/wp-content/plugins/clear-com-vendor-inventory-management/delete_selected_pos.php",
+                url: "<?php echo plugins_url(); ?>/clear-com-vendor-inventory-management/delete_selected_pos.php",
                 beforeSend: function () {
                     // setting a timeout
                     //$(placeholder).addClass('loading');
@@ -534,11 +541,11 @@ function get_print_status($order = FALSE) {
             });
         }
     });
-    jQuery(".delete_entire").bind("click", function () {
-        var txt;
-        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
-        if (r == true) {
-            jQuery("#" + this.id).submit();
-        }
-    });
-</script>-->
+//    jQuery(".delete_entire").bind("click", function () {
+//        var txt;
+//        var r = confirm("You're about to delete the entire PO. Are you sure you want to continue?");
+//        if (r == true) {
+//            jQuery("#" + this.id).submit();
+//        }
+//    });
+</script>
