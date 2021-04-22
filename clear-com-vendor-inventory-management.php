@@ -1371,7 +1371,10 @@ class WC_Clear_Com_Vendor_Inventory_Management
                     <th class="center seventh-cell">On<br>Order</th>
 <!--                    <th class="center seventh-cell">On<br>Vendor<br>BO</th>-->
                     <th class="center seventh-cell">Order<br>QTY</th>
-                    <th class="center seventh-cell">Add<br>To<br>PO</th>
+                    <th class="center seventh-cell">Add<br>To<br>PO
+                    <input type="checkbox" class='checkall' value="false">
+                    </th>
+                    
                 </tr>
             </thead>
             <tbody>

@@ -134,6 +134,14 @@ jQuery(document).ready(function ($) {
         return arr;
 
     }
+    $(".checkall").on("click", function() {
+        $("input:checkbox").each(function() {
+            if ($(this).hasClass('po-selected-products')){
+                console.log('\s');
+                $(this).trigger('click');
+            }
+           }); 
+    });    
     var selected_ids = new Array();
     $('.po-selected-products').on('click', function () {
         var selected_id = $(this).val();

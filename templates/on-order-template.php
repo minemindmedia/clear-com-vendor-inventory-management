@@ -214,10 +214,10 @@
                         <?= sprintf(esc_html__('PO Expected Date: %s'), date('m/d/Y', $order->po_expected_date)) ?>
                     </div>
 
-                    <div class="flex flex-1">
+<!--                    <div class="flex flex-1">
 
-                    </div>
-                    <div class="self-center text-base font-semibold">
+                    </div>-->
+                    <div class="self-center text-base font-semibold" style="margin-left:auto;">
                         <div class="flex space-x-4">
                             <div>
                                 <a href="javascript:void(0);" id="<?= esc_attr($order->order_id) ?>" class="flex block px-2 py-1.5 border-2 border-red-700 hover:border-red-500 text-red-700 hover:text-red-500 text-xs rounded delete_selected">
