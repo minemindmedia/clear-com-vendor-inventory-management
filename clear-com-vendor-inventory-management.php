@@ -1891,10 +1891,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 $(this).hide();
                                 if(isChecked){
                                     if($(this).find('.po-selected-products').is(':checked')){                                    
-                                    $(this).find('.po-selected-products').trigger('click')
-                                    console.log('s');
+                                    $(this).find('.po-selected-products').trigger('click');
                                     }
-                                    console.log('ds');
                                 }
                             } else {
                                 var check ;
@@ -1902,11 +1900,8 @@ class WC_Clear_Com_Vendor_Inventory_Management
                                 if(isChecked){
                                     check = $(this).find('.po-selected-products').is(':checked');
                                     if(!check){
-//                                    if($(this).find('.po-selected-products').is(':checked')){
                                     $(this).find('.po-selected-products').trigger('click');
-                                    console.log('s');
                                     }
-                                    console.log('ds');
                                 }                                
                             }
                         }
