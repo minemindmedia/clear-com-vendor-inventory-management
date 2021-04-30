@@ -891,6 +891,12 @@ class WC_Clear_Com_Vendor_Inventory_Management
         $end_range = 0;
         $prev_strt_range = 0;
         $prev_end_range = 0;
+        if (array_key_exists('checkall', $_GET)) {
+            if ($_GET['checkall'] != "") {
+                $checkall  = $_GET['checkall'];
+            }
+
+        }
         if (array_key_exists('strt_range', $_GET)) {
             if ($_GET['strt_range'] != "") {
                 $strt_range = $_GET['strt_range'];
@@ -1304,6 +1310,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
                 <input type="text" name="end_range" id="end_range" placeholder="QTY On Hand % To" value="<?php if($end_range){echo $end_range;} ?>" style="font-size:14px; margin-left: 10px; height: 10px!important;"" />                                
                 <input type="hidden" name="exception_ids" id="exception_ids" value="">
                 <input type="submit" name="filter_action" class="btn btn-primary button" id="filter-vendor" value="<?= esc_attr__('Filter', 'wcvm') ?>" style="min-height:29px !important;margin-left:20px;display:none">
+                <input type="hidden" name="checkall" id="checkall" value="<?php echo $checkall; ?>" />                
             </form>
             <!-- end filter section -->
 
@@ -1742,6 +1749,7 @@ class WC_Clear_Com_Vendor_Inventory_Management
 //                        console.log(" ssssss "+end_range);
 //                        console.log(" ssssss "+strt_range);
 //                    }else{
+                    var isChecked = $(".checkall").is(':checked');
                     if(strt_range){
                         if(strt_range < 0){
                             strt_range = 0;
@@ -1881,8 +1889,25 @@ class WC_Clear_Com_Vendor_Inventory_Management
                         } else {
                             if (!show_row) {
                                 $(this).hide();
+                                if(isChecked){
+                                    if($(this).find('.po-selected-products').is(':checked')){                                    
+                                    $(this).find('.po-selected-products').trigger('click')
+                                    console.log('s');
+                                    }
+                                    console.log('ds');
+                                }
                             } else {
+                                var check ;
                                 $(this).show();
+                                if(isChecked){
+                                    check = $(this).find('.po-selected-products').is(':checked');
+                                    if(!check){
+//                                    if($(this).find('.po-selected-products').is(':checked')){
+                                    $(this).find('.po-selected-products').trigger('click');
+                                    console.log('s');
+                                    }
+                                    console.log('ds');
+                                }                                
                             }
                         }
                     });

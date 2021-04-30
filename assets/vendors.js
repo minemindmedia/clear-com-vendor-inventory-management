@@ -1,6 +1,13 @@
 jQuery(document).ready(function ($) {
     $("#filter-vendor").show();
     $("#filter_action").show();
+    var checkall = $("#checkall").val();
+    if(checkall == "true"){
+        setTimeout(function() {
+        $(".checkall").trigger('click');
+    },10);
+
+    }
     // hide open return button on collapse
     $(".completed-po").on('click', function () {
         $("#open-return-" + $(this).data('id')).addClass("hidden");
@@ -139,10 +146,13 @@ jQuery(document).ready(function ($) {
         //update checkall value
            var updatedVal = value;
            if(value == "true"){
+               $("#checkall").val("false");
                updatedVal = false;
            }else{
+               $("#checkall").val("true");
                updatedVal = true;
-           }        
+           }
+           
         $(".po-selected-products").each(function() {
             var isChecked = $(this).is(':checked');
             //only trigger click if not already
@@ -151,6 +161,17 @@ jQuery(document).ready(function ($) {
             }
         }); 
         $(this).val(updatedVal);
+        var filter = false;
+        if ($("#primary_vendor_filter").val()) {
+            filter = true;
+        }else if($("#strt_range").val()){
+            filter = true;
+        }else if($("#end_range").val()){
+            filter = true;
+        }
+        if(filter){
+            $("#filter-vendor").trigger('click');
+        }
     });    
     var selected_ids = new Array();
     $('.po-selected-products').on('click', function () {
